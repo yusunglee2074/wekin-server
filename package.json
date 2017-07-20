@@ -1,0 +1,34 @@
+{
+  "name": "wekin-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "apidoc": "apidoc -i app/ -o public/",
+    "local": "export SQL_USER=postgres && export SQL_PASSWORD=dnlzlsjwmfru! && export SQL_DATABASE=wekin && export INSTANCE_CONNECTION_NAME=127.0.0.1 && export SQL_CLIENT=pg && npm run start"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.2",
+    "express-param": "^1.0.2",
+    "express-validator": "^3.2.0",
+    "firebase": "^4.1.3",
+    "firebase-admin": "^5.0.0",
+    "googleapis": "^20.0.1",
+    "iamporter": "^1.4.1",
+    "json2xls": "^0.1.2",
+    "moment": "^2.18.1",
+    "node-schedule": "^1.2.3",
+    "nodemailer": "^4.0.1",
+    "nodemailer-smtp-pool": "^2.8.3",
+    "nodemailer-smtp-transport": "^2.7.4",
+    "pg": "^6.2.3",
+    "request": "^2.81.0",
+    "sequelize": "^4.0.0",
+    "sequelize-datatables": "^1.2.0",
+    "util": "^0.10.3"
+  }
+}

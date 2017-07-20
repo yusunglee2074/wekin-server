@@ -1,0 +1,16 @@
+{
+  "development": {
+    "username": "wekin",
+    "password": "dnlzlsjwmfru!",
+    "database": "wekin",
+    "host": "35.189.153.138",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "postgres",
+    "password": "dnlzlsjwmfru!",
+    "database": "wekin",
+    "host": "35.189.139.31",
+    "dialect": "postgres"
+  }
+}
