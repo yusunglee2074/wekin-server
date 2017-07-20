@@ -119,7 +119,7 @@ exports.confirmOrder = (req, res) => {
     } else if (r[1][0].status === 'ready') {
       utilService.sendOrderReadySms(r[1][0])
     }
-    utilService.slackLog(r)
+    // utilService.slackLog(r)
     return tmp
   })
   .then(r => {
@@ -184,17 +184,17 @@ let cancelVbank = (imp_uid) => {
 }
 
 exports.setOrderCancelled = (req, res) => {
-  utilService.slackLog('주문취소')
+  // utilService.slackLog('주문취소')
   model.Order.findById(req.params.order_key)
   .then(orderObj => {
     if((orderObj.order_pay_price === 0) && (orderObj.order_pay_method === 'vbank')) {
-      utilService.slackLog('0원 무통장')
+      // utilService.slackLog('0원 무통장')
       return cancelVbank(orderObj.imp_uid)
     } else if ((orderObj.order_pay_price !== 0) && (orderObj.order_pay_method === 'vbank')) {
       // 돈이 들어온 무통장
       return {status: '무통장 취소처리'}
     } else {
-      utilService.slackLog('가격이 있거나 무통장외')
+      // utilService.slackLog('가격이 있거나 무통장외')
       return iamporter.cancel({
         imp_uid: orderObj.imp_uid,
         merchant_uid: orderObj.order_id,
@@ -210,9 +210,9 @@ exports.setOrderCancelled = (req, res) => {
     return r
   })
   .then(r => {
-    utilService.slackLog('취소상태 업데이트')
-    utilService.slackLog(r)
-    utilService.slackLog('취소상태 업데이트')
+    // utilService.slackLog('취소상태 업데이트')
+    // utilService.slackLog(r)
+    // utilService.slackLog('취소상태 업데이트')
     return model.Order.update({
       status: 'cancelled',
       order_refund_price: req.body.order_refund_price
@@ -223,22 +223,22 @@ exports.setOrderCancelled = (req, res) => {
     })
   })
   .then(r => {
-    utilService.slackLog('취소 sms 전송')
+    // utilService.slackLog('취소 sms 전송')
     utilService.sendOrderConcellSuccess(r[1][0])
     return r
   })
   .then(r => {
-    utilService.slackLog('대기자 전송')
+    // utilService.slackLog('대기자 전송')
     notiService.waitingBookable(r[1][0])
     return waitingService.sendNoti(r[1][0].wekin_key)
   })
   .then(r => {
-    utilService.slackLog('성공')
+    // utilService.slackLog('성공')
     returnMsg.success200RetObj(res, {result: 'done'})
   })
   .catch(e => {
-    utilService.slackLog('실패')
-    utilService.slackLog(e)
+    // utilService.slackLog('실패')
+    // utilService.slackLog(e)
     returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', e.raw.message)
   })
 }
@@ -253,7 +253,7 @@ exports.setOrderBeen = (req, res) => {
   })
   .then(r => {
     tmp.myInfo = r
-    utilService.slackLog(r)
+    // utilService.slackLog(r)
 
     return model.Order.create({
       user_key: r.user_key,
