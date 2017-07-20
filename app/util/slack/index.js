@@ -1,8 +1,8 @@
 const request = require('request');
 
-const WEBHOOK_URL = 'https://hooks.slack.com/services/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'
-const WEBHOOK_CHANNEL = '#wekin-confirm-channel'
-const WEBHOOK_NAME = 'wekin!'
+const WEBHOOK_URL = ''
+const WEBHOOK_CHANNEL = ''
+const WEBHOOK_NAME = ''
 const WEBHOOK_EMOJI = ':ghost:'
 
 function sendMessage(msg) {
