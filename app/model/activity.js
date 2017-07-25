@@ -18,7 +18,8 @@ module.exports = function (sequelize, DataTypes) {
     price: { type: DataTypes.INTEGER, allowNull: false },
     count: { type: DataTypes.INTEGER, defaultValue: 0 },
     confirm_date: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-    category: { type: DataTypes.STRING, allowNull: true}
+    category: { type: DataTypes.STRING, allowNull: true},
+    isteamorpeople: { type: DataTypes.STRING, allowNull: true},
     // last_mod_date: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
     // create_date: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     // coordinates: { type: DataTypes.GEOMETRY('POINT'), allowNull: true },

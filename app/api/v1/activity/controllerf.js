@@ -9,7 +9,7 @@ exports.findAllActivity = (req, res, next) => {
     group: ['Activity.activity_key', 'Host.host_key', 'Favorites.fav_key', 'Wekins.wekin_key', 'Wekins->Orders.order_key'],
     order: [['Wekins', 'start_date', 'ASC']],
     attributes: [
-      'activity_key', 'status', 'host_key', 'main_image', 'title', 'intro_summary', 'address', 'address_detail', 'price', 'category', 'created_at',
+      'activity_key', 'status', 'host_key', 'main_image', 'title', 'intro_summary', 'address', 'address_detail', 'price', 'category', 'created_at', 'isteamorpeople',
       [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
       [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count']
     ],
@@ -48,6 +48,7 @@ exports.createActivity = (req, res, next) => {
     refund_policy: requestData.refund_policy,
     price: requestData.price,
     category: requestData.category,
+    isteamorpeople: requestData.isteamorpeople,
     status: service.activityStatus.request.code
   }
   return model.sequelize.transaction(t => {
@@ -83,7 +84,8 @@ exports.updateActivity = (req, res, next) => {
     refund_policy: requestData.refund_policy,
     price: requestData.price,
     status: service.activityStatus.request.code,
-    category: requestData.category
+    category: requestData.category,
+    isteamorpeople: requestData.isteamorpeople
   }
 
   return model.sequelize.transaction(t => {
@@ -120,7 +122,7 @@ exports.findOneActivity = (req, res, next) => {
     group: ['Activity.activity_key', 'Host.host_key', 'Host->User.user_key'],
     where: { activity_key: req.params.activity_key, status: { $in: [service.activityStatus.activity.code, service.activityStatus.end.code] } },
     attributes: [
-      'activity_key', 'status', 'host_key', 'main_image', 'title', 'intro_summary', 'intro_detail', 'inclusion', 'schedule', 'preparation', 'refund_policy', 'address', 'address_detail', 'price', 'created_at', 'count',
+      'activity_key', 'status', 'host_key', 'main_image', 'title', 'intro_summary', 'intro_detail', 'inclusion', 'schedule', 'preparation', 'refund_policy', 'address', 'address_detail', 'price', 'created_at', 'count', 'isteamorpeople',
       [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count']
     ],
     include: [
