@@ -4,6 +4,7 @@ const moment = require('moment')
 // activity 조회
 exports.findAllActivity = (req, res, next) => {
   let keyword = req.query.keyword ? req.query.keyword : '%'
+  let nextMonth = moment().add('months', 1).format('YYYY-MM-DD')
 
   model.Activity.findAll({
     group: ['Activity.activity_key', 'Host.host_key', 'Favorites.fav_key', 'Wekins.wekin_key', 'Wekins->Orders.order_key'],
@@ -17,7 +18,8 @@ exports.findAllActivity = (req, res, next) => {
     include: [
       {
         where: {
-          activity_key: { $in: model.Sequelize.literal(`(SELECT DISTINCT "activity_key" FROM "wekin" WHERE "start_date" > '${moment().format('YYYY-MM-DD')}')`) }
+          activity_key: { $in: model.Sequelize.literal(`(SELECT DISTINCT "activity_key" FROM "wekin" WHERE "start_date" > '${moment().format('YYYY-MM-DD')}')`) },
+          start_date: {$gt: new Date()}, $and: {start_date: {$lt: nextMonth}}
         },
         model: model.Wekin,
         attributes: ['wekin_key', 'activity_key', 'min_user', 'max_user', 'start_date', 'due_date', 'commission',
@@ -213,6 +215,7 @@ exports.findAllWekinWithActivity = (req, res, next) => {
     // [model.Sequelize.fn('COUNT', model.Sequelize.col('Orders.order_key')), 'current_user']
     // ],
     // where: { activity_key: req.params.activity_key, wekin_key: req.params.wekin_key },
+    where: { start_date: {$gt: new Date()}, $and: {start_date: {$lt: nextMonth}} },
     include: { model: model.Activity, attributes: ['activity_key', 'main_image', 'title', 'intro_summary', 'address', 'price'], where: { status: service.activityStatus.activity.code } }
   }
   model.Wekin.findAll(queryOptions)
