@@ -22,7 +22,7 @@ exports.popularActivity = (req, res) => {
       {
         where: {
           activity_key: { $in: model.Sequelize.literal(`(SELECT DISTINCT "activity_key" FROM "wekin" WHERE "start_date" > '${now}' and "start_date" < '${nextMonth}')`) },
-          // start_date: {$gt: new Date()}, $and: {start_date: {$lt: nextMonth}}
+          start_date: {$gt: new Date()}, $and: {start_date: {$lt: nextMonth}}
         },
         model: model.Wekin,
         order: [['start_date', 'desc']],
