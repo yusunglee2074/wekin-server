@@ -196,7 +196,7 @@ let sendOrderConfirmSms = (objectData) => {
   return new Promise((resolve, reject) => {
     wekinService.getWekinByKey(objectData.wekin_key)
     .then(wekin => {
-      let msg = `${objectData.user_name} 위키너님 [${objectData.wekin_name}] 우리(We)와 함께 즐(KIN)길 준비 되셨나요?\n\n- 일시: ${moment(wekin.start_date).format('YYYY-MM-DD HH:mm')}\n- 메이커: ${objectData.wekin_host_name}\n- 장소: ${wekin.Activity.address_detail.meet_area}\n- 준비물: ${wekin.Activity.preparation}\n\n\n* 문의\n- 위키너카카오톡: @wekiner\n- 메이커전화: ${wekin.Activity.Host.tel}\n(평일 10:00 ~ 19:00)\n(점심시간 13:00 ~ 14:00)\n\n위(We)를 보면 즐(KIN)거움이 보인다. WE:KIN`
+      let msg = `${objectData.user_name} 위키너님 [${objectData.wekin_name}] 우리(We)와 함께 즐(KIN)길 준비 되셨나요?\n\n- 일시: ${moment(wekin.start_date).format('YYYY-MM-DD HH:mm')}\n- 메이커: ${objectData.wekin_host_name}\n- 장소: ${wekin.Activity.address_detail.meet_area}\n- 준비물: ${wekin.Activity.preparation}\n- 예약인원: ${objectData.wekin_amount}\n\n\n* 문의\n- 위키너카카오톡: @wekiner\n- 메이커전화: ${wekin.Activity.Host.tel}\n(평일 10:00 ~ 19:00)\n(점심시간 13:00 ~ 14:00)\n\n위(We)를 보면 즐(KIN)거움이 보인다. WE:KIN`
       return this.sendSms(objectData.user_phone, msg, `[위킨] 참가신청 완료`)
     })
     .then(_ => resolve(objectData)).catch(reject)
