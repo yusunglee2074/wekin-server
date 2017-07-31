@@ -576,7 +576,6 @@ exports.postOrder = (req, res) => {
       v.Orders.forEach(v => {
         count += v.wekin_amount
       })
-      utilService.slackLog(`${v.max_user}:${count}:${parseInt(body.amount)}`)
       if (v.max_user >= (count + parseInt(body.amount))) {
         //인원 내
         // FIXME: create까지 transaction 잡아줘야함
