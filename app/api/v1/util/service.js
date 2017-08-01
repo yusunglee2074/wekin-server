@@ -217,6 +217,7 @@ let sendOrderConfirmMail = (objectData) => {
           메이커 :${objectData.wekin_host_name}<br>
           장소 :${wekin.Activity.address_detail.meet_area}<br>
           준비물 :${wekin.Activity.preparation}<br>
+          예약인원 :${objectData.wekin_amount}<br>
         </div>
         <div style="width: 400px; margin: 0 auto; font-size: 20px; margin-top: 100px;">
           <p>기다리는 동안 다른 위킨들도 구경해보세요.</p>
@@ -245,7 +246,7 @@ let sendOrderConfirmMail = (objectData) => {
 exports.sendOrderReConfirmSms = (objectData) => {
   wekinService.getWekinByKey(objectData.wekin_key)
   .then(wekin => {
-    let msg = `${objectData.user_name} 위키너님 [${objectData.wekin_name}] 잊지 않으셨겠죠? 오늘 우리(We) 즐(KIN)길 위킨데이~\n\n- 일시: ${moment(wekin.start_date).format('YYYY-MM-DD HH:mm')}\n- 장소: ${wekin.Activity.address_detail.meet_area}\n- 준비물: ${wekin.Activity.preparation}\n- 메이커: ${objectData.wekin_host_name}(${wekin.Activity.Host.tel})\n\n늦으면 안돼요…\n빨리 보고싶어서 현기증 난단 말이에요.\n\n* 문의\n- 위키너 카카오톡: @wekiner\n  (매일 10:00 ~ 19:00)\n  (점심시간 13:00 ~ 14:00)\n- 메이커번호:${wekin.Activity.Host.tel} \n당일 문의는 위 메이커 번호로 전화주시기 바랍니다.\n\n위(We)를 보면 즐(KIN)거움이 보인다. WE:KIN`
+    let msg = `${objectData.user_name} 위키너님 [${objectData.wekin_name}] 잊지 않으셨겠죠? 오늘 우리(We) 즐(KIN)길 위킨데이~\n\n- 일시: ${moment(wekin.start_date).format('YYYY-MM-DD HH:mm')}\n- 장소: ${wekin.Activity.address_detail.meet_area}\n- 준비물: ${wekin.Activity.preparation}\n- 예약인원: ${objectData.wekin_amount}\n- 메이커: ${objectData.wekin_host_name}(${wekin.Activity.Host.tel})\n\n늦으면 안돼요…\n빨리 보고싶어서 현기증 난단 말이에요.\n\n* 문의\n- 위키너 카카오톡: @wekiner\n  (매일 10:00 ~ 19:00)\n  (점심시간 13:00 ~ 14:00)\n- 메이커번호:${wekin.Activity.Host.tel} \n당일 문의는 위 메이커 번호로 전화주시기 바랍니다.\n\n위(We)를 보면 즐(KIN)거움이 보인다. WE:KIN`
     return this.sendSms(objectData.user_phone, msg, `[위킨] 진행 사전 안내`)
   })
   .then(_ => resolve(objectData)).catch(reject)
