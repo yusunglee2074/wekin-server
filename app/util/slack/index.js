@@ -1,8 +1,8 @@
 const request = require('request');
 
-const WEBHOOK_URL = ''
+const WEBHOOK_URL = 'https://hooks.slack.com/services/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'
 const WEBHOOK_CHANNEL = ''
-const WEBHOOK_NAME = ''
+const WEBHOOK_NAME = '위킨데브서버'
 const WEBHOOK_EMOJI = ':ghost:'
 
 function sendMessage(msg) {
@@ -15,7 +15,7 @@ function sendMessage(msg) {
 exports.sendMessage = sendMessage
 
 exports.sendMsg = (channel, name, msg) => {
-    payload = { channel: channel, username: name, text: msg, icon_emoji: WEBHOOK_EMOJI }
+    payload = { channel: channel, username: name, text: msg}
     return new Promise((resolve, reject) => {
         request.post({
             url:WEBHOOK_URL,

@@ -287,7 +287,7 @@ function createUserDBFromToken (jwtToken, name, profileImage) {
         return user
       }).then(user => {
         if (user[1] === true) {
-          utilService.sendJoinAfterMail(user[0])
+          utilService.slackLog(user + '님 회원가입 완료')
         }
         resolve(user)
       }).catch(err => {
