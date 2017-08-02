@@ -77,6 +77,7 @@ exports.createUser = (req, res, next) => {
   })
   .then(user => {
     if (user[1] === true) {
+      utilService.slackLog(user + '님 회원가입 완료')
       utilService.sendJoinAfterMail(user[0])
     }
     // return tmp.getIdToken()
