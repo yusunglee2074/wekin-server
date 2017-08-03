@@ -9,7 +9,7 @@ router.route('/front')
   .get(controllerf.findAllActivity)
   .post(authChk, controllerf.createActivity)
 
-router.route('/front/:period/')
+router.route('/front/period/:key/')
   .get(controllerf.findAllActivity)
 
 router.route('/front/wekin')
