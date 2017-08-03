@@ -5,7 +5,7 @@ const moment = require('moment')
 exports.findAllActivity = (req, res, next) => {
   let keyword = req.query.keyword ? req.query.keyword : '%'
   let nextMonth = moment().add('months', 1).format('YYYY-MM-DD')
-  let period = req.params.key
+  let period  = 3 || req.params.key
   let periodNextMonth = moment().add('months', period).format('YYYY-MM-DD')
   
 
