@@ -76,6 +76,7 @@ exports.createUser = (req, res, next) => {
     })
   })
   .then(user => {
+    console.log("설마~")
     if (user[1] === true) {
       utilService.slackLog(user + '님 회원가입 완료')
       utilService.sendJoinAfterMail(user[0])
@@ -88,7 +89,9 @@ exports.createUser = (req, res, next) => {
     res.json(r)
   })
   .catch(e => {
-    console.log(e)
+    var error = String(e)
+    console.log(error)
+    res.json({ error: error })
   })
 } 
 
