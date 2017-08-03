@@ -5,34 +5,67 @@ const moment = require('moment')
 exports.findAllActivity = (req, res, next) => {
   let keyword = req.query.keyword ? req.query.keyword : '%'
   let nextMonth = moment().add('months', 1).format('YYYY-MM-DD')
+  let period = req.params.period
+  let periodNextMonth = moment().add('months', period).format('YYYY-MM-DD')
+  
 
-  model.Activity.findAll({
-    group: ['Activity.activity_key', 'Host.host_key', 'Favorites.fav_key', 'Wekins.wekin_key', 'Wekins->Orders.order_key'],
-    order: [['Wekins', 'start_date', 'ASC']],
-    attributes: [
-      'activity_key', 'status', 'host_key', 'main_image', 'title', 'intro_summary', 'address', 'address_detail', 'price', 'category', 'created_at', 'isteamorpeople',
-      [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
-      [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count']
-    ],
-    where: { title: { like: `%${keyword}%` }, status: service.activityStatus.activity.code },
-    include: [
-      {
-        where: {
-          activity_key: { $in: model.Sequelize.literal(`(SELECT DISTINCT "activity_key" FROM "wekin" WHERE "start_date" > '${moment().format('YYYY-MM-DD')}')`) },
-          start_date: {$gt: new Date()}, $and: {start_date: {$lt: nextMonth}}
+  if (period) {
+    model.Activity.findAll({
+      group: ['Activity.activity_key', 'Host.host_key', 'Favorites.fav_key', 'Wekins.wekin_key', 'Wekins->Orders.order_key'],
+      order: [['Wekins', 'start_date', 'ASC']],
+      attributes: [
+        'activity_key', 'status', 'host_key', 'main_image', 'title', 'intro_summary', 'address', 'address_detail', 'price', 'category', 'created_at', 'isteamorpeople',
+        [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
+        [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count']
+      ],
+      where: { title: { like: `%${keyword}%` }, status: service.activityStatus.activity.code },
+      include: [
+        {
+          where: {
+            activity_key: { $in: model.Sequelize.literal(`(SELECT DISTINCT "activity_key" FROM "wekin" WHERE "start_date" > '${moment().format('YYYY-MM-DD')}')`) },
+            start_date: {$gt: new Date()}, $and: {start_date: {$lt: periodNextMonth }}
+          },
+          model: model.Wekin,
+          attributes: ['wekin_key', 'activity_key', 'min_user', 'max_user', 'start_date', 'due_date', 'commission',
+            [model.Sequelize.fn('SUM', model.Sequelize.col('Wekins->Orders.wekin_amount')), 'current_user']
+          ],
+          include: { model: model.Order, attributes: [], where: { status: { $in: ['order', 'ready', 'paid'] } }, required: false },
+          required: true
         },
-        model: model.Wekin,
-        attributes: ['wekin_key', 'activity_key', 'min_user', 'max_user', 'start_date', 'due_date', 'commission',
-          [model.Sequelize.fn('SUM', model.Sequelize.col('Wekins->Orders.wekin_amount')), 'current_user']
-        ],
-        include: { model: model.Order, attributes: [], where: { status: { $in: ['order', 'ready', 'paid'] } }, required: false },
-        required: true
-      },
-      { model: model.Host }, { model: model.Favorite }, { model: model.Doc, attributes: [], where: { type: service.docType.review.code }, required: false }
-    ]
-  })
-    .then(results => res.json({ results: results }))
-    .catch(err => next(err))
+        { model: model.Host }, { model: model.Favorite }, { model: model.Doc, attributes: [], where: { type: service.docType.review.code }, required: false }
+      ]
+    })
+      .then(results => res.json({ results: results }))
+      .catch(err => next(err)) 
+  } else {
+    model.Activity.findAll({
+      group: ['Activity.activity_key', 'Host.host_key', 'Favorites.fav_key', 'Wekins.wekin_key', 'Wekins->Orders.order_key'],
+      order: [['Wekins', 'start_date', 'ASC']],
+      attributes: [
+        'activity_key', 'status', 'host_key', 'main_image', 'title', 'intro_summary', 'address', 'address_detail', 'price', 'category', 'created_at', 'isteamorpeople',
+        [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
+        [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count']
+      ],
+      where: { title: { like: `%${keyword}%` }, status: service.activityStatus.activity.code },
+      include: [
+        {
+          where: {
+            activity_key: { $in: model.Sequelize.literal(`(SELECT DISTINCT "activity_key" FROM "wekin" WHERE "start_date" > '${moment().format('YYYY-MM-DD')}')`) },
+            start_date: {$gt: new Date()}, $and: {start_date: {$lt: nextMonth}}
+          },
+          model: model.Wekin,
+          attributes: ['wekin_key', 'activity_key', 'min_user', 'max_user', 'start_date', 'due_date', 'commission',
+            [model.Sequelize.fn('SUM', model.Sequelize.col('Wekins->Orders.wekin_amount')), 'current_user']
+          ],
+          include: { model: model.Order, attributes: [], where: { status: { $in: ['order', 'ready', 'paid'] } }, required: false },
+          required: true
+        },
+        { model: model.Host }, { model: model.Favorite }, { model: model.Doc, attributes: [], where: { type: service.docType.review.code }, required: false }
+      ]
+    })
+      .then(results => res.json({ results: results }))
+      .catch(err => next(err))
+  }
 }
 exports.createActivity = (req, res, next) => {
   let user = req.user

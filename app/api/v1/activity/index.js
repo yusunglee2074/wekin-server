@@ -9,6 +9,9 @@ router.route('/front')
   .get(controllerf.findAllActivity)
   .post(authChk, controllerf.createActivity)
 
+router.route('/front/:period/')
+  .get(controllerf.findAllActivity)
+
 router.route('/front/wekin')
   .get(controllerf.findAllWekinWithActivity)
 
