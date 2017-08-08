@@ -34,7 +34,7 @@ router.route('/host/:host_key/wekin')
       })
       model.Wekin.findAll({
         where: { activity_key: { in: activityKeys } },
-        include: { model: model.Activity }
+        include: [{ model: model.Activity }, { model: model.Order, where: { status: { $in: ['order', 'ready', 'paid'] } }, required: false } ]
       })
         .then(results => {
           res.json({ results: results })
