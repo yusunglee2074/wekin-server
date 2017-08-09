@@ -113,7 +113,7 @@ exports.confirmOrder = (req, res) => {
     })
   })
   .then(r => {
-    notiService.wekinPay(r[1][0])
+    // notiService.wekinPay(r[1][0])
     if (r[1][0].status === 'paid') {
       utilService.sendOrderConfirm(r[1][0])
     } else if (r[1][0].status === 'ready') {
