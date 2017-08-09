@@ -12,7 +12,7 @@ exports.cafe24Sender = (target, message, title) => {
       secure: USER_KEY,
       rphone: target,
       msg:message,
-      title: title
+      smsType: 'L'
     }
     let param = Object.assign(base, BASE_NUMBER)
     
