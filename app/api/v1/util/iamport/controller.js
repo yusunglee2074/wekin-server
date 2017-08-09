@@ -1,5 +1,6 @@
 const { Iamporter, IamporterError } = require('iamporter')
 const { utilService, orderService } = require('../../service')
+const returnMsg = require('../return.msg')
 const iamporter = new Iamporter({
   apiKey: '4401466536780514',
   secret: 'PDNJ0Cws2yDvdk5AXOp0nxu5kbKh70gWE3GEFc6ILKdY4iy26Y2uwwzQHk8PkoMYrsC7FJQqt3oxmXAs'
@@ -10,10 +11,11 @@ exports.importHook = (req, res) => {
 
   iamporter.findByImpUid(req.body.imp_uid)
   .then(r => {
+    console.log(r)
     this.tmp.import = r
-    utilService.slackLog('/iamporthook')
-    utilService.slackLog(r)
-    utilService.slackLog('iamporthook/')
+    // utilService.slackLog('/iamporthook')
+    // utilService.slackLog(r)
+    // utilService.slackLog('iamporthook/')
     if (r.status === 200) {
       return orderService.findOneOrderById(r.merchant_uid)
     } else {
