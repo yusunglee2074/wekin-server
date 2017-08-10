@@ -17,7 +17,7 @@ exports.importHook = (req, res) => {
     // utilService.slackLog(r)
     // utilService.slackLog('iamporthook/')
     if (r.status === 200) {
-      return orderService.findOneOrderById(r.merchant_uid)
+      return orderService.findOneOrderById(r.data.merchant_uid)
     } else {
       returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', 'ERROR_INVALID_PARAM')
       throw 'hook error'
@@ -25,7 +25,7 @@ exports.importHook = (req, res) => {
   })
   .then(r => {
     return orderService.updateOrderById(r.order_key, {
-      status: tmp.import.status,
+      status: tmp.import.data.status,
       order_pay_price	: r.order_receipt_price
     })
   })
