@@ -7,15 +7,10 @@ const iamporter = new Iamporter({
 })
 exports.importHook = (req, res) => {
   let body = req.body
-  let tmp = {}
 
   iamporter.findByImpUid(req.body.imp_uid)
   .then(r => {
-    console.log(r)
-    this.tmp.import = r
-    // utilService.slackLog('/iamporthook')
-    // utilService.slackLog(r)
-    // utilService.slackLog('iamporthook/')
+    let data = r
     if (r.status === 200) {
       return orderService.findOneOrderById(r.data.merchant_uid)
     } else {
@@ -25,13 +20,14 @@ exports.importHook = (req, res) => {
   })
   .then(r => {
     return orderService.updateOrderById(r.order_key, {
-      status: tmp.import.data.status,
+      status: r.data.status,
       order_pay_price	: r.order_receipt_price
     })
   })
   .then(r => {
     if (r[1][0].status === 'paid') {
       utilService.sendOrderConfirmSms(r[1][0])
+      utilService.sendOrderConfirmSmsToMaker(r[1][0])
     } else if (r[1][0].status === 'ready') {
       utilService.sendOrderReadySms(r[1][0])
     }
