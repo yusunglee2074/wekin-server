@@ -52,6 +52,12 @@ exports.sendSms = (to, msg, title = '위킨') => {
     .then(resolve).catch(reject)
   })
 }
+exports.sendSmsShort = (to, msg) => {
+  return new Promise((resolve, reject) => {
+    sms.sendSmsShort(to, msg)
+    .then(resolve).catch(reject)
+  })
+}
 
 exports.slackLog = (msg) => {
   return new Promise((resolve, reject) => {

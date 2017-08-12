@@ -177,7 +177,7 @@ exports.postVerifyPhone = (req, res, next) => {
   let verifyCode = fireHelper.sendSmsValidationCode(phoneNumber)
   let message = `위킨 핸드폰 인증번호 : ${verifyCode}`
 
-  utilService.sendSms(phoneNumber, message)
+  utilService.sendSmsShort(phoneNumber, message)
   .then(r => {
     res.sendStatus(200)
   })

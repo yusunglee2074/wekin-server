@@ -12,7 +12,33 @@ exports.cafe24Sender = (target, message, title) => {
       secure: USER_KEY,
       rphone: target,
       msg:message,
+      title:title,
       smsType: 'L'
+    }
+    let param = Object.assign(base, BASE_NUMBER)
+    
+    request.post({
+      url: TARGET_URL,
+      method: 'POST',
+      form: param
+    }, (e, r, b) => {
+      if (e) {
+        reject(e)
+      } else {
+        resolve(b)
+      }
+    })
+  })
+}
+
+exports.cafe24SenderShort = (target, message) => {
+  return new Promise((resolve, reject) => {
+    const base = {
+      user_id: USER_ID,
+      secure: USER_KEY,
+      rphone: target,
+      msg:message,
+      smsType: 'S'
     }
     let param = Object.assign(base, BASE_NUMBER)
     
