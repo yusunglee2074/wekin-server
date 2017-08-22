@@ -5,8 +5,10 @@ const returnMsg = require('./return.msg')
 const expressValidator = require('express-validator')
 const fetcher = require('express-param')
 const { auchChk, adminChk } = require('./api/v1/service')
+const compression = require('compression')
 
 const app = express()
+app.use(compression());
 const CURRENT_API_VERSION = '/v1'
 
 const allowCORS = (req, res, next) => {
