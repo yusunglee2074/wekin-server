@@ -28,7 +28,7 @@
     "nodemailer-smtp-transport": "^2.7.4",
     "pg": "^6.2.3",
     "request": "^2.81.0",
-    "sequelize": "^4.0.0",
+    "sequelize": "^4.7.2",
     "sequelize-datatables": "^1.2.0",
     "util": "^0.10.3"
   }
