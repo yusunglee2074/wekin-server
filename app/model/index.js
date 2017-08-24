@@ -41,7 +41,8 @@ var db = {
   Env: sequelize.import(path.join(__dirname, 'environment.js')),
   Noti: sequelize.import(path.join(__dirname, 'noti.js')),
   Like: sequelize.import(path.join(__dirname, 'like.js')),
-  Waiting: sequelize.import(path.join(__dirname, 'waiting.js'))
+  Waiting: sequelize.import(path.join(__dirname, 'waiting.js')),
+  Point: sequelize.import(path.join(__dirname, 'point.js'))
 }
 
 fs.readdirSync(__dirname)
