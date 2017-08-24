@@ -5,6 +5,9 @@ var config = {
     db.User.hasMany(db.Follow, { foreignKey: 'user_key' })
     db.User.hasOne(db.Host, { foreignKey: 'user_key' })
 
+    db.User.hasMany(db.Point, { foreignKey: 'user_key' })
+    db.Point.hasOne(db.User, { foreignKey: 'user_key' })
+
     db.Host.belongsTo(db.User, { foreignKey: 'user_key' })
     db.Host.hasMany(db.Activity, { foreignKey: 'host_key' })
 
