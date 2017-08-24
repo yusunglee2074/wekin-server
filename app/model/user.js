@@ -16,7 +16,8 @@ module.exports = function (sequelize, DataTypes) {
     phone: { type: DataTypes.STRING, allowNull: true },
     phone_valid: { type: DataTypes.BOOLEAN, defaultValue: false },
     notification: { type: DataTypes.STRING, allowNull: true },
-    last_login_date: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
+    last_login_date: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+    point: { type: DataTypes.INTEGER, defaultValue: 0 }
   }, {
     classMethods: {},
     tableName: 'user',
