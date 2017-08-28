@@ -6,6 +6,7 @@ module.exports = function (sequelize, DataTypes) {
     user_key: { type: DataTypes.INTEGER, allowNull: false, references: { model: model.User, key: 'user_key' } },
     point_change: { type: DataTypes.INTEGER, allowNull: false },
     due_date_be_written_days: { type: DataTypes.INTEGER, allowNull: true },
+    point_use_percentage: { type: DataTypes.INTEGER, allowNull: true, defaultValue: 100 },
   }, {
     tableName: 'point',
     freezeTableName: true,
