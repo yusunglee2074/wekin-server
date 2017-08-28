@@ -24,7 +24,8 @@ exports.postData = (req, res) => {
   .then(val => model.Env.create({
     type: val,
     name: req.params.name,
-    value: req.body.value
+    value: req.body.value,
+    description: req.body.description ? req.body.description : null
   }))
   .then(result => returnMsg.success200RetObj(res, result))
   .catch(val => { console.log(val) })
