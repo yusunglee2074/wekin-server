@@ -6,9 +6,9 @@ module.exports = {
       'user',
       'point',
       {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-        defaultValue: 0
+        type: Sequelize.JSON,
+        allowNull: false,
+        defaultValue: { point: 0, point_special: 0 }
       }
     )
   },
