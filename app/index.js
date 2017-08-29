@@ -50,7 +50,8 @@ app.use(`${CURRENT_API_VERSION}/point`, require('./api/v1/point'))
 app.use(
   function errorHandler(err, req, res, next) {
     res.status(500)
-    res.json({ error: err })
+    console.log(err)
+    res.json({ 'error': err })
   }
 )
 module.exports = app;
