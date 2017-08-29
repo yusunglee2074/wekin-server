@@ -181,7 +181,7 @@ router.get('/percentage/:user_key',
       if (point) {
         res.json(point)
       } else {
-        res.send('존재 하지 않습니다.')
+        res.send('fail')
       }
     })
     .catch( err => {
