@@ -25,7 +25,7 @@ exports.postData = (req, res) => {
     type: val,
     name: req.params.name,
     value: req.body.value,
-    description: req.body.description ? req.body.description : null
+    description: req.body.description
   }))
   .then(result => returnMsg.success200RetObj(res, result))
   .catch(val => { console.log(val) })
