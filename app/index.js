@@ -9,7 +9,7 @@ const compression = require('compression')
 
 const app = express()
 app.use(compression());
-const CURRENT_API_VERSION = '/v1'
+const CURRENT_API_VERSION = '/v2'
 
 const allowCORS = (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*')
@@ -27,7 +27,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use('/apidoc', express.static('public'))
 
-app.use(`${CURRENT_API_VERSION}/user`, require('./api/v1/user'))
+app.use(`${CURRENT_API_VERSION}/user`, require('./api/v2/user'))
 app.use(`${CURRENT_API_VERSION}/activity`, require('./api/v1/activity'))
 app.use(`${CURRENT_API_VERSION}/board`, require('./api/v1/board'))
 app.use(`${CURRENT_API_VERSION}/env`, require('./api/v1/environment'))
@@ -51,7 +51,8 @@ app.use(
   function errorHandler(err, req, res, next) {
     res.status(500)
     console.log(err)
-    res.json({ 'error': err })
+    let error = String(err)
+    res.json({ 'error': error })
   }
 )
 module.exports = app;
