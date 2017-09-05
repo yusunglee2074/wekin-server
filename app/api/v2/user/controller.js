@@ -157,19 +157,15 @@ exports.verify = (req, res, next) => {
   res.json(req.user)
 }
 exports.verifyPhone = (req, res, next) => {
-  let userKey = req.user.user_key
   let phoneNumber = req.body.phoneNumber
   let verifyCode = req.body.verifyCode
-
   let modelData = { phone: phoneNumber, phone_valid: true }
-  let queryOptions = { where: { user_key: userKey } }
 
   fireHelper.verifySmsCode(phoneNumber, verifyCode)
     .then((isSuccess) => {
-      model.User.update(modelData, queryOptions)
-        .then(result => res.json({ success: isSuccess }))
-        .catch(err => next(err))
+      res.json({ success: isSuccess })
     })
+    .catch(err => next(err))
 }
 exports.postVerifyPhone = (req, res, next) => {
   let phoneNumber = req.body.phoneNumber
