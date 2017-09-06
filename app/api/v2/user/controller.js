@@ -57,6 +57,7 @@ exports.withdraw = (req, res) => {
 
 exports.createUser = (req, res, next) => {
   let tmp = {}
+  let user = JSON.parse(req.body.userObject)
   fireHelper.admin.auth().createUser({
     email: req.body.email,
     displayName: req.body.name,
@@ -70,12 +71,11 @@ exports.createUser = (req, res, next) => {
           uuid: r.uid
         }, defaults: {
           email: r.email,
-          email_company: req.body.email_company || null,
-          email_company_valid: req.body.email_company ? true : false,
-          // TODO: 7자리 그냥 숫자로 오는데 로직 수정해야됨
-          birthday: moment().format(),
-          gender: req.body.gender,
-          phone: req.body.phone,
+          email_company: user.email_company ? user.email_company : null,
+          email_company_valid: user.email_company ? true : false,
+          birthday: moment().set({ 'year': user.birthday.year, 'month': user.birthday.month, 'date': user.birthday.day }).format(),
+          gender: user.gender,
+          phone: user.phoneNumber,
           phone_valid: true,
           name: r.displayName,
           profile_image: r.photoURL || '/static/images/default-profile.png',
