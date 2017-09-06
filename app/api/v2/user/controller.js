@@ -271,7 +271,7 @@ function createUserDBFromToken (jwtToken, name, profileImage) {
     fireHelper.admin.auth().verifyIdToken(jwtToken).then(decoded => {
       model.User.findOrCreate({
         where: {
-          uuid: decoded.sub
+          email: decoded.email
         },
         defaults: {
           email: decoded.email,
