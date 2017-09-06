@@ -12,7 +12,7 @@ const DB_DEV = {
   user: 'wekin'
 }
 
-const dbTarget = DB_PROD
+const dbTarget = DB_DEV
 
 let dbconf = {
   db: process.env.SQL_DATABASE || 'wekin',
