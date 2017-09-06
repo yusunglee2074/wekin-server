@@ -9,7 +9,7 @@ const compression = require('compression')
 
 const app = express()
 app.use(compression());
-const CURRENT_API_VERSION = '/v2'
+const CURRENT_API_VERSION = '/v1'
 
 const allowCORS = (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*')
@@ -51,8 +51,8 @@ app.use(
   function errorHandler(err, req, res, next) {
     res.status(500)
     console.log(err)
-    let error = String(err)
-    res.json({ 'error': error })
+    let error = JSON.stringify(err)
+    res.send(error)
   }
 )
 module.exports = app;
