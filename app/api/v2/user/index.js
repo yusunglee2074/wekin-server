@@ -69,7 +69,7 @@ router.put('/front/verify/phone', controller.verifyPhone)
 router.post('/front/verify/phone', controller.postVerifyPhone)
 router.post('/front', controller.postFrotUser)
 router.get('/front/:user_key', controller.getFrontUserInfo)
-router.put('/front/:user_key', authChk, controller.putFrontUserInfo)
+router.put('/front/:user_key', controller.putFrontUserInfo)
 router.get('/front/:user_key/activity', controller.getUsersActiviry)
 router.get('/front/:user_key/qna', controller.getUsersQna)
 
