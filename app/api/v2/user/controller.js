@@ -217,12 +217,8 @@ exports.getFrontUserInfo = (req, res, next) => {
     .catch(err => next(err))
 }
 exports.putFrontUserInfo = (req, res, next) => {
-  req.checkBody('name', '이름은 필수입니다.').notEmpty()
+  // req.checkBody('name', '이름은 필수입니다.').notEmpty()
   req.getValidationResult().then(result => {
-    if (!result.isEmpty()) {
-      res.status(400).json(util.inspect(result.array()))
-      return
-    }
     let user = req.body
     let modelData = {
       name: user.name,
@@ -230,16 +226,18 @@ exports.putFrontUserInfo = (req, res, next) => {
       profileImage: user.profile_image,
       gender: user.gender,
       email_noti: user.email_noti,
-      push_noti: user.push_noti
+      push_noti: user.push_noti,
+      phone: user.phone,
+      phone_valid: user.phone_valid
     }
     if (user.profile_image) {
       modelData.profile_image = user.profile_image
     }
     let queryOptions = {
-      where: { user_key: req.user.user_key }
+      where: { user_key: req.params.user_key }
     }
     model.User.update(modelData, queryOptions)
-      .then(result => res.json(result))
+      .then(result => res.send('success'))
       .catch(err => next(err))
   })
 }
