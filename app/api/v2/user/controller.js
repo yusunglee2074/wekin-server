@@ -34,11 +34,12 @@ exports.kakaoLogin = (req, res, next) => {
           request(options, (err, response, body) => {
             // 이미 앱과 연동이 되어있다면 엑세스 토큰을 이용해서 유저 정보를 가져온다음
             let userInfo = JSON.parse(body)
+            console.log(userInfo)
             let additionalClaims = {
               email: userInfo.kaccount_email,
               id: userInfo.id,
-              photo: userInfo.properties.profile_image,
-              name: userInfo.properties.nickname
+              photo: userInfo.properties ? userInfo.properties.profile_image : null,
+              name: userInfo.properties ? userInfo.properties.nickname : null
             }
             fireHelper.createCustomToken(userInfo.id, additionalClaims)
               .then( customToken => {
@@ -75,7 +76,7 @@ exports.kakaoLogin = (req, res, next) => {
         let additionalClaims = {
           email: userInfo.email,
           id: userInfo.id,
-          photo: userInfo.profile_image,
+          photo: userInfo.profile_image || null,
           name: userInfo.name
         }
         fireHelper.createCustomToken(userInfo.id, additionalClaims)
@@ -105,12 +106,13 @@ exports.dbCreateWithIdtoken = (req, res, next) => {
         }
       })
         .then(user => {
+          console.log(user)
           fireHelper.admin.auth().updateUser(decoded.sub, {
             displayName: decoded.name,
             email: decoded.email
           })
           .then( user => {
-          res.send(user)
+            res.send(user)
           })
           .catch( err => next(err) )
         })
