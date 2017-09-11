@@ -157,7 +157,7 @@ exports.findOneActivity = (req, res, next) => {
     group: ['Activity.activity_key', 'Host.host_key', 'Host->User.user_key'],
     where: { activity_key: req.params.activity_key, status: { $in: [service.activityStatus.activity.code, service.activityStatus.end.code] } },
     attributes: [
-      'activity_key', 'status', 'host_key', 'main_image', 'title', 'intro_summary', 'intro_detail', 'inclusion', 'schedule', 'preparation', 'refund_policy', 'address', 'address_detail', 'price', 'created_at', 'count', 'isteamorpeople',
+      'category', 'activity_key', 'status', 'host_key', 'main_image', 'title', 'intro_summary', 'intro_detail', 'inclusion', 'schedule', 'preparation', 'refund_policy', 'address', 'address_detail', 'price', 'created_at', 'count', 'isteamorpeople',
       [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count']
     ],
     include: [
