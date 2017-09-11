@@ -49,7 +49,8 @@ app.use(`${CURRENT_API_VERSION}/admin/front`, require('./api/v1/admin'))
 app.use(`${CURRENT_API_VERSION}/point`, require('./api/v1/point'))
 app.use(
   function errorHandler(err, req, res, next) {
-    res.status(500)
+    res.status(501)
+    console.log(err)
     let error = JSON.stringify(err)
     if (error == '{}') {
       console.log(typeof(err))
