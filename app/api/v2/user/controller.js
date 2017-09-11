@@ -5,14 +5,131 @@ const { userService, utilService, fireHelper } = require('../service')
 const request = require('request')
 const moment = require('moment')
 
+exports.kakaoLogin = (req, res, next) => {
+  if (req.params.type === "kakao") {
+    request.post("https://kauth.kakao.com/oauth/token", {
+      form: { 
+        grant_type: 'authorization_code',
+        client_id: '75c0694ad636bcca94fa48cbc7c9d8cf',
+        redirect_url: 'http://175.195.139.99:8080/auth/kakao',
+        code: req.params.code 
+      }
+    }, (err,httpResponse,body) => { 
+      let userToken = JSON.parse(body)
+      var options = {
+        url: 'https://kapi.kakao.com/v1/user/signup',
+        headers: {
+          Authorization: 'Bearer ' + userToken.access_token
+        }
+      }
+      request(options, (err, response, body) => {
+        let userRegistration = JSON.parse(body)
+        if (userRegistration.msg === "already registered") {
+          var options = {
+            url: 'https://kapi.kakao.com/v1/user/me',
+            headers: {
+              Authorization: 'Bearer ' + userToken.access_token
+            }
+          }
+          request(options, (err, response, body) => {
+            // 이미 앱과 연동이 되어있다면 엑세스 토큰을 이용해서 유저 정보를 가져온다음
+            let userInfo = JSON.parse(body)
+            let additionalClaims = {
+              email: userInfo.kaccount_email,
+              id: userInfo.id,
+              photo: userInfo.properties.profile_image,
+              name: userInfo.properties.nickname
+            }
+            fireHelper.createCustomToken(userInfo.id, additionalClaims)
+              .then( customToken => {
+
+                res.json({ customToken: customToken, userInfo: userInfo }) 
+              })
+              .catch( err => next(err))
+          })
+          // 유저 정보를 이용해서 커스텀 토큰을 만든 후 프론트에게 넘겨준 후 프론트에서 커스텀 토큰으로 signInWithCustomToken로 파배 가입시킨다.
+        } else {
+          console.log(userRegistration)
+        }
+      })
+    })
+  } else if (req.params.type === "naver") {
+    request.post("https://nid.naver.com/oauth2.0/token", {
+      form: { 
+        grant_type: 'authorization_code',
+        client_id: 'rTHYGlmyZuVKSzR4_45d',
+        redirect_url: 'http://175.195.139.99:8080/auth/naver',
+        code: req.params.code,
+        client_secret: '5Wo2kSoe2R'
+      }
+    }, (err,httpResponse,body) => { 
+      let userToken = JSON.parse(body)
+      var options = {
+        url: 'https://openapi.naver.com/v1/nid/me',
+        headers: {
+          Authorization: 'Bearer ' + userToken.access_token
+        }
+      }
+      request(options, (err, response, body) => {
+        let userInfo = JSON.parse(body).response
+        let additionalClaims = {
+          email: userInfo.email,
+          id: userInfo.id,
+          photo: userInfo.profile_image,
+          name: userInfo.name
+        }
+        fireHelper.createCustomToken(userInfo.id, additionalClaims)
+          .then( customToken => {
+
+            res.json({ customToken: customToken, userInfo: userInfo }) 
+          })
+          .catch( err => next(err))
+      })
+      // 유저 정보를 이용해서 커스텀 토큰을 만든 후 프론트에게 넘겨준 후 프론트에서 커스텀 토큰으로 signInWithCustomToken로 파배 가입시킨다.
+    })
+  }
+}
+
+exports.dbCreateWithIdtoken = (req, res, next) => {
+  fireHelper.admin.auth().verifyIdToken(req.body.idToken)
+    .then(decoded => {
+      model.User.findOrCreate({
+        where: {
+          email: decoded.email
+        },
+        defaults: {
+          email: decoded.email,
+          name: decoded.name,
+          profile_image: decoded.profile_image || '/static/images/default-profile.png',
+          uuid: decoded.sub
+        }
+      })
+        .then(user => {
+          fireHelper.admin.auth().updateUser(decoded.sub, {
+            displayName: decoded.name,
+            email: decoded.email
+          })
+          .then( user => {
+          res.send(user)
+          })
+          .catch( err => next(err) )
+        })
+        .catch(err => {
+          console.log(err)
+          next(err)
+        })
+    })
+    .catch( error => next(error) )
+}
+
 exports.getList = (req, res) => {
   model.User.findAll({paranoid: false})
-  .then((results) => {
-    returnMsg.success200RetObj(res, results) 
-  })
-  .catch((err) => {
-    returnMsg.error500Server(res, err)
-  })
+    .then((results) => {
+      returnMsg.success200RetObj(res, results) 
+    })
+    .catch((err) => {
+      returnMsg.error500Server(res, err)
+    })
 }
 exports.getOne = (req, res) => {
   let tmp = {}
@@ -78,8 +195,9 @@ exports.createUser = (req, res, next) => {
           phone: user.phoneNumber,
           phone_valid: true,
           name: r.displayName,
-          profile_image: r.photoURL || '/static/images/default-profile.png',
-          uuid: r.uid
+          profile_image: r.photoURL || user.photo || '/static/images/default-profile.png',
+          uuid: r.uid,
+          country: user.country || 'Korea'
         }
       })
     })
