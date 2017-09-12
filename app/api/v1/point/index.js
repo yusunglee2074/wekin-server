@@ -36,7 +36,7 @@ let getUserByToken = (req) => {
 
 router.post('/create',
   function (req, res, next) {
-    // 헤더에 있는 토큰으로 어드민 유저인지 판단 후 
+    // TODO:헤더에 있는 토큰으로 어드민 유저인지 판단 후 
     getUserByToken(req)
       .then( user => {
         // 어드민 유저라면 날라오는 유저키를 이용해서 포인트 적립
