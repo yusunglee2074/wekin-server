@@ -4,10 +4,12 @@ const model = require('./../../../model')
 const { authChk } = require('../service')
 const fireHelper = require('../../../util/firebase')
 const moment = require('moment')
+const Model = require('./../../../model')
 
 const router = express.Router()
 
 // TODO: 에러처리 해야함 에러 났을때 기존 만든 모든 객체 삭제해야함
+// TODO: 모든 처리 Transaction 처리해야함
 
 /*
  Point type = {
@@ -41,54 +43,66 @@ router.post('/create',
       .then( user => {
         // 어드민 유저라면 날라오는 유저키를 이용해서 포인트 적립
         // TODO: admin 유저인가? 판단해야함
-        model.Point.create({
-          user_key: req.body.user_key,
-          point_change: req.body.value,
-          due_date_be_written_days: moment().add(req.body.due_date, 'M').format(),
-          point_use_percentage: req.body.percentage,
-          type: req.body.type
+        Model.sequelize.transaction( t => {
+          return model.Point.create({
+            user_key: req.body.user_key,
+            point_change: req.body.value,
+            due_date_be_written_days: moment().add(req.body.due_date, 'M').format(),
+            point_use_percentage: req.body.percentage,
+            type: req.body.type
+          }, { transaction: t })
+            .then( point => {
+              return Promise.all([point, model.User.findOne({
+                where: {
+                  user_key: req.body.user_key,
+                },
+                transaction: t
+              })
+              ])
+            })
+            .then( result => {
+              if (req.body.type === '1') {
+                return result[1].updateAttributes({ "point.point_special": result[1].point.point_special + result[0].point_change }, { transaction: t } )
+              } else if (req.body.type === '0') {
+                return result[1].updateAttributes({ "point.point": result[1].point.point + result[0].point_change }, { transaction: t } )
+              } else {
+                throw new Error()
+              }
+            })
+            .then( result => {
+              if (req.body.type === '1') {
+                return model.Point.create({
+                  user_key: req.body.user_key,
+                  point_change: req.body.value,
+                  due_date_be_written_days: moment().format(),
+                  point_use_percentage: req.body.percentage,
+                  type: 20
+                },
+                  { transaction: t }
+                )
+              } else if (req.body.type === '0') {
+                return model.Point.create({
+                  user_key: req.body.user_key,
+                  point_change: req.body.value,
+                  due_date_be_written_days: moment().format(),
+                  point_use_percentage: req.body.percentage,
+                  type: 10
+                },
+                  { transaction: t }
+                )
+              } else {
+                throw new Error()
+              }
+            })
+            .then( result => {
+              res.send('success')
+            })
+            .catch( err => {
+              next(err)
+            })
         })
-          .then( point => {
-            model.User.findById(point.user_key)
-              .then( user => {
-                if (req.body.type === '1') {
-                  user.set("point.point_special", user.point.point_special + point.point_change)
-                  user.save()
-                  model.Point.create({
-                    user_key: req.body.user_key,
-                    point_change: req.body.value,
-                    due_date_be_written_days: moment().format(),
-                    point_use_percentage: req.body.percentage,
-                    type: 20
-                  })
-                  res.send('success')
-                } else if (req.body.type === '0') {
-                  user.set("point.point", user.point.point + point.point_change)
-                  user.save()
-                  console.log(req.body.value)
-                  model.Point.create({
-                    user_key: req.body.user_key,
-                    point_change: req.body.value,
-                    due_date_be_written_days: moment().format(),
-                    point_use_percentage: req.body.percentage,
-                    type: 10
-                  })
-                  res.send('success')
-                } else {
-                  res.send('fail')
-                }
-              })
-              .catch( err => {
-                next(err)
-              })
-          })
-          .catch(err => {
-            next(err) 
-          })
       })
-      .catch( err => { 
-        next(err) 
-      })
+      .catch( err => next(err) )
   })
 
 router.get('/front/:user_key',
@@ -137,7 +151,6 @@ router.post('/front/use',
           }
           // 포인트 사용할때 유저의 포인트를 먼저 깎고 적립된 포인트를 전부 가져와서 하나씩 지워나가면서 
           user.set("point.point_special", Number(user.point.point_special) + Number(req.body.value))
-          user.save()
           model.Point.findAll({
             where: {
               type: 1,
@@ -150,38 +163,46 @@ router.post('/front/use',
               let usePoint = Number(req.body.value)
               let point_use_percentage = 0
               let due_date_be_written_days = 0
-              for (let i = 0; i < points.length; i++) {
-                if (usePoint < 0) {
-                  point_use_percentage = points[i].point_use_percentage
-                  due_date_be_written_days = points[i].due_date_be_written_days
-                  let created_at = points[i].created_at
-                  usePoint += Number(points[i].point_change)
-                  points[i].destroy()
-                  if (usePoint > 0) {
-                    model.Point.create({
-                      user_key: user.user_key,
-                      point_change: usePoint,
-                      due_date_be_written_days: due_date_be_written_days,
-                      point_use_percentage: point_use_percentage,
-                      type: req.body.type,
-                      created_at: created_at
-                    })
-                      .then( point => {
+              Model.sequelize.transaction( t => {
+                let promises = []
+                for (let i = 0; i < points.length; i++) {
+                  if (usePoint < 0) {
+                    point_use_percentage = points[i].point_use_percentage
+                    due_date_be_written_days = points[i].due_date_be_written_days
+                    let created_at = points[i].created_at
+                    usePoint += Number(points[i].point_change)
+                    points[i].destroy()
+                    if (usePoint > 0) {
+                      promises.push(
+                        model.Point.create({
+                          user_key: user.user_key,
+                          point_change: usePoint,
+                          due_date_be_written_days: due_date_be_written_days,
+                          point_use_percentage: point_use_percentage,
+                          type: req.body.type,
+                          created_at: created_at
+                        }, { transaction: t })
+                      )
+                      promises.push(
                         model.Point.create({
                           user_key: user.user_key,
                           point_change: req.body.value,
                           due_date_be_written_days: due_date_be_written_days,
                           point_use_percentage: point_use_percentage,
                           type: 21
-                        })
-                        res.send("success")
-                      })
-                      .catch(err => {
-                        next(err)
-                      })
-                  }
-                } 
-              }
+                        }, { transaction: t })
+                      )
+                    }
+                  } 
+                }
+                return Promise.all(promises) })
+                .then( results => {
+                  user.save()
+                  res.send("success")
+                })
+                .catch(err => {
+                  next(err)
+                })
             })
             .catch(err => {
               next(err)
@@ -193,7 +214,6 @@ router.post('/front/use',
             return
           }
           user.set("point.point", Number(user.point.point) + Number(req.body.value))
-          user.save()
           model.Point.findAll({
             where: {
               type: 0,
@@ -206,44 +226,46 @@ router.post('/front/use',
               let usePoint = Number(req.body.value)
               let point_use_percentage = 0
               let due_date_be_written_days = 0
-              for (let i = 0; i < points.length; i++) {
-                if (usePoint < 0) {
-                  point_use_percentage = points[i].point_use_percentage
-                  due_date_be_written_days = points[i].due_date_be_written_days
-                  let created_at = points[i].created_at
-                  usePoint += Number(points[i].point_change)
-                  points[i].destroy()
-                  if (usePoint > 0) {
-                    model.Point.create({
-                      user_key: user.user_key,
-                      point_change: usePoint,
-                      due_date_be_written_days: due_date_be_written_days,
-                      point_use_percentage: point_use_percentage,
-                      type: req.body.type,
-                      created_at: created_at
-                    })
-                      .then( point => {
-                        model.Point.create({
-                          user_key: user.user_key,
-                          point_change: req.body.value,
-                          due_date_be_written_days: due_date_be_written_days,
-                          point_use_percentage: point_use_percentage,
-                          type: 11
-                        })
-                        res.send("success")
-                      })
-                      .catch(err => {
-                        next(err)
-                      })
-                  }
-                } 
-              }
-            })
-            .catch(err => {
-              next(err)
+              Model.sequelize.transaction( t => {
+                let promises = []
+                for (let i = 0; i < points.length; i++) {
+                  if (usePoint < 0) {
+                    point_use_percentage = points[i].point_use_percentage
+                    due_date_be_written_days = points[i].due_date_be_written_days
+                    let created_at = points[i].created_at
+                    usePoint += Number(points[i].point_change)
+                    points[i].destroy()
+                    if (usePoint > 0) {
+                      promises.push(model.Point.create({
+                        user_key: user.user_key,
+                        point_change: usePoint,
+                        due_date_be_written_days: due_date_be_written_days,
+                        point_use_percentage: point_use_percentage,
+                        type: req.body.type,
+                        created_at: created_at
+                      }))
+                      promises.push(model.Point.create({
+                        user_key: user.user_key,
+                        point_change: req.body.value,
+                        due_date_be_written_days: due_date_be_written_days,
+                        point_use_percentage: point_use_percentage,
+                        type: 11
+                      }))
+                    }
+                  } 
+                }
+                return Promise.all(promises) 
+              })
+                .then( results => {
+                  user.save()
+                  res.send("success")
+                })
+                .catch(err => {
+                  next(err)
+                })
             })
         } else {
-          res.send("fail")
+          next(err)
         }
       })
       .catch(err => {
