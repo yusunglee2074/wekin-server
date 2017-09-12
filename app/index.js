@@ -46,7 +46,7 @@ app.use(`${CURRENT_API_VERSION}/iamport`, require('./api/v1/util/iamport'))
 app.use(`${CURRENT_API_VERSION}/home`, require('./api/v1/home'))
 app.use(`${CURRENT_API_VERSION}/qna`, require('./api/v1/qna'))
 app.use(`${CURRENT_API_VERSION}/admin/front`, require('./api/v1/admin'))
-app.use(`${CURRENT_API_VERSION}/point`, require('./api/v1/point'))
+app.use(`${CURRENT_API_VERSION}/point`, require('./api/v2/point'))
 app.use(
   function errorHandler(err, req, res, next) {
     res.status(501)
