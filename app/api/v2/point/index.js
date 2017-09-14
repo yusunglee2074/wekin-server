@@ -48,7 +48,6 @@ router.post('/create',
             user_key: req.body.user_key,
             point_change: req.body.value,
             due_date_be_written_days: moment(req.body.due_date),
-            point_use_percentage: req.body.percentage,
             type: req.body.type
           }, { transaction: t })
             .then( point => {
@@ -75,7 +74,6 @@ router.post('/create',
                   user_key: req.body.user_key,
                   point_change: req.body.value,
                   due_date_be_written_days: moment(req.body.due_date),
-                  point_use_percentage: req.body.percentage,
                   type: 20
                 },
                   { transaction: t }
@@ -85,7 +83,6 @@ router.post('/create',
                   user_key: req.body.user_key,
                   point_change: req.body.value,
                   due_date_be_written_days: moment(req.body.due_date),
-                  point_use_percentage: req.body.percentage,
                   type: 10
                 },
                   { transaction: t }
@@ -121,7 +118,6 @@ router.get('/front/:user_key',
               return
             }
             result.point = user.point
-            result.percentage = point.point_use_percentage
             res.send(JSON.stringify(result))
           })
           .catch( err => {
@@ -156,13 +152,11 @@ router.post('/front/use',
           })
             .then( points => {
               let usePoint = Number(req.body.value)
-              let point_use_percentage = 0
               let due_date_be_written_days = 0
               return Model.sequelize.transaction( t => {
                 let promises = []
                 for (let i = 0; i < points.length; i++) {
                   if (usePoint < 0) {
-                    point_use_percentage = points[i].point_use_percentage
                     due_date_be_written_days = points[i].due_date_be_written_days
                     let created_at = points[i].created_at
                     usePoint += Number(points[i].point_change)
@@ -173,7 +167,6 @@ router.post('/front/use',
                           user_key: user.user_key,
                           point_change: usePoint,
                           due_date_be_written_days: due_date_be_written_days,
-                          point_use_percentage: point_use_percentage,
                           type: req.body.type,
                           created_at: created_at
                         }, { transaction: t })
@@ -183,7 +176,6 @@ router.post('/front/use',
                           user_key: user.user_key,
                           point_change: req.body.value,
                           due_date_be_written_days: due_date_be_written_days,
-                          point_use_percentage: point_use_percentage,
                           type: 21
                         }, { transaction: t })
                       )
@@ -219,13 +211,11 @@ router.post('/front/use',
           })
             .then( points => {
               let usePoint = Number(req.body.value)
-              let point_use_percentage = 0
               let due_date_be_written_days = 0
               return Model.sequelize.transaction( t => {
                 let promises = []
                 for (let i = 0; i < points.length; i++) {
                   if (usePoint < 0) {
-                    point_use_percentage = points[i].point_use_percentage
                     due_date_be_written_days = points[i].due_date_be_written_days
                     let created_at = points[i].created_at
                     usePoint += Number(points[i].point_change)
@@ -235,7 +225,6 @@ router.post('/front/use',
                         user_key: user.user_key,
                         point_change: usePoint,
                         due_date_be_written_days: due_date_be_written_days,
-                        point_use_percentage: point_use_percentage,
                         type: req.body.type,
                         created_at: created_at
                       }))
@@ -243,7 +232,6 @@ router.post('/front/use',
                         user_key: user.user_key,
                         point_change: req.body.value,
                         due_date_be_written_days: due_date_be_written_days,
-                        point_use_percentage: point_use_percentage,
                         type: 11
                       }))
                     }
