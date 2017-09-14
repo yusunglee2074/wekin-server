@@ -54,6 +54,30 @@ exports.kakaoLogin = (req, res, next) => {
         }
       })
     })
+  } else if (req.params.type === "androidnaver") {
+    let accessToken = req.header('access-token')
+    var options = {
+      url: 'https://openapi.naver.com/v1/nid/me',
+      headers: {
+        Authorization: 'Bearer ' + accessToken
+      }
+    }
+    request(options, (err, response, body) => {
+      let userInfo = JSON.parse(body).response
+      let additionalClaims = {
+        email: userInfo.email,
+        id: userInfo.id,
+        photo: userInfo.profile_image || null,
+        name: userInfo.name
+      }
+      fireHelper.createCustomToken(userInfo.id, additionalClaims)
+        .then( customToken => {
+
+          res.json({ customToken: customToken, userInfo: userInfo }) 
+        })
+        .catch( err => next(err))
+      // 유저 정보를 이용해서 커스텀 토큰을 만든 후 프론트에게 넘겨준 후 프론트에서 커스텀 토큰으로 signInWithCustomToken로 파배 가입시킨다.
+    })
   } else if (req.params.type === "naver") {
     request.post("https://nid.naver.com/oauth2.0/token", {
       form: { 
