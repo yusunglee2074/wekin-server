@@ -43,7 +43,7 @@ router.post('/create',
       .then( user => {
         // 어드민 유저라면 날라오는 유저키를 이용해서 포인트 적립
         // TODO: admin 유저인가? 판단해야함
-        Model.sequelize.transaction( t => {
+        return Model.sequelize.transaction( t => {
           return model.Point.create({
             user_key: req.body.user_key,
             point_change: req.body.value,
@@ -61,16 +61,16 @@ router.post('/create',
               ])
             })
             .then( result => {
-              if (req.body.type === '1') {
+              if (req.body.type === 1) {
                 return result[1].updateAttributes({ "point.point_special": result[1].point.point_special + result[0].point_change }, { transaction: t } )
-              } else if (req.body.type === '0') {
+              } else if (req.body.type === 0) {
                 return result[1].updateAttributes({ "point.point": result[1].point.point + result[0].point_change }, { transaction: t } )
               } else {
                 throw new Error()
               }
             })
             .then( result => {
-              if (req.body.type === '1') {
+              if (req.body.type === 1) {
                 return model.Point.create({
                   user_key: req.body.user_key,
                   point_change: req.body.value,
@@ -80,7 +80,7 @@ router.post('/create',
                 },
                   { transaction: t }
                 )
-              } else if (req.body.type === '0') {
+              } else if (req.body.type === 0) {
                 return model.Point.create({
                   user_key: req.body.user_key,
                   point_change: req.body.value,
@@ -94,14 +94,9 @@ router.post('/create',
                 throw new Error()
               }
             })
-            .then( result => {
-              res.send('success')
-            })
-            .catch( err => {
-              next(err)
-            })
         })
       })
+      .then( result => res.send(result + 'success'))
       .catch( err => next(err) )
   })
 
@@ -163,7 +158,7 @@ router.post('/front/use',
               let usePoint = Number(req.body.value)
               let point_use_percentage = 0
               let due_date_be_written_days = 0
-              Model.sequelize.transaction( t => {
+              return Model.sequelize.transaction( t => {
                 let promises = []
                 for (let i = 0; i < points.length; i++) {
                   if (usePoint < 0) {
@@ -226,7 +221,7 @@ router.post('/front/use',
               let usePoint = Number(req.body.value)
               let point_use_percentage = 0
               let due_date_be_written_days = 0
-              Model.sequelize.transaction( t => {
+              return Model.sequelize.transaction( t => {
                 let promises = []
                 for (let i = 0; i < points.length; i++) {
                   if (usePoint < 0) {
