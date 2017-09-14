@@ -47,7 +47,7 @@ router.post('/create',
           return model.Point.create({
             user_key: req.body.user_key,
             point_change: req.body.value,
-            due_date_be_written_days: moment().add(req.body.due_date, 'M').format(),
+            due_date_be_written_days: moment(req.body.due_date),
             point_use_percentage: req.body.percentage,
             type: req.body.type
           }, { transaction: t })
@@ -74,7 +74,7 @@ router.post('/create',
                 return model.Point.create({
                   user_key: req.body.user_key,
                   point_change: req.body.value,
-                  due_date_be_written_days: moment().format(),
+                  due_date_be_written_days: moment(req.body.due_date),
                   point_use_percentage: req.body.percentage,
                   type: 20
                 },
@@ -84,7 +84,7 @@ router.post('/create',
                 return model.Point.create({
                   user_key: req.body.user_key,
                   point_change: req.body.value,
-                  due_date_be_written_days: moment().format(),
+                  due_date_be_written_days: moment(req.body.due_date),
                   point_use_percentage: req.body.percentage,
                   type: 10
                 },
@@ -286,7 +286,7 @@ router.get('/detail/:user_key/:month',
         created_at: { $gt: getDate(req.params.month) },
         type: { $in: [10, 11, 20, 21] },
       },
-      attributes: [ 'user_key', 'type', 'point_change', 'created_at' ]
+      attributes: [ 'user_key', 'type', 'point_change', 'created_at', 'due_date_be_written_days' ]
     })
     .then( points => {
       res.json(points)
