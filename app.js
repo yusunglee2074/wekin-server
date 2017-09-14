@@ -6,7 +6,7 @@ fireHelper.init()
 
 
 const { utilService } = require('./app/api/v1/service')
-const cron = require('./app/api/v1/util/cron')
+const cron = require('./app/api/v2/util/cron')
 
 cron.batch()
 

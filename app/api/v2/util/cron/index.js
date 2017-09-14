@@ -7,6 +7,9 @@ exports.batch = _ => {
   schedule.scheduleJob('* 0 * * *', checkPointDueDate)
 }
 
+
+// TODO: transaction 처리, 로직이 조금 이상함
+
 function checkPointDueDate () {
   let endDueDatePoint = []
   model.Point.findAll({
