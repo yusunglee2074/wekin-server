@@ -248,7 +248,7 @@ router.post('/front/use',
                 })
             })
         } else {
-          next(err)
+          next("쏴주신 body.type :" + req.body.type + "'0' or '1'로 주세요")
         }
       })
       .catch(err => {
