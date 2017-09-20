@@ -42,7 +42,9 @@ var db = {
   Noti: sequelize.import(path.join(__dirname, 'noti.js')),
   Like: sequelize.import(path.join(__dirname, 'like.js')),
   Waiting: sequelize.import(path.join(__dirname, 'waiting.js')),
-  Point: sequelize.import(path.join(__dirname, 'point.js'))
+  Point: sequelize.import(path.join(__dirname, 'point.js')),
+  ActivityNew: sequelize.import(path.join(__dirname, 'activity-new.js')),
+  WekinNew: sequelize.import(path.join(__dirname, 'wekin-new.js'))
 }
 
 fs.readdirSync(__dirname)

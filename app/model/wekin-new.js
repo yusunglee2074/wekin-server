@@ -14,7 +14,7 @@ module.exports = function (sequelize, DataTypes) {
     pay_amount: { type: DataTypes.INTEGER, allowNull: false },
   }, {
     classMethods: {},
-    tableName: 'wekin',
+    tableName: 'WekinNew',
     freezeTableName: true,
     underscored: true,
     timestamps: true,

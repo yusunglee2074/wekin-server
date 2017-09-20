@@ -10,11 +10,18 @@ var config = {
 
     db.Host.belongsTo(db.User, { foreignKey: 'user_key' })
     db.Host.hasMany(db.Activity, { foreignKey: 'host_key' })
+    db.Host.hasMany(db.ActivityNew, { foreignKey: 'host_key' })
 
     db.Activity.belongsTo(db.Host, { foreignKey: 'host_key' })
     db.Activity.hasMany(db.Favorite, { foreignKey: 'activity_key' })
     db.Activity.hasMany(db.Wekin, { foreignKey: 'activity_key' })
     db.Activity.hasMany(db.Doc, { foreignKey: 'activity_key' })
+    
+    db.ActivityNew.belongsTo(db.Host, { foreignKey: 'host_key' })
+    db.ActivityNew.hasMany(db.WekinNew, { foreignKey: 'activity_key' })
+
+    db.WekinNew.belongsTo(db.Activity, { foreignKey: 'activity_key' })
+    db.WekinNew.hasMany(db.Order, { foreignKey: 'wekin_key' })
 
     db.Wekin.belongsTo(db.Activity, { foreignKey: 'activity_key' })
     db.Wekin.hasMany(db.Order, { foreignKey: 'wekin_key' })
