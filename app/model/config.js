@@ -17,11 +17,10 @@ var config = {
     db.Activity.hasMany(db.Wekin, { foreignKey: 'activity_key' })
     db.Activity.hasMany(db.Doc, { foreignKey: 'activity_key' })
     
-    db.ActivityNew.belongsTo(db.Host, { foreignKey: 'host_key' })
+    db.ActivityNew.hasOne(db.Host, { foreignKey: 'host_key' })
     db.ActivityNew.hasMany(db.WekinNew, { foreignKey: 'activity_key' })
 
-    db.WekinNew.belongsTo(db.Activity, { foreignKey: 'activity_key' })
-    db.WekinNew.hasMany(db.Order, { foreignKey: 'wekin_key' })
+    db.WekinNew.hasOne(db.ActivityNew, { foreignKey: 'activity_key' })
 
     db.Wekin.belongsTo(db.Activity, { foreignKey: 'activity_key' })
     db.Wekin.hasMany(db.Order, { foreignKey: 'wekin_key' })

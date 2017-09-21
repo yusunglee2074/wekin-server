@@ -40,7 +40,7 @@ module.exports = function (sequelize, DataTypes) {
     comision: { type: DataTypes.INTEGER, defaultValue: 0},
   }, {
     classMethods: {},
-    tableName: 'ActivityNew',
+    tableName: 'activitynew',
     freezeTableName: true,
     underscored: true,
     timestamps: true,
