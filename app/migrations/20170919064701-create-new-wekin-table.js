@@ -4,10 +4,10 @@ let model = require('./../model')
 module.exports = {
   up: function (queryInterface, Sequelize) {
     return queryInterface.createTable(
-      'WekinNew',
+      'wekinnew',
       { 
         wekin_key: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-        activity_key: { type: Sequelize.INTEGER, allowNull: false, references: { model: 'ActivityNew', key: 'activity_key' } },
+        activity_key: { type: Sequelize.INTEGER, allowNull: false, references: { model: 'activitynew', key: 'activity_key' } },
         user_key: { type: Sequelize.INTEGER, allowNull: false, references: { model: 'user', key: 'user_key' } },
         final_price: { type: Sequelize.INTEGER, allowNull: false },
         start_date: { type: Sequelize.DATE, allowNull: false },
@@ -21,6 +21,6 @@ module.exports = {
   },
 
   down: function (queryInterface, Sequelize) {
-    return queryInterface.dropTable('WekinNew');
+    return queryInterface.dropTable('wekinnew');
   }
 };

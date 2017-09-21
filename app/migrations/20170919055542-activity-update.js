@@ -4,7 +4,7 @@ let model = require('./../model')
 module.exports = {
   up: function (queryInterface, Sequelize) {
     return queryInterface.createTable(
-      'ActivityNew',
+      'activitynew',
       { 
         activity_key: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
         host_key: { type: Sequelize.INTEGER, allowNull: false, references: { model: 'host', key: 'host_key' } },
@@ -46,6 +46,6 @@ module.exports = {
   },
 
   down: function (queryInterface, Sequelize) {
-    return queryInterface.dropTable('ActivityNew');
+    return queryInterface.dropTable('activitynew');
   }
 };
