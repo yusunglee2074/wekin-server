@@ -3,7 +3,7 @@ const model = require('./index')
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define('Doc', {
     doc_key: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    activity_key: { type: DataTypes.INTEGER, allowNull: true, references: { model: model.Activity, key: 'activity_key' } },
+    activity_key: { type: DataTypes.INTEGER, allowNull: true, references: { model: model.ActivityNew, key: 'activity_key' } },
     user_key: { type: DataTypes.INTEGER, allowNull: false, references: { model: model.User, key: 'user_key' } },
     activity_title: { type: DataTypes.STRING(128), allowNull: true },
     activity_rating: { type: DataTypes.INTEGER, allowNull: true },
