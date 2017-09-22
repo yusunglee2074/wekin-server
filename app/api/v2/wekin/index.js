@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-
+const { authChk } = require('../service')
 const controller = require('./controller')
 
 
@@ -83,7 +83,8 @@ router.delete('/:wekin_key', controller.deleteWekin)
 
 router.get('/', controller.getList)
 
-router.post('/', controller.postWekin)
+router.route('/')
+  .post(authChk, controller.postWekin)
 
 router.get('/:key', controller.getOne)
 
