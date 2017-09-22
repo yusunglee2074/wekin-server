@@ -12,6 +12,7 @@ module.exports = function (sequelize, DataTypes) {
     start_time: { type: DataTypes.DATE, allowNull: false },
     select_option: { type: DataTypes.JSON, allowNull: false },
     pay_amount: { type: DataTypes.INTEGER, allowNull: false },
+    state: { type: DataTypes.STRING, allowNull: false },
   }, {
     classMethods: {},
     tableName: 'wekinnew',
