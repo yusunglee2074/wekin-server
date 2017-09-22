@@ -4,6 +4,7 @@ const moment = require('moment')
 const { wekinService, activityService } = require('../service')
 const { getMainActivityModel } = require('./service')
 
+/*
 // 검색일시 기준, 일정이 남아있는 위킨만 대상으로 누적 관심(즐겨찾기) 수 상위 5개 단, 한달이내
 exports.popularActivity = (req, res) => {
   let nextMonth = moment().add('months', 1).format('YYYY-MM-DD')
@@ -68,9 +69,39 @@ exports.popularActivity = (req, res) => {
   .then(r => {
     returnMsg.success200RetObj(res, r.slice(0, 5))
   })
-  */
   .catch(r => { console.log(r) })
 }
+*/
+
+// 리펙토링
+// 인기 위킨
+// 달려있는 위킨 갯수(결제 횟수) 상위 30 위킨을 뽑아 보여줌 단
+exports.popularActivity = (req, res, next) => {
+  let nextMonth = moment().add('months', 1).format('YYYY-MM-DD')
+  let now = moment().format('YYYY-MM-DD')
+
+  model.ActivityNew.findAll({
+    order: [[model.Sequelize.fn('COUNT', model.Sequelize.col('WekinNews.wekin_key')), 'desc']],
+    group: ['ActivityNew.activity_key', 'Host.host_key', 'Favorites.fav_key'],
+    attributes: {
+      include: [
+        [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
+        [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count']
+      ]
+    },
+    where: { status: 3 },
+    include: [
+      { model: model.Doc, attributes: [], where: { type: 1 }, required: false },
+      { model: model.WekinNew, attributes: [], required: false },
+      { model: model.Host, attributes: ['host_key', 'profile_image'] }, { model: model.Favorite, attributes: ['fav_key'] }
+    ]
+  })
+  .then(results => {
+    returnMsg.success200RetObj(res, results)
+  })
+  .catch(err => next(err))
+}
+
 
 /** 누적 팔로우수 기준으로 상위 20개 선정 후, 10개를 랜덤으로 표시
  * host: profile, name
@@ -154,7 +185,6 @@ exports.popularFeed = (req, res) => {
 
 // 위킨 승인 완료 일시 기준으로 7개 표시
 exports.newestActivity = (req, res) => {
-  
   model.Activity.findAll({
     order: [['confirm_date', 'desc'], ['Wekins', 'start_date', 'asc']],
     group: ['Activity.activity_key', 'Host.host_key', 'Favorites.fav_key', 'Wekins.wekin_key', 'Wekins->Orders.order_key'],
