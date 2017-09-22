@@ -77,9 +77,6 @@ exports.popularActivity = (req, res) => {
 // 인기 위킨
 // 달려있는 위킨 갯수(결제 횟수) 상위 30 위킨을 뽑아 보여줌 단
 exports.popularActivity = (req, res, next) => {
-  let nextMonth = moment().add('months', 1).format('YYYY-MM-DD')
-  let now = moment().format('YYYY-MM-DD')
-
   model.ActivityNew.findAll({
     order: [[model.Sequelize.fn('COUNT', model.Sequelize.col('WekinNews.wekin_key')), 'desc']],
     group: ['ActivityNew.activity_key', 'Host.host_key', 'Favorites.fav_key'],
@@ -183,6 +180,7 @@ exports.popularFeed = (req, res) => {
 }
 
 
+/*
 // 위킨 승인 완료 일시 기준으로 7개 표시
 exports.newestActivity = (req, res) => {
   model.Activity.findAll({
@@ -210,6 +208,41 @@ exports.newestActivity = (req, res) => {
     returnMsg.success200RetObj(res, results.slice(0, 7))
   })
   .catch(err => console.log(err))
+}
+
+function shuffleArray(array) {
+  for (var i = array.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1))
+    var temp = array[i]
+    array[i] = array[j]
+    array[j] = temp
+  }
+  return array
+}
+*/
+// 리펙토링
+// 최신 위킨 승인날짜 기준 7개 가져옴 
+exports.newestActivity = (req, res, next) => {
+  model.ActivityNew.findAll({
+    order: [['confirm_date', 'desc']],
+    group: ['ActivityNew.activity_key', 'Host.host_key', 'Favorites.fav_key'],
+    attributes: {
+      include: [
+        [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
+        [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count']
+      ]
+    },
+    where: { status: 3 },
+    include: [
+      { model: model.Doc, attributes: [], where: { type: 1 }, required: false },
+      { model: model.WekinNew, attributes: [], required: false },
+      { model: model.Host, attributes: ['host_key', 'profile_image'] }, { model: model.Favorite, attributes: ['fav_key'] }
+    ]
+  })
+  .then(results => {
+    returnMsg.success200RetObj(res, results)
+  })
+  .catch(err => next(err))
 }
 
 function shuffleArray(array) {
