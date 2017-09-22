@@ -18,7 +18,7 @@ exports.findAllActivity = (req, res, next) => {
         [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
         [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count']
       ],
-      where: { title: { like: `%${keyword}%` }, status: service.activityStatus.activity.code },
+      where: { title: { $like: `%${keyword}%` }, status: service.activityStatus.activity.code },
       include: [
         {
           where: {
@@ -46,7 +46,7 @@ exports.findAllActivity = (req, res, next) => {
         [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
         [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count']
       ],
-      where: { title: { like: `%${keyword}%` }, status: service.activityStatus.activity.code },
+      where: { title: { $like: `%${keyword}%` }, status: service.activityStatus.activity.code },
       include: [
         {
           where: {
@@ -67,6 +67,76 @@ exports.findAllActivity = (req, res, next) => {
       .catch(err => next(err))
   }
 }
+
+// 리펙토링
+//엑티비티 생성
+exports.createActivity = (req, res, next) => {
+  let user = req.user
+  let requestData = req.body
+  let data= {
+    host_key: user.Host.host_key,
+    main_image: { image: JSON.parse(requestData.main_image) },
+    title: requestData.title,
+    intro_summary: requestData.intro_summary,
+    intro_detail: requestData.intro_detail,
+    schedule: requestData.schedule,
+    inclusion: requestData.inclusion,
+    preparation: requestData.preparation,
+    address_detail: requestData.address_detail,
+    refund_policy: requestData.refund_policy,
+    price: requestData.price,
+    isteamorpeople: requestData.isteamorpeople,
+    status: service.activityStatus.request.code,
+    category: requestData.category1,
+    category_two: requestData.category2,
+    start_date: moment(requestData.start_date),
+    end_date: moment(requestData.end_date),
+    due_date: requestData.due_date,
+    base_start_time: requestData.base_start_time,
+    base_price: requestData.base_price,
+    base_min_user: requestData.base_min_user,
+    base_max_user: requestData.base_max_user,
+    base_price_option: JSON.parse(requestData.base_price_option),
+    base_extra_price_option: requestData.base_extra_price_option,
+    base_week_option: JSON.parse(requestData.base_week_option),
+    close_dates: JSON.parse(requestData.close_dates),
+    is_it_ticket: requestData.is_it_ticket,
+    ticket_due_date: requestData.ticket_due_date,
+    ticket_max_apply: requestData.ticket_max_apply,
+    comision: requestData.comision
+  }
+  let start_date_list = []
+  let count_days = data.end_date.diff(data.start_date, 'days')
+  let week = []
+  for (let i in data.base_week_option) {
+    if (data.base_week_option[i].min_user > 0) {
+      week.push(1)
+    } else {
+      week.push(0)
+    }
+  }
+  var start_day = data.start_date.clone()
+  for (let i = 0; i < count_days; i++) {
+    if (week[start_day.day()] === 1) {
+      let clone_start_day = start_day.clone()
+      start_date_list.push(clone_start_day)
+      start_day = start_day.add(1, 'days')
+    } else {
+      start_day = start_day.add(1, 'days')
+    }
+  }
+  data.start_date_list = start_date_list
+
+  return model.sequelize.transaction(t => {
+    return model.ActivityNew.create(data, { transaction: t })
+    .then( result => {
+      res.json({ message: 'success', data: result })
+      
+    })
+    .catch( error => next(error) )
+  })
+}
+/*
 exports.createActivity = (req, res, next) => {
   let user = req.user
   let requestData = req.body
@@ -103,6 +173,9 @@ exports.createActivity = (req, res, next) => {
       .catch(err => next(err))
   }).catch(err => next(err))
 }
+*/
+
+/*
 exports.updateActivity = (req, res, next) => {
   let user = req.user
   let requestData = req.body
@@ -141,6 +214,52 @@ exports.updateActivity = (req, res, next) => {
       .catch(err => console.error(err))
   }).catch(err => console.error(err))
 }
+*/
+
+// 리펙토링
+// 엑티비티 수정
+exports.updateActivity = (req, res, next) => {
+  let user = req.user
+  let requestData = req.body
+  let activityModelData = {
+    host_key: user.Host.host_key,
+    main_image: { image: requestData.main_image },
+    title: requestData.title,
+    intro_summary: requestData.intro_summary,
+    intro_detail: requestData.intro_detail,
+    schedule: requestData.schedule,
+    inclusion: requestData.inclusion,
+    preparation: requestData.preparation,
+    address_detail: requestData.address_detail,
+    refund_policy: requestData.refund_policy,
+    price: requestData.price,
+    isteamorpeople: requestData.isteamorpeople,
+    status: service.activityStatus.request.code,
+    category: requestData.category1,
+    category_two: requestData.category2,
+    start_date: moment(requestData.start_date),
+    end_date: moment(requestData.end_date),
+    due_date: requestData.due_date,
+    base_start_time: requestData.base_start_time,
+    base_price: requestData.base_price,
+    base_min_user: requestData.base_min_user,
+    base_max_user: requestData.base_max_user,
+    base_price_option: JSON.parse(requestData.base_price_option),
+    base_extra_price_option: requestData.base_extra_price_option,
+    base_week_option: requestData.base_week_option,
+    close_dates: JSON.parse(requestData.close_dates),
+    is_it_ticket: requestData.is_it_ticket,
+    ticket_due_date: requestData.ticket_due_date,
+    ticket_max_apply: requestData.ticket_max_apply,
+    comision: requestData.comision
+  }
+  return model.ActivityNew.update(activityModelData, { returning: true, where: { host_key: user.Host.host_key, activity_key: req.params.activity_key } })
+    .then( result => {
+      res.json({ message: "success", data: result[1][0] })
+    })
+    .catch( error => next(error) )
+}
+
 exports.deleteActivity = (req, res, next) => {
   let modelData = {
     status: service.activityStatus.deletion.code
