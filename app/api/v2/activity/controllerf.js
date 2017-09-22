@@ -108,6 +108,10 @@ exports.createActivity = (req, res, next) => {
   let start_date_list = []
   let count_days = data.end_date.diff(data.start_date, 'days')
   let week = []
+  let close_dates = []
+  for (let i = 0; i < data.close_dates.length; i++) {
+    close_dates.push(moment(data.close_dates[i]).format('YYMMDD'))
+  }
   for (let i in data.base_week_option) {
     if (data.base_week_option[i].min_user > 0) {
       week.push(1)
@@ -117,7 +121,7 @@ exports.createActivity = (req, res, next) => {
   }
   var start_day = data.start_date.clone()
   for (let i = 0; i < count_days; i++) {
-    if (week[start_day.day()] === 1) {
+    if (week[start_day.day()] === 1 && !close_dates.includes(start_day.format('YYMMDD'))) {
       let clone_start_day = start_day.clone()
       start_date_list.push(clone_start_day)
       start_day = start_day.add(1, 'days')
@@ -271,6 +275,7 @@ exports.deleteActivity = (req, res, next) => {
     .then(result => res.json(result))
     .catch(err => next(err))
 }
+/*
 exports.findOneActivity = (req, res, next) => {
   let queryOptions = {
     group: ['Activity.activity_key', 'Host.host_key', 'Host->User.user_key'],
@@ -302,6 +307,41 @@ exports.findOneActivity = (req, res, next) => {
       next(err)
     })
 }
+*/
+
+//리펙토링
+// 엑티비티 디테일
+exports.findOneActivity = (req, res, next) => {
+  let queryOptions = {
+    group: ['ActivityNew.activity_key', 'Host.host_key', 'Host->User.user_key'],
+    where: { activity_key: req.params.activity_key, status: { $in: [service.activityStatus.activity.code, service.activityStatus.end.code] } },
+    attributes: {
+      include: [ [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count'] ]
+    },
+    include: [
+      {
+        model: model.Host,
+        include: {
+          model: model.User,
+          attributes: ['email']
+        }
+      }, {
+        model: model.Doc,
+        attributes: [],
+        where: { type: service.docType.review.code },
+        required: false
+      }]
+  }
+  model.ActivityNew.findOne(queryOptions)
+    .then(result => {
+      model.ActivityNew.update({ count: result.count + 1 }, { where: { activity_key: req.params.activity_key, status: service.activityStatus.activity.code } })
+        .then(r => res.json(result))
+        .catch(err => next(err))
+    }).catch(err => {
+      next(err)
+    })
+}
+
 // Host 소유의 Activity 조회
 exports.findAllActivityOfHost = (req, res, next) => {
   let queryOptions = {
