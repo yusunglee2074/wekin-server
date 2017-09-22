@@ -21,7 +21,6 @@ exports.postFrontWekin = (req, res, next) => {
   }).catch(err => next(err))
 }
 
-
 exports.adjustCommission = (req, res) => {
   
   model.Wekin.update({
@@ -36,8 +35,6 @@ exports.adjustCommission = (req, res) => {
 }
 
 exports.putWekin = (req, res) => {
-
-  console.log(req.body.due_date)
   
   model.Wekin.update({
     commission: req.body.commission,
@@ -80,10 +77,12 @@ exports.getList = (req, res) => {
   .catch(val => {console.log(val)})
 }
 
+/*
 exports.postWekin = (req, res) => {
-  
-  model.Wekin.create({
-    activity_key: req.body.activity_key
+  let user = req.user
+  model.WekinNew.create({
+    activity_key: req.body.activity_key,
+    user_key: user.user_key,
   })
   .then(result => returnMsg.success200RetObj(res, result))
   .catch(val => {console.log(val)})
@@ -91,6 +90,44 @@ exports.postWekin = (req, res) => {
 
 exports.getFinishList = (req, res) => {
   
+  model.Wekin.findAll({
+    where: {
+      start_date: {$lt: new Date()}
+    },
+    include: [{
+      model: model.Activity,
+      include: { model: model.Host },
+      where: {
+        status: { $in: [3, 5] } }
+    },
+    { model: model.Order }]
+  })
+  .then(result => returnMsg.success200RetObj(res, result))
+  .catch(val => {console.log(val)})
+}
+*/
+
+// 리펙토링
+// 신청하기 눌렀을떄 위킨 생성
+exports.postWekin = (req, res, next) => {
+  console.log(req.user)
+  let user = req.user
+  let data = req.body
+  model.WekinNew.create({
+    activity_key: req.body.activity_key,
+    user_key: user.user_key,
+    final_price: data.final_price,
+    start_date: data.start_date,
+    start_time: data.start_time,
+    select_option: JSON.parse(data.select_option),
+    pay_amount: data.pay_amount,
+    state: 'booking' 
+  })
+  .then(result => res.json({ message: 'success', data: result}))
+  .catch(error => {next(error)})
+}
+
+exports.getFinishList = (req, res) => {
   model.Wekin.findAll({
     where: {
       start_date: {$lt: new Date()}
