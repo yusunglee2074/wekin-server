@@ -15,6 +15,7 @@ exports.getChildWekin = (req, res) => {
   })
 }
 
+/*
 exports.getApproveList = (req, res) => {
   model.Activity.findAll({
     order: [['created_at', 'DESC']],
@@ -26,6 +27,22 @@ exports.getApproveList = (req, res) => {
   }).catch((err) => {
     console.log(err)
   })
+}
+*/
+// 리펙토링
+// 승인해야할 엑티비티 가져오기
+exports.getApproveList = (req, res, next) => {
+  model.ActivityNew.findAll({
+    order: [['created_at', 'DESC']],
+    where: { status: { $in: [1] } },
+    include: {
+      model: model.Host
+    }
+  })
+    .then( result => {
+      res.json(result)
+    })
+    .catch( error => next(error) )
 }
 
 exports.getList = (req, res) => {
@@ -71,6 +88,27 @@ exports.putOne = (req, res) => {
   
 }
 
+//리펙토링
+// 위킨 승인
+exports.getApproveActivity = (req, res, next) => {
+  model.ActivityNew.update({
+    status: 3,
+    confirm_date: new Date()
+  }, {
+    where: {
+      activity_key: req.params.activity_key
+    },
+    returning: true
+  })
+    .then(result => {
+      notiService.activityNotiToFollow(result[1][0])
+      utilService.sendWekinConfirmSuccess(result[1][0].host_key)
+      res.json({ message: 'success', data: result[1][0] })
+    })
+    .catch(err => next(err))
+}
+
+/*
 exports.getApproveActivity = (req, res) => {
   model.Activity.update({
     status: 3,
@@ -87,8 +125,8 @@ exports.getApproveActivity = (req, res) => {
     returnMsg.success200RetObj(res, req.body)
   })
   .catch(err => console.log(err))
-  
 }
+*/
 
 exports.deleteAvtivity = (req, res) => {
 
