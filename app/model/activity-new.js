@@ -33,7 +33,7 @@ module.exports = function (sequelize, DataTypes) {
     base_price_option: { type: DataTypes.JSON, allowNull: true },
     base_extra_price_option: { type: DataTypes.JSON, allowNull: true },
     base_week_option: { type: DataTypes.JSON, allowNull: true },
-    close_dates: { type: DataTypes.ARRAY(DataTypes.TEXT), allowNull: true },
+    close_dates: { type: DataTypes.ARRAY(DataTypes.JSON), allowNull: true },
     is_it_ticket: { type: DataTypes.BOOLEAN, defaultValue: false },
     ticket_due_date: { type: DataTypes.DATE },
     ticket_max_apply: { type: DataTypes.INTEGER },

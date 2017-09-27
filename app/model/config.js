@@ -4,6 +4,7 @@ var config = {
   initAssociations: function (db) {
     db.User.hasMany(db.Follow, { foreignKey: 'user_key' })
     db.User.hasOne(db.Host, { foreignKey: 'user_key' })
+    db.User.hasMany(db.WekinNew, { foreignKey: 'user_key' })
 
     db.User.hasMany(db.Point, { foreignKey: 'user_key' })
     db.Point.hasOne(db.User, { foreignKey: 'user_key' })
@@ -23,6 +24,7 @@ var config = {
     db.ActivityNew.hasMany(db.Favorite, { foreignKey: 'activity_key' })
 
     db.WekinNew.hasOne(db.ActivityNew, { foreignKey: 'activity_key' })
+    db.WekinNew.hasOne(db.User, { foreignKey: 'user_key' })
 
     db.Wekin.belongsTo(db.Activity, { foreignKey: 'activity_key' })
     db.Wekin.hasMany(db.Order, { foreignKey: 'wekin_key' })
