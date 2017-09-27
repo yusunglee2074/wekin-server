@@ -60,16 +60,16 @@ router.post('/create',
               ])
             })
             .then( result => {
-              if (req.body.type === 1) {
+              if (req.body.type == 1) {
                 return result[1].updateAttributes({ "point.point_special": result[1].point.point_special + result[0].point_change }, { transaction: t } )
-              } else if (req.body.type === 0) {
+              } else if (req.body.type == 0) {
                 return result[1].updateAttributes({ "point.point": result[1].point.point + result[0].point_change }, { transaction: t } )
               } else {
                 throw new Error()
               }
             })
             .then( result => {
-              if (req.body.type === 1) {
+              if (req.body.type == 1) {
                 return model.Point.create({
                   user_key: req.body.user_key,
                   point_change: req.body.value,
@@ -78,7 +78,7 @@ router.post('/create',
                 },
                   { transaction: t }
                 )
-              } else if (req.body.type === 0) {
+              } else if (req.body.type == 0) {
                 return model.Point.create({
                   user_key: req.body.user_key,
                   point_change: req.body.value,
