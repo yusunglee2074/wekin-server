@@ -1,6 +1,8 @@
 const model = require('../../../model')
 const service = require('../service')
 const moment = require('moment')
+
+/*
 // activity 조회
 exports.findAllActivity = (req, res, next) => {
   let keyword = req.query.keyword ? req.query.keyword : '%'
@@ -67,15 +69,44 @@ exports.findAllActivity = (req, res, next) => {
       .catch(err => next(err))
   }
 }
+*/
+
+// 리펙토링
+// 엑티비티 리스트
+exports.findAllActivity = (req, res, next) => {
+  model.ActivityNew.findAll({
+    where: {
+    },
+    include: [
+      {
+        model: model.Host,
+        include: {
+          model: model.User,
+          attributes: ['email']
+        }
+      }, {
+        model: model.Doc,
+        attributes: [],
+        where: { type: service.docType.review.code },
+        required: false
+      }]
+  })
+    .then( activities => {
+      res.json(activities)
+    })
+    .catch( error => next(error) )
+}
 
 // 리펙토링
 //엑티비티 생성
 exports.createActivity = (req, res, next) => {
   let user = req.user
   let requestData = req.body
+  console.log("이유성" + moment(requestData.start_date))
+  console.log("이유성" + moment(requestData.end_date))
   let data= {
     host_key: user.Host.host_key,
-    main_image: { image: JSON.parse(requestData.main_image) },
+    main_image: { image: requestData.main_image },
     title: requestData.title,
     intro_summary: requestData.intro_summary,
     intro_detail: requestData.intro_detail,
@@ -89,24 +120,24 @@ exports.createActivity = (req, res, next) => {
     status: service.activityStatus.request.code,
     category: requestData.category1,
     category_two: requestData.category2,
-    start_date: moment(requestData.start_date),
-    end_date: moment(requestData.end_date),
+    start_date: moment(requestData.start_date).format(),
+    end_date: moment(requestData.end_date).format(),
     due_date: requestData.due_date,
-    base_start_time: requestData.base_start_time,
+    base_start_time: moment().set(requestData.base_start_time.split(':')[0], 'hours').set(requestData.base_start_time.split(':')[1], 'minites'),
     base_price: requestData.base_price,
     base_min_user: requestData.base_min_user,
     base_max_user: requestData.base_max_user,
-    base_price_option: JSON.parse(requestData.base_price_option),
+    base_price_option: requestData.base_price_option,
     base_extra_price_option: requestData.base_extra_price_option,
-    base_week_option: JSON.parse(requestData.base_week_option),
-    close_dates: JSON.parse(requestData.close_dates),
+    base_week_option: requestData.base_week_option,
+    close_dates: requestData.close_dates,
     is_it_ticket: requestData.is_it_ticket,
     ticket_due_date: requestData.ticket_due_date,
     ticket_max_apply: requestData.ticket_max_apply,
     comision: requestData.comision
   }
   let start_date_list = []
-  let count_days = data.end_date.diff(data.start_date, 'days')
+  let count_days = moment(data.end_date).diff(data.start_date, 'days')
   let week = []
   let close_dates = []
   for (let i = 0; i < data.close_dates.length; i++) {
@@ -115,11 +146,15 @@ exports.createActivity = (req, res, next) => {
   for (let i in data.base_week_option) {
     if (data.base_week_option[i].min_user > 0) {
       week.push(1)
+      let time = data.base_week_option[i].start_time
+      for (let y in time) {
+        data.base_week_option[i].start_time[y] = moment().set(time[y].split(':')[0], 'hours').set(time[y].split(':')[1], 'minites')
+      }
     } else {
       week.push(0)
     }
   }
-  var start_day = data.start_date.clone()
+  var start_day = moment(data.start_date).clone()
   for (let i = 0; i < count_days; i++) {
     if (week[start_day.day()] === 1 && !close_dates.includes(start_day.format('YYMMDD'))) {
       let clone_start_day = start_day.clone()
@@ -132,6 +167,7 @@ exports.createActivity = (req, res, next) => {
   data.start_date_list = start_date_list
 
   return model.sequelize.transaction(t => {
+    console.log(data)
     return model.ActivityNew.create(data, { transaction: t })
     .then( result => {
       res.json({ message: 'success', data: result })
