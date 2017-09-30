@@ -9,6 +9,7 @@ module.exports = {
         title: { type: Sequelize.STRING },
         sub_title: { type: Sequelize.STRING },
         link_url: { type: Sequelize.STRING },
+        thumbnail_url: { type: Sequelize.STRING },
         created_at: { type: Sequelize.DATE },
         updated_at: { type: Sequelize.DATE },
         deleted_at: { type: Sequelize.DATE },

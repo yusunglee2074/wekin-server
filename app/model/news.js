@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     link_url: { type: DataTypes.STRING },
     title: { type: DataTypes.STRING },
     sub_title: { type: DataTypes.STRING },
+    thumbnail_url: { type: DataTypes.STRING },
   }, {
     classMethods: {},
     tableName: 'news',
