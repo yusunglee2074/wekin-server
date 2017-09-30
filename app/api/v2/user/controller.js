@@ -103,12 +103,22 @@ exports.kakaoLogin = (req, res, next) => {
           photo: userInfo.profile_image || null,
           name: userInfo.name
         }
-        fireHelper.createCustomToken(userInfo.id, additionalClaims)
-          .then( customToken => {
-
-            res.json({ customToken: customToken, userInfo: userInfo }) 
+        fireHelper.admin.auth().getUserByEmail(userInfo.email)
+          .then(function(userRecord) {
+            let err = {
+              message: 'fail already email exist',
+              data: userRecord
+            }
+            next(err) 
           })
-          .catch( err => next(err))
+          .catch(function(error) {
+            fireHelper.createCustomToken(userInfo.id, additionalClaims)
+              .then( customToken => {
+
+                res.json({ customToken: customToken, userInfo: userInfo }) 
+              })
+              .catch( err => next(err))
+          });
       })
       // 유저 정보를 이용해서 커스텀 토큰을 만든 후 프론트에게 넘겨준 후 프론트에서 커스텀 토큰으로 signInWithCustomToken로 파배 가입시킨다.
     })
@@ -130,15 +140,19 @@ exports.dbCreateWithIdtoken = (req, res, next) => {
         }
       })
         .then(user => {
-          console.log(user)
+          let uuid = user[0].dataValues.uuid
           fireHelper.admin.auth().updateUser(decoded.sub, {
             displayName: decoded.name,
             email: decoded.email
           })
-          .then( user => {
-            res.send(user)
-          })
-          .catch( err => next(err) )
+            .then( user => {
+              res.send(user)
+            })
+            .catch( err => {
+              fireHelper.admin.auth().getUser(uuid)
+                .then( user => res.send(user) )
+                .catch( error => next(error) )
+            })
         })
         .catch(err => {
           console.log(err)
