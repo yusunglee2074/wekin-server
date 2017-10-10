@@ -52,10 +52,9 @@ router.put('/update',
 
 // 뉴스 삭제 
 // 필요 인자 = id 
-router.delete('/delete',
+router.delete('/delete/:news_key',
   function (req, res, next) {
-    let body = req.body
-    model.News.destroy({ where: { news_key: body.id } })
+    model.News.destroy({ where: { news_key: req.params.news_key } })
       .then(result => {
         res.json({ message: 'success' })
       })
