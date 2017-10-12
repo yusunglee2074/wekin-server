@@ -1,4 +1,5 @@
 const model = require('../../../model')
+const moment = require('moment')
 const returnMsg = require('../../../return.msg')
 const { wekinService, activityService, utilService } = require('../service')
 
@@ -110,17 +111,24 @@ exports.getFinishList = (req, res) => {
 // 리펙토링
 // 신청하기 눌렀을떄 위킨 생성
 exports.postWekin = (req, res, next) => {
-  console.log(req.user)
   let user = req.user
-  let data = req.body
+  let data = req.body.params
+  let cloneData = Object.assign({}, data)
+  let amount = 0
+  for (i in data.selectedExtraOption) {
+    amount += data.selectedExtraOption[i]
+  }
+  delete cloneData.finalPrice
+  delete cloneData.selectedDate
+  delete cloneData.activity_key
   model.WekinNew.create({
-    activity_key: req.body.activity_key,
+    activity_key: data.activity_key,
     user_key: user.user_key,
-    final_price: data.final_price,
-    start_date: data.start_date,
-    start_time: data.start_time,
-    select_option: JSON.parse(data.select_option),
-    pay_amount: data.pay_amount,
+    final_price: data.finalPrice,
+    start_date: moment(data.start_date).format(),
+    start_time: moment(data.startTime[0]).format(),
+    select_option: cloneData,
+    pay_amount: amount,
     state: 'booking' 
   })
   .then(result => res.json({ message: 'success', data: result}))
