@@ -82,14 +82,22 @@ exports.findAllActivity = (req, res, next) => {
         model: model.Host,
         include: {
           model: model.User,
-          attributes: ['email']
-        }
+          attributes: []
+        },
+        group: ['User.user_key']
       }, {
         model: model.Doc,
         attributes: [],
         where: { type: service.docType.review.code },
         required: false
-      }]
+      }],
+    attributes: {
+      include: [
+        [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
+        [model.Sequelize.fn('COUNT', model.Sequelize.fn('DISTINCT', model.Sequelize.col('Docs.doc_key'))), 'review_count']
+      ]
+    },
+    group: ['ActivityNew.activity_key', 'Docs.doc_key', 'Host.host_key'],
   })
     .then( activities => {
       res.json(activities)
@@ -102,8 +110,6 @@ exports.findAllActivity = (req, res, next) => {
 exports.createActivity = (req, res, next) => {
   let user = req.user
   let requestData = req.body
-  console.log("이유성" + moment(requestData.start_date))
-  console.log("이유성" + moment(requestData.end_date))
   let data= {
     host_key: user.Host.host_key,
     main_image: { image: requestData.main_image },
@@ -123,7 +129,7 @@ exports.createActivity = (req, res, next) => {
     start_date: moment(requestData.start_date).format(),
     end_date: moment(requestData.end_date).format(),
     due_date: requestData.due_date,
-    base_start_time: moment().set(requestData.base_start_time.split(':')[0], 'hours').set(requestData.base_start_time.split(':')[1], 'minites'),
+    base_start_time: moment().set(1, 'hours').set(00, 'minites'),
     base_price: requestData.base_price,
     base_min_user: requestData.base_min_user,
     base_max_user: requestData.base_max_user,
@@ -138,36 +144,36 @@ exports.createActivity = (req, res, next) => {
   }
   let start_date_list = []
   let count_days = moment(data.end_date).diff(data.start_date, 'days')
-  let week = []
+  let week = {}
   let close_dates = []
   for (let i = 0; i < data.close_dates.length; i++) {
     close_dates.push(moment(data.close_dates[i]).format('YYMMDD'))
   }
-  for (let i in data.base_week_option) {
+  for (i in data.base_week_option) {
     if (data.base_week_option[i].min_user > 0) {
-      week.push(1)
+      week[i] = 1
       let time = data.base_week_option[i].start_time
       for (let y in time) {
-        data.base_week_option[i].start_time[y] = moment().set(time[y].split(':')[0], 'hours').set(time[y].split(':')[1], 'minites')
+        data.base_week_option[i].start_time[y] = moment().set('hour', time[y].split(':')[0]).set('minute', time[y].split(':')[1]).format()
       }
     } else {
-      week.push(0)
+      week[i] = 0
     }
   }
   var start_day = moment(data.start_date).clone()
-  for (let i = 0; i < count_days; i++) {
-    if (week[start_day.day()] === 1 && !close_dates.includes(start_day.format('YYMMDD'))) {
+  for (let a = 0; a < count_days; a++) {
+    if (week[start_day.format('dddd').slice(0, 2)] === 1 && !close_dates.includes(start_day.format('YYMMDD'))) {
       let clone_start_day = start_day.clone()
-      start_date_list.push(clone_start_day)
+      start_date_list.push(clone_start_day.format())
       start_day = start_day.add(1, 'days')
     } else {
       start_day = start_day.add(1, 'days')
     }
   }
+  data.close_dates = close_dates
   data.start_date_list = start_date_list
 
   return model.sequelize.transaction(t => {
-    console.log(data)
     return model.ActivityNew.create(data, { transaction: t })
     .then( result => {
       res.json({ message: 'success', data: result })
