@@ -36,7 +36,7 @@ var config = {
     db.Doc.hasMany(db.Comment, { foreignKey: 'doc_key' })
     db.Doc.belongsTo(db.Host, { foreignKey: 'host_key' })
 
-    db.Order.belongsTo(db.Wekin, { foreignKey: 'wekin_key' })
+    db.Order.belongsTo(db.WekinNew, { foreignKey: 'wekin_key' })
     db.Order.belongsTo(db.User, { foreignKey: 'user_key' })
     db.Order.belongsTo(db.Host, { foreignKey: 'host_key' })
 
