@@ -37,7 +37,7 @@ app.use(`${CURRENT_API_VERSION}/host`, require('./api/v1/host'))
 app.use(`${CURRENT_API_VERSION}/util`, require('./api/v1/util'))
 app.use(`${CURRENT_API_VERSION}/noti`, require('./api/v1/noti'))
 app.use(`${CURRENT_API_VERSION}/dashboard`, require('./api/v1/dashboard'))
-app.use(`${CURRENT_API_VERSION}/order`, require('./api/v1/order'))
+app.use(`${CURRENT_API_VERSION}/order`, require('./api/v2/order'))
 app.use(`${CURRENT_API_VERSION}/favorite`, require('./api/v2/favorite'))
 app.use(`${CURRENT_API_VERSION}/follow`, require('./api/v1/follow'))
 app.use(`${CURRENT_API_VERSION}/like`, require('./api/v1/like'))
@@ -50,15 +50,14 @@ app.use(`${CURRENT_API_VERSION}/point`, require('./api/v2/point'))
 app.use(`${CURRENT_API_VERSION}/news`, require('./api/v2/news'))
 app.use(
   function errorHandler(err, req, res, next) {
+    let error = JSON.stringify(err)
+    console.log("에러")
     res.status(501)
     console.log(err)
-    let error = JSON.stringify(err)
     if (error == '{}') {
-      console.log(typeof(err))
-      console.log(err)
-      res.send(err.message)
+      res.json({ message: err.message, data: err})
     } else {
-      res.json({ 'error': error })
+      res.json({ 'message': 'error', data: error  })
     }
   }
 )
