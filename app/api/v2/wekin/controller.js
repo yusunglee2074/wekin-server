@@ -64,7 +64,7 @@ exports.getOneIncludeOrder = (req, res) => {
   })
 } 
 
-exports.getList = (req, res) => {
+exports.getList = (req, res, next) => {
   
   model.Wekin.findAll({
     include: [{
@@ -75,7 +75,7 @@ exports.getList = (req, res) => {
     { model: model.Order }]
   })
   .then(result => returnMsg.success200RetObj(res, result))
-  .catch(val => {console.log(val)})
+  .catch(val => next(val))
 }
 
 /*
@@ -111,7 +111,6 @@ exports.getFinishList = (req, res) => {
 // 리펙토링
 // 신청하기 눌렀을떄 위킨 생성
 exports.postWekin = (req, res, next) => {
-  let user = req.user
   let data = req.body.params
   let cloneData = Object.assign({}, data)
   let amount = 0
@@ -121,18 +120,62 @@ exports.postWekin = (req, res, next) => {
   delete cloneData.finalPrice
   delete cloneData.selectedDate
   delete cloneData.activity_key
-  model.WekinNew.create({
-    activity_key: data.activity_key,
-    user_key: user.user_key,
-    final_price: data.finalPrice,
-    start_date: moment(data.start_date).format(),
-    start_time: moment(data.startTime[0]).format(),
-    select_option: cloneData,
-    pay_amount: amount,
-    state: 'booking' 
+  // 한 사람당 한 엑티비티에 대해서 하나의 북킹 위킨만 생성가능
+  model.WekinNew.findOne({
+    where: {
+      user_key: req.user.user_key,
+      activity_key: req.body.params.activity_key
+    }
   })
-  .then(result => res.json({ message: 'success', data: result}))
-  .catch(error => {next(error)})
+    .then( wekin => {
+      if (wekin === null) {
+        model.WekinNew.create({
+          activity_key: data.activity_key,
+          user_key: req.user.user_key,
+          final_price: data.finalPrice,
+          start_date: moment(data.start_date).format(),
+          start_time: moment(data.startTime[0]).format(),
+          select_option: cloneData,
+          pay_amount: amount,
+          state: 'booking' 
+        })
+          .then(result => res.json({ message: 'success', data: result }))
+          .catch(error => next(error))
+      } else {
+        let value = {}
+        value.final_price = data.finalPrice
+        value.start_date = moment(data.start_date).format()
+        value.start_time = moment(data.startTime[0]).format()
+        value.select_option = cloneData
+        value.pay_amount = amount
+        model.WekinNew.update(value, { where: { wekin_key: wekin.wekin_key } })
+          .then(result => res.json({ message: 'success', data: result }))
+          .catch(error => next(error))
+      }
+    })
+}
+
+// 엑티비티 디테일 페이지 들어왔을때 activity_key, start_date 인자로 넘겨주면 남은 인원수 보여주는 api 작성
+exports.getCurrentNumberOfBookingUsers = (req, res, next) => {
+  let activity_key = req.params.key
+  let date = req.params.date
+  model.WekinNew.count(
+    {
+      where: {
+        activity_key: activity_key,
+        start_date: {
+          $or: {
+            $lt: new Date(moment('2017-10-11T15:47:44.927Z').set('hour', 23).set('minute', 59).set('second', 59).format()),
+            $gt: new Date(moment('2017-10-11T15:47:44.927Z').set('hour', 0).set('minute', 0).set('second', 0).format())
+          }
+        }
+      }
+    }
+  )
+    .then( result => {
+      res.json({ message: 'success', date: result })
+    })
+    .catch(error => next(error))
 }
 
 exports.getFinishList = (req, res) => {
