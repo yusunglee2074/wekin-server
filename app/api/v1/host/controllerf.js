@@ -37,7 +37,7 @@ exports.createHost = (req, res, next) => {
       res.json(result)
     })
     .catch(e => {
-      res.send(400)
+      next(e)
     })
 }
 
