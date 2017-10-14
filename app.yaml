@@ -4,7 +4,7 @@ api_version: 1.0.0
 runtime: nodejs
 env: flex
 automatic_scaling:
-  min_num_instances: 2
+  min_num_instances: 1
 env_variables:
   SQL_USER: postgres
   # SQL_USER: wekin
@@ -16,3 +16,7 @@ env_variables:
 beta_settings:
   cloud_sql_instances: wekinproject:asia-northeast1:wekin-production
   # cloud_sql_instances: wekinproject:asia-northeast1:wekin-dev
+resources:
+  cpu: 1
+  memory_gb: 2
+  disk_size_gb: 10
