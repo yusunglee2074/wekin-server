@@ -550,7 +550,7 @@ exports.putOrder = (req, res) => {
   .catch(val => { returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', val) })
 }
 
-exports.postOrder = (req, res) => {
+exports.postOrder = (req, res, next) => {
 
   model.sequelize.transaction(t => {
   // transaction start
@@ -564,51 +564,46 @@ exports.postOrder = (req, res) => {
         where: { user_key: body.user_key }
       }, {transaction: t})
     })
-    .then(v => {
-      tmp.user = v
-      return model.Wekin.findOne({
-        where: { wekin_key: body.wekin_key},
-        include: [{ model: model.Activity, include: {model: model.Host} }, { required: false, model: model.Order, where: { status: {$in: ['order', 'ready', 'paid']} }}]
-      }, { transaction: t })
-    })
-    .then(v => {
-      let count = 0
-      v.Orders.forEach(v => {
-        count += v.wekin_amount
+      .then(v => {
+        tmp.user = v
+        return model.WekinNew.findOne(
+          {
+            where: { wekin_key: body.wekin_key},
+            include: [
+              { model: model.ActivityNew, include: { model: model.Host }, attributes: ['title', 'host_key', 'base_price', 'refund_policy', 'comision'] },
+              { required: false, model: model.Order, where: { status: { $in: ['order', 'ready', 'paid'] } }}
+            ]
+          }, { transaction: t })
       })
-      if (v.max_user >= (count + parseInt(body.amount))) {
-        //인원 내
-        // FIXME: create까지 transaction 잡아줘야함
-        return model.Order.create({
-          user_key: body.user_key,
-          user_email: tmp.user.email,
-          user_name: tmp.user.name,
-          user_phone: tmp.user.phone,
-          wekin_key: body.wekin_key,
-          status: tmp.status,
-          amount: body.amount,
-          wekin_name: v.Activity.title,
-          wekin_price: v.Activity.price,
-          wekin_amount: body.amount,
-          order_total_price: (v.Activity.price * body.amount),
-          order_receipt_price: (v.Activity.price * body.amount),
-          order_refund_policy: v.Activity.refund_policy,
-          wekin_host_name: v.Activity.Host.name,
-          host_key: v.Activity.Host.host_key,
-          refund_info: body.extra,
-          commission: v.commission
-        })
-      } else {
-        // 인원초과
-        returnMsg.success200RetObj(res, {msg: `현재 인원 ${v.Orders.length} 이므로 ${body.amount} 명을 더 예약할 수 없습니다.`, current: v.Orders.length, request: body.amount})
-      }
+    .then(v => {
+      console.log(v.ActivityNew)
+      //인원 내
+      // FIXME: create까지 transaction 잡아줘야함
+      return model.Order.create({
+        user_key: body.user_key,
+        user_email: tmp.user.email,
+        user_name: tmp.user.name,
+        user_phone: tmp.user.phone,
+        wekin_key: body.wekin_key,
+        status: tmp.status,
+        amount: body.amount,
+        wekin_name: v.ActivityNew.title,
+        wekin_price: v.ActivityNew.base_price,
+        wekin_amount: body.amount,
+        order_total_price: v.final_price,
+        order_receipt_price: v.final_price,
+        order_refund_policy: v.ActivityNew.refund_policy,
+        wekin_host_name: v.ActivityNew.Host.name,
+        host_key: v.ActivityNew.Host.host_key,
+        refund_info: body.extra,
+        commission: v.ActivityNew.comision
+      })
     })
     .then(result => {
       returnMsg.success200RetObj(res, result)
     })
     .catch(val => {
-      console.log(val)
-      returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', val)
+      next(val)
     })
   })
   // transaction end
