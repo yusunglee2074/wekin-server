@@ -2,7 +2,7 @@
 
 module.exports = {
   up: function (queryInterface, Sequelize) {
-      return queryInterface.changeColumn(
+      return queryInterface.addColumn(
         'order',
         'wekin_key',
         {
@@ -14,14 +14,9 @@ module.exports = {
   },
 
   down: function (queryInterface, Sequelize) {
-      return queryInterface.changeColumn(
+      return queryInterface.removeColumn(
         'order',
-        'wekin_key',
-        {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-          references: { model: 'wekin', key: 'wekin_key' }
-        }
-      );
+        'wekin_key'
+      )
   }
 };
