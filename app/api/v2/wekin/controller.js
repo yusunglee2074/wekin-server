@@ -148,7 +148,7 @@ exports.postWekin = (req, res, next) => {
         value.start_time = moment(data.startTime[0]).format()
         value.select_option = cloneData
         value.pay_amount = amount
-        model.WekinNew.update(value, { where: { wekin_key: wekin.wekin_key } })
+        model.WekinNew.update(value, { where: { wekin_key: wekin.wekin_key }, returning: true })
           .then(result => res.json({ message: 'success', data: result }))
           .catch(error => next(error))
       }
