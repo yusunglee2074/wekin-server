@@ -14,10 +14,7 @@ exports.importHook = (req, res) => {
       if (r.status === 200) {
         model.Order.update({ status: r.data.status, order_pay_price: r.data.amount }, { where: { order_id: r.data.merchant_uid }, returning: true })
           .then(r => {
-            if (r[1][0].status === 'paid') {
-              utilService.sendOrderConfirmSms(r[1][0])
-              utilService.sendOrderConfirmSmsToMaker(r[1][0])
-            } else if (r.status === 'ready') {
+            if (r.status === 'ready') {
               utilService.sendOrderReadySms(r[1][0])
             }
             returnMsg.success200RetObj(res, {success: true})
