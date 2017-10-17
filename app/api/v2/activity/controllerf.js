@@ -408,9 +408,9 @@ exports.findAllRecentlyActivityOfHost = (req, res, next) => {
     limit: 2,
     order: [['created_at', 'DESC']],
     where: { host_key: req.params.host_key, status: 3 },
-    attributes: ['activity_key', 'host_key', 'main_image', 'title', 'price']
+    attributes: ['activity_key', 'host_key', 'main_image', 'title', 'base_price']
   }
-  model.Activity.findAll(queryOptions)
+  model.ActivityNew.findAll(queryOptions)
     .then(result => res.json(result))
     .catch(err => next(err))
 }
