@@ -8,8 +8,8 @@ exports.getData = (req, res, next) => {
     include: [{
       attributes: { 
         include: [
-          [model.Sequelize.fn('AVG', model.Sequelize.col('ActivityNew->Docs.activity_key')), 'rating_avg'],
           [model.Sequelize.fn('COUNT', model.Sequelize.col('ActivityNew->Docs.activity_key')), 'review_count'],
+          [model.Sequelize.fn('AVG', model.Sequelize.fn('DISTINCT', model.Sequelize.col('ActivityNew->Docs.activity_rating'))), 'rating_avg'],
           [model.Sequelize.fn('COUNT', model.Sequelize.col('Favorite')), 'total']
         ]
       },
