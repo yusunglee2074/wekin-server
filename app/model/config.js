@@ -25,7 +25,7 @@ var config = {
 
     db.WekinNew.belongsTo(db.ActivityNew, { foreignKey: 'activity_key' })
     db.WekinNew.hasOne(db.User, { foreignKey: 'user_key' })
-    db.WekinNew.belongsTo(db.Order, { foreignKey: 'wekin_key' })
+    db.WekinNew.hasOne(db.Order, { foreignKey: 'wekin_key' })
 
     db.Wekin.belongsTo(db.Activity, { foreignKey: 'activity_key' })
     db.Wekin.hasMany(db.Order, { foreignKey: 'wekin_key' })
@@ -37,7 +37,7 @@ var config = {
     db.Doc.hasMany(db.Comment, { foreignKey: 'doc_key' })
     db.Doc.belongsTo(db.Host, { foreignKey: 'host_key' })
 
-    db.Order.hasOne(db.WekinNew, { foreignKey: 'wekin_key' })
+    db.Order.belongsTo(db.WekinNew, { foreignKey: 'wekin_key' })
     db.Order.belongsTo(db.User, { foreignKey: 'user_key' })
     db.Order.belongsTo(db.Host, { foreignKey: 'host_key' })
 
