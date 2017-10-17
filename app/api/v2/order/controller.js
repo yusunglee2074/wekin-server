@@ -611,17 +611,17 @@ exports.postOrder = (req, res, next) => {
 
 }
 
-exports.getOneByUser = (req, res) => {
+exports.getOneByUser = (req, res, next) => {
   model.Order.findAll({
     where: { user_key: req.params.user_key },
     include: [
-      { model: model.Wekin, include: model.Activity},
+      { model: model.WekinNew, include: model.ActivityNew },
       { model: model.User }]
   })
   .then(v => {
     returnMsg.success200RetObj(res, v)
   })
-  .catch(val => { returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', val) })
+  .catch(err => next(err))
 }
 exports.getOneOrder = (req, res) => {
   model.Order.findOne({
