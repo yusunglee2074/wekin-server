@@ -24,7 +24,7 @@ var config = {
     db.ActivityNew.hasMany(db.Favorite, { foreignKey: 'activity_key' })
 
     db.WekinNew.belongsTo(db.ActivityNew, { foreignKey: 'activity_key' })
-    db.WekinNew.hasOne(db.User, { foreignKey: 'user_key' })
+    db.WekinNew.belongsTo(db.User, { foreignKey: 'user_key' })
     db.WekinNew.hasOne(db.Order, { foreignKey: 'wekin_key' })
 
     db.Wekin.belongsTo(db.Activity, { foreignKey: 'activity_key' })
