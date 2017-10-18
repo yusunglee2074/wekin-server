@@ -367,7 +367,14 @@ exports.getFrontUserInfo = (req, res, next) => {
       'email',
       'email_noti',
       'push_noti',
-      'sms_noti'
+      'sms_noti',
+      'introduce',
+      'work_balance_point',
+      'work_balance_point_history',
+      // 추가로 불러와야 할 정보들 입력
+    ],
+    include: [
+      { model: model.WekinNew, include: { model: model.ActivityNew, attributes: [ 'category' ] } }
     ]
   }
   model.User.findOne(queryOptions)
