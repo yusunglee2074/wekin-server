@@ -76,6 +76,7 @@ exports.findAllActivity = (req, res, next) => {
 exports.findAllActivity = (req, res, next) => {
   model.ActivityNew.findAll({
     where: {
+      status: 3 || 5 
     },
     include: [
       {
@@ -356,7 +357,7 @@ exports.findOneActivity = (req, res, next) => {
 exports.findOneActivity = (req, res, next) => {
   let queryOptions = {
     group: ['ActivityNew.activity_key', 'Host.host_key', 'Host->User.user_key'],
-    where: { activity_key: req.params.activity_key, status: { $in: [service.activityStatus.activity.code, service.activityStatus.end.code] } },
+    where: { activity_key: req.params.activity_key },
     attributes: {
       include: [
         [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count'],
@@ -393,12 +394,12 @@ exports.findAllActivityOfHost = (req, res, next) => {
     where: { host_key: req.params.host_key, status: { $ne: service.activityStatus.deletion.code } }
   }
   if (req.query.count === 'true') {
-    model.Activity.sum('count', queryOptions)
+    model.ActivityNew.sum('count', queryOptions)
       .then(result => res.json(result))
       .catch(err => next(err))
   } else {
-    queryOptions.attributes = ['activity_key', 'status', 'host_key', 'main_image', 'title', 'intro_summary', 'address', 'address_detail', 'price', 'created_at']
-    model.Activity.findAll(queryOptions)
+    queryOptions.attributes = ['activity_key', 'status', 'host_key', 'main_image', 'title', 'intro_summary', 'address', 'address_detail', 'base_price', 'created_at']
+    model.ActivityNew.findAll(queryOptions)
       .then(result => res.json(result))
       .catch(err => next(err))
   }
@@ -461,13 +462,15 @@ exports.findAllWekinWithActivity = (req, res, next) => {
 }
 exports.findWekiner = (req, res, next) => {
   let queryOptions = {
-    where: { wekin_key: req.params.wekin_key, status: { $in: ['order', 'ready', 'paid'] } },
+    where: { activity_key: req.params.wekin_key },
     include: [
-      { model: model.User },
-      { model: model.Wekin, include: { model: model.Activity } }
+      { model: model.User }, { model: model.ActivityNew }
     ]
   }
-  model.Order.findAll(queryOptions)
-    .then(result => res.json(result))
+  model.WekinNew.findAll(queryOptions)
+    .then(result => {
+      console.log(result[0].User)
+      res.json({ message: 'success', data: result })
+    })
     .catch(err => next(err))
 }
