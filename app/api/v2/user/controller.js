@@ -371,6 +371,7 @@ exports.getFrontUserInfo = (req, res, next) => {
       'introduce',
       'work_balance_point',
       'work_balance_point_history',
+      'email',
       // 추가로 불러와야 할 정보들 입력
     ],
     include: [
@@ -418,7 +419,7 @@ exports.getUsersActiviry = (req, res, next) => {
 exports.getUsersQna = (req, res, next) => {
   let queryOptions = {
     where: { user_key: req.params.user_key, type: 2 },
-    include: [{ model: model.Activity }, { model: model.User }]
+    include: [{ model: model.ActivityNew }, { model: model.User }]
   }
   model.Doc.findAll(queryOptions)
     .then((results) => res.json({ results: results }))
