@@ -4,6 +4,7 @@ const moment = require('moment')
 
 exports.batch = _ => {
   schedule.scheduleJob('*/50 * * * *', orderDelete)
+  schedule.scheduleJob('*/50 * * * *', readyDelete)
   schedule.scheduleJob('* 0 * * *', checkPointDueDate)
 }
 
@@ -31,11 +32,13 @@ function checkPointDueDate () {
             }
           })
           .catch( err => {
+            console.log("에러")
             console.log("error: " + err)
           })
       }
     })
     .catch(err => {
+      console.log("에러")
       console.log("error: " + err)
     })
 }
@@ -61,6 +64,35 @@ function orderDelete () {
     return Promise.all(stack)
   })
   .catch(e => {
+    console.log("에러")
+    console.log(e)
+  })
+}
+
+
+function readyDelete() {
+  model.Order.findAll({
+    where: {
+      status: 'ready',
+      order_at: {
+        $lt: moment().add(-3, 'days')
+      }
+    }
+  })
+  .then(r => {
+    let stack = []
+    
+    r.forEach(v => {
+      stack.push(
+      model.Order.destroy({where: {
+        order_key: v.order_key
+      }, returning: true}))
+    })
+    
+    return Promise.all(stack)
+  })
+  .catch(e => {
+    console.log("에러")
     console.log(e)
   })
 }
