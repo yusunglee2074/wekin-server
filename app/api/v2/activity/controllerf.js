@@ -106,6 +106,60 @@ exports.findAllActivity = (req, res, next) => {
     .catch( error => next(error) )
 }
 
+// 카테고리에 해당하는 acitivity만 불러옴
+// category = {
+// 0(특별한 경험): [ 투어/여행, 익스트림(레저), 스포츠(구기종목), 힐링, 아웃도어],
+// 1(새로운 모임): [ 투어/여행, 익스트림(레저), 스포츠(구기종목), 음악, 댄스, 뷰티, 요리, 아트, 힐링, 아웃도어, 요가/피트니스, 소품제작 ],
+// 2(일상탈출): [ 투어/여행, 익스트림(레저), 스포츠(구기종목), 힐링,  아웃도어 ],
+// 3(자기관리): [ 힐링, 아웃도어, 요가/피트니스 ],
+// 4(실력향상): [ 스포츠(구기종목), 음악, 댄스, 뷰티, 요리, 아트, 아웃도어, 요가/피트니스, 소품제작 ],
+// 5(아이템 제작): [ 뷰티, 아트, 소품제작 ],
+// 6(전문가 과정): [ 음악, 댄스, 뷰티, 요리, 아트, 요가/피트니스, 소품제작 ],
+// }
+exports.getActivityWithCateogry = (req, res, next) => {
+  let category = {
+    0: [ '투어/여행', '익스트림(레저)', '스포츠(구기종목)', '힐링', '아웃도어'],
+    1: [ '투어/여행', '익스트림(레저)', '스포츠(구기종목)', '음악', '댄스', '뷰티', '요리', '아트', '힐링', '아웃도어', '요가/피트니스', '소품제작' ],
+    2: [ '투어/여행', '익스트림(레저)', '스포츠(구기종목)', '힐링',  '아웃도어' ],
+    3: [ '힐링', '아웃도어', '요가/피트니스' ],
+    4: [ '스포츠(구기종목)', '음악', '댄스', '뷰티', '요리', '아트', '아웃도어', '요가/피트니스', '소품제작' ],
+    5: [ '뷰티', '아트', '소품제작' ],
+    6: [ '음악', '댄스', '뷰티', '요리', '아트', '요가/피트니스', '소품제작' ],
+  }
+  let categoryKey = req.params.key
+  model.ActivityNew.findAll({
+    where: {
+      category: {
+        $in: category[categoryKey]
+      }
+    },
+    include: [
+      {
+        model: model.Host,
+        include: {
+          model: model.User,
+          attributes: []
+        },
+        group: ['User.user_key']
+      }, {
+        model: model.Doc,
+        attributes: [],
+        where: { type: service.docType.review.code },
+        required: false
+      }],
+    attributes: {
+      include: [
+        [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
+        [model.Sequelize.fn('COUNT', model.Sequelize.fn('DISTINCT', model.Sequelize.col('Docs.doc_key'))), 'review_count']
+      ]
+    },
+    group: ['ActivityNew.activity_key', 'Docs.doc_key', 'Host.host_key'],
+  })
+  .then( result => {
+    res.json({ message: 'success', data: result })
+  })
+}
+
 // 리펙토링
 //엑티비티 생성
 exports.createActivity = (req, res, next) => {
