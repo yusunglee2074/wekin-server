@@ -51,22 +51,29 @@ function orderDelete () {
       }
     }
   })
-  .then(r => {
-    let stack = []
-    
-    r.forEach(v => {
-      stack.push(
-      model.Order.destroy({where: {
-        order_key: v.order_key
-      }, returning: true}))
+    .then(r => {
+      let stack = []
+
+      r.forEach(v => {
+        stack.push(
+          model.WekinNew.destory({
+            where: {
+              wekin_key: v.wekin_key
+            }
+          })
+        )
+        stack.push(
+          model.Order.destroy({where: {
+            order_key: v.order_key
+          }, returning: true}))
+      })
+
+      return Promise.all(stack)
     })
-    
-    return Promise.all(stack)
-  })
-  .catch(e => {
-    console.log("에러")
-    console.log(e)
-  })
+    .catch(e => {
+      console.log("에러")
+      console.log(e)
+    })
 }
 
 
@@ -79,20 +86,26 @@ function readyDelete() {
       }
     }
   })
-  .then(r => {
-    let stack = []
-    
-    r.forEach(v => {
-      stack.push(
-      model.Order.destroy({where: {
-        order_key: v.order_key
-      }, returning: true}))
+    .then(r => {
+      let stack = []
+      r.forEach(v => {
+        stack.push(
+          model.WekinNew.destory({
+            where: {
+              wekin_key: v.wekin_key
+            }
+          })
+        )
+        stack.push(
+          model.Order.destroy({where: {
+            order_key: v.order_key
+          }, returning: true}))
+      })
+
+      return Promise.all(stack)
     })
-    
-    return Promise.all(stack)
-  })
-  .catch(e => {
-    console.log("에러")
-    console.log(e)
-  })
+    .catch(e => {
+      console.log("에러")
+      console.log(e)
+    })
 }
