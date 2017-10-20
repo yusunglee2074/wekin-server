@@ -4,7 +4,8 @@ const moment = require('moment')
 
 exports.batch = _ => {
   schedule.scheduleJob('*/50 * * * *', orderDelete)
-  schedule.scheduleJob('*/50 * * * *', readyDelete)
+  schedule.scheduleJob('*/48 * * * *', readyDelete)
+  schedule.scheduleJob('*/46 * * * *', bookingDelete)
   schedule.scheduleJob('* 0 * * *', checkPointDueDate)
 }
 
@@ -103,6 +104,28 @@ function readyDelete() {
       })
 
       return Promise.all(stack)
+    })
+    .catch(e => {
+      console.log("에러")
+      console.log(e)
+    })
+}
+
+function bookingDelete() {
+  let stack= []
+  stack.push(
+    model.WekinNew.findAll({
+      where: {
+        status: 'booking',
+        updated_at: {
+          $lt: moment().add(-3, 'days')
+        }
+      }
+    })
+  )
+  Promise.all(stack)
+    .then( result => {
+      return result
     })
     .catch(e => {
       console.log("에러")
