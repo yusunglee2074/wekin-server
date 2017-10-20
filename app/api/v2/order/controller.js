@@ -73,7 +73,7 @@ exports.importHook = (req, res) => {
 }
 
 
-exports.confirmOrder = (req, res) => {
+exports.confirmOrder = (req, res, next) => {
   let body = req.body
   let tmp = {}
 
@@ -115,9 +115,19 @@ exports.confirmOrder = (req, res) => {
   .then(r => {
     // notiService.wekinPay(r[1][0])
     if (r[1][0].status === 'paid') {
-      utilService.sendOrderConfirm(r[1][0])
+      r[1][0].getWekinNew()
+        .then( wekin => {
+          wekin.update( { state: 'paid' })
+          utilService.sendOrderConfirm(r[1][0])
+        })
+        .catch(error => next(error))
     } else if (r[1][0].status === 'ready') {
-      utilService.sendOrderReadySms(r[1][0])
+      r[1][0].getWekinNew()
+        .then( wekin => {
+          wekin.update( { state: 'ready' })
+          utilService.sendOrderReadySms(r[1][0])
+        })
+        .catch(error => next(error))
     }
     // utilService.slackLog(r)
     return tmp
