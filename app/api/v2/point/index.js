@@ -168,7 +168,8 @@ router.post('/front/use',
                           point_change: usePoint,
                           due_date_be_written_days: due_date_be_written_days,
                           type: req.body.type,
-                          created_at: created_at
+                          created_at: created_at,
+                          wekin_key: req.body.wekin_key || null
                         }, { transaction: t })
                       )
                       promises.push(
@@ -176,6 +177,7 @@ router.post('/front/use',
                           user_key: user.user_key,
                           point_change: req.body.value,
                           due_date_be_written_days: due_date_be_written_days,
+                          wekin_key: req.body.wekin_key || null,
                           type: 21
                         }, { transaction: t })
                       )
@@ -226,13 +228,15 @@ router.post('/front/use',
                         point_change: usePoint,
                         due_date_be_written_days: due_date_be_written_days,
                         type: req.body.type,
-                        created_at: created_at
+                        created_at: created_at,
+                        wekin_key: req.body.wekin_key || null
                       }))
                       promises.push(model.Point.create({
                         user_key: user.user_key,
                         point_change: req.body.value,
                         due_date_be_written_days: due_date_be_written_days,
-                        type: 11
+                        type: 11,
+                        wekin_key: req.body.wekin_key || null
                       }))
                     }
                   } 
