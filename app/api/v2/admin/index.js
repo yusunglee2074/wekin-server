@@ -28,7 +28,7 @@ router.route('/host/:host_key/wekin')
     model.ActivityNew.findAll({
       where: { host_key: req.params.host_key },
       attributes: ['activity_key', 'title', 'status'],
-      include: [{ model: model.WekinNew, include: model.Order }]
+      include: [{ model: model.WekinNew, include: model.Order, where: { state: { $in:  ['paid', 'ready'] } } }]
     })
       .then(results => {
         res.json({ message: 'success', data: results})
