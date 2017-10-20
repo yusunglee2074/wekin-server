@@ -452,7 +452,6 @@ exports.findAllActivityOfHost = (req, res, next) => {
       .then(result => res.json(result))
       .catch(err => next(err))
   } else {
-    queryOptions.attributes = ['activity_key', 'status', 'host_key', 'main_image', 'title', 'intro_summary', 'address', 'address_detail', 'base_price', 'created_at']
     model.ActivityNew.findAll(queryOptions)
       .then(result => res.json(result))
       .catch(err => next(err))
@@ -516,14 +515,13 @@ exports.findAllWekinWithActivity = (req, res, next) => {
 }
 exports.findWekiner = (req, res, next) => {
   let queryOptions = {
-    where: { activity_key: req.params.wekin_key },
+    where: { activity_key: req.params.wekin_key, state: 'paid' },
     include: [
-      { model: model.User }, { model: model.ActivityNew }
+      { model: model.User, attributes: ['profile_image', 'user_key'] }
     ]
   }
   model.WekinNew.findAll(queryOptions)
     .then(result => {
-      console.log(result[0].User)
       res.json({ message: 'success', data: result })
     })
     .catch(err => next(err))
