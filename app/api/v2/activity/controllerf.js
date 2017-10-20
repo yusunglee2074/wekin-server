@@ -178,7 +178,7 @@ exports.createActivity = (req, res, next) => {
     refund_policy: requestData.refund_policy,
     price: requestData.price,
     isteamorpeople: requestData.isteamorpeople,
-    status: service.activityStatus.request.code,
+    status: requestData.status || service.activityStatus.request.code,
     category: requestData.category1,
     category_two: requestData.category2,
     start_date: moment(requestData.start_date).format(),
