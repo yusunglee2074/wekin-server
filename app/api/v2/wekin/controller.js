@@ -4,8 +4,7 @@ const returnMsg = require('../../../return.msg')
 const { wekinService, activityService, utilService } = require('../service')
 
 exports.getFrontWekin = (req, res, next) => {
-  model.Wekin
-  .findAll()
+  model.Wekin.findAll()
   .then(results => res.json(results))
   .catch(err => next(err))
 }
@@ -65,16 +64,19 @@ exports.getOneIncludeOrder = (req, res) => {
 } 
 
 exports.getList = (req, res, next) => {
-  
-  model.Wekin.findAll({
-    include: [{
-      model: model.Activity,
-      include: { model: model.Host },
-      where: { status: { $in: [3] } }
-    },
-    { model: model.Order }]
+  model.WekinNew.findAll({
+    include: [
+      {
+        model: model.ActivityNew,
+        include: { model: model.Host },
+      },
+      { model: model.Order }],
+    where: {
+      user_key: req.params.user_key
+    }
+
   })
-  .then(result => returnMsg.success200RetObj(res, result))
+  .then(result => res.json({ message: 'success', data: result }))
   .catch(val => next(val))
 }
 
@@ -124,7 +126,8 @@ exports.postWekin = (req, res, next) => {
   model.WekinNew.findOne({
     where: {
       user_key: req.user.user_key,
-      activity_key: req.body.params.activity_key
+      activity_key: req.body.params.activity_key,
+      state: 'booking'
     }
   })
     .then( wekin => {
@@ -133,7 +136,7 @@ exports.postWekin = (req, res, next) => {
           activity_key: data.activity_key,
           user_key: req.user.user_key,
           final_price: data.finalPrice,
-          start_date: moment(data.start_date).format(),
+          start_date: moment(data.selectedDate).format(),
           start_time: moment(data.startTime[0]).format(),
           select_option: cloneData,
           pay_amount: amount,
@@ -144,12 +147,14 @@ exports.postWekin = (req, res, next) => {
       } else {
         let value = {}
         value.final_price = data.finalPrice
-        value.start_date = moment(data.start_date).format()
+        value.start_date = moment(data.selectedDate).format()
         value.start_time = moment(data.startTime[0]).format()
         value.select_option = cloneData
         value.pay_amount = amount
         model.WekinNew.update(value, { where: { wekin_key: wekin.wekin_key }, returning: true })
-          .then(result => res.json({ message: 'success', data: result }))
+          .then(result => {
+            res.json({ message: 'success', data: result })
+          })
           .catch(error => next(error))
       }
     })
@@ -164,16 +169,16 @@ exports.getCurrentNumberOfBookingUsers = (req, res, next) => {
       where: {
         activity_key: activity_key,
         start_date: {
-          $or: {
-            $lt: new Date(moment('2017-10-11T15:47:44.927Z').set('hour', 23).set('minute', 59).set('second', 59).format()),
-            $gt: new Date(moment('2017-10-11T15:47:44.927Z').set('hour', 0).set('minute', 0).set('second', 0).format())
+          $and: {
+            $lt: new Date(moment(date).set('hour', 23).set('minute', 59).set('second', 59).format()),
+            $gt: new Date(moment(date).set('hour', 0).set('minute', 0).set('second', 0).format())
           }
         }
       }
     }
   )
     .then( result => {
-      res.json({ message: 'success', date: result })
+      res.json({ message: 'success', data: result })
     })
     .catch(error => next(error))
 }
