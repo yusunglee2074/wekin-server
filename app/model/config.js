@@ -7,7 +7,9 @@ var config = {
     db.User.hasMany(db.WekinNew, { foreignKey: 'user_key' })
 
     db.User.hasMany(db.Point, { foreignKey: 'user_key' })
+
     db.Point.hasOne(db.User, { foreignKey: 'user_key' })
+    db.Point.belongsTo(db.WekinNew, { foreignKey: 'wekin_key' })
 
     db.Host.belongsTo(db.User, { foreignKey: 'user_key' })
     db.Host.hasMany(db.Activity, { foreignKey: 'host_key' })
@@ -26,6 +28,7 @@ var config = {
     db.WekinNew.belongsTo(db.ActivityNew, { foreignKey: 'activity_key' })
     db.WekinNew.belongsTo(db.User, { foreignKey: 'user_key' })
     db.WekinNew.hasOne(db.Order, { foreignKey: 'wekin_key' })
+    db.WekinNew.hasOne(db.Point, { foreignKey: 'wekin_key' })
 
     db.Wekin.belongsTo(db.Activity, { foreignKey: 'activity_key' })
     db.Wekin.hasMany(db.Order, { foreignKey: 'wekin_key' })

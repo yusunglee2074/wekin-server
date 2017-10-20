@@ -8,6 +8,7 @@ module.exports = function (sequelize, DataTypes) {
     due_date_be_written_days: { type: DataTypes.DATE, allowNull: true },
     point_use_percentage: { type: DataTypes.INTEGER, allowNull: true, defaultValue: 100 },
     type: { type: DataTypes.INTEGER, allowNull: true, defaultValue: null },
+    wekin_key: { type: DataTypes.INTEGER, allowNull: true, references: { model: model.WekinNew, key: 'wekin_key' } },
   }, {
     tableName: 'point',
     freezeTableName: true,
