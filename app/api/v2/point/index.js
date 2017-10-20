@@ -278,6 +278,9 @@ router.get('/detail/:user_key/:month',
         created_at: { $gt: getDate(req.params.month) },
         type: { $in: [10, 11, 20, 21] },
       },
+      include: [
+        { model: model.WekinNew, include: [{ model: model.ActivityNew, attributes: ['title'] }], attributes: ['wekin_key'] }
+      ],
       attributes: [ 'user_key', 'type', 'point_change', 'created_at', 'due_date_be_written_days' ]
     })
     .then( points => {
