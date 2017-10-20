@@ -19,11 +19,12 @@ exports.getQna = (req, res, next) => {
       'private_mode',
       'status',
       'answer',
-      'created_at'
+      'created_at',
+      'updated_at'
     ],
     include: [{
       model: model.User,
-      attributes: ['user_key', 'name']
+      attributes: ['user_key', 'name', 'profile_image']
     }]
     // offset: 0,
     // limit: 5
