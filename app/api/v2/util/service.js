@@ -90,7 +90,7 @@ exports.sendOrderCancellRequest = (objectData) => {
 
 exports.sendOrderConcellSuccess = (objectData) => {
   return new Promise((resolve, reject) => {
-    let msg = `[${objectData.user_name}] 위키너님, [${objectData.wekin_name}]에 대한 취소 처리가 완료되었습니다. 신용카드로 결제한 경우 전표 취소까지 카드사에 따라 2~5일정도 소요될 수 있으며, 계좌 입금의 경우 은행 영업일 기준 2~3일 정도 소요될 수 있음을 알려드립니다.\n추가적인 문의사항은 아래번호로 연락 바랍니다. 감사합니다.\n\n* 문의\n* 위키너카카오톡 : @wekiner\n(평일 10:00 ~ 19:00)\n(점심시간 13:00 ~ 14:00)\n\n위(We)를 보면 즐(KIN)거움이 보인다. WE:KIN`
+    let msg = `[${objectData.user_name}] 위키너님, [${objectData.wekin_name}]에 대한 취소 처리가 완료되었습니다. 신용카드로 결제한 경우 전표 취소까지 카드사에 따라 2~5일정도 소요될 수 있으며, 혹은 가상계좌에 입금의 경우 은행 영업일 기준 2~3일 정도 소요될 수 있음을 알려드립니다.\n추가적인 문의사항은 아래번호로 연락 바랍니다. 감사합니다.\n\n* 문의\n* 위키너카카오톡 : @wekiner\n(평일 10:00 ~ 19:00)\n(점심시간 13:00 ~ 14:00)\n\n위(We)를 보면 즐(KIN)거움이 보인다. WE:KIN`
     this.sendSms(objectData.user_phone, msg, `[위킨] 취소 완료`)
     .then(_ => resolve(objectData)).catch(reject)
   })
