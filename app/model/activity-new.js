@@ -39,6 +39,7 @@ module.exports = function (sequelize, DataTypes) {
     ticket_max_apply: { type: DataTypes.INTEGER },
     comision: { type: DataTypes.INTEGER, defaultValue: 0},
     start_date_list: { type: DataTypes.JSON, allowNull: true },
+    detail_question: { type: DataTypes.JSON, allowNull: true },
   }, {
     classMethods: {},
     tableName: 'activitynew',
