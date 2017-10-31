@@ -8,7 +8,7 @@ const wekinService = require('./wekin/service')
 const orderService = require('./order/service')
 const returnMsg = require('../../return.msg')
 
-const ADMIN_LIST = ['b3hL1vS6uSTaZEPK4YfTeS3ySOg2', '7rJfyA9N1ePygZXpZCmdUSTSexI2', 'UGxNNJ5g1nSia24aC82qB7Eqfkt1', 'bGsdG3iWEAWetGlRBqq19L8ztij1']
+const ADMIN_LIST = ['qMBDHB2hlidSxEHHFYYfeAv9FHU2', 'b3hL1vS6uSTaZEPK4YfTeS3ySOg2', '7rJfyA9N1ePygZXpZCmdUSTSexI2', 'UGxNNJ5g1nSia24aC82qB7Eqfkt1', 'bGsdG3iWEAWetGlRBqq19L8ztij1']
 
 exports.fireHelper = fireHelper
 exports.userService = userService
@@ -57,6 +57,8 @@ exports.authChk = (req, res, next) => {
 }
 exports.adminChk = (req, res, next) => {
   fireHelper.verifyFireToken(req.headers['x-access-token'])
-  .then(token => { ADMIN_LIST.includes(token.uid) ? next() : returnMsg.error401Unauthorized(res) })
+  .then(token => { 
+    ADMIN_LIST.includes(token.uid) ? next() : returnMsg.error401Unauthorized(res)
+  })
   .catch(err => { returnMsg.error400InvalidCall(res, 'ERROR_INVALID_ACCESS_TOKEN', err) })
 }
