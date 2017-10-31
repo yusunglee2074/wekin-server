@@ -116,7 +116,7 @@ function bookingDelete() {
   stack.push(
     model.WekinNew.findAll({
       where: {
-        status: 'booking',
+        state: 'booking',
         updated_at: {
           $lt: moment().add(-3, 'days')
         }
