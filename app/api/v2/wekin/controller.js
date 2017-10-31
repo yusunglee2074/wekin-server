@@ -137,7 +137,7 @@ exports.postWekin = (req, res, next) => {
           user_key: req.user.user_key,
           final_price: data.finalPrice,
           start_date: moment(data.selectedDate).format(),
-          start_time: moment(data.startTime[0]).format(),
+          start_time: moment().set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6)),
           select_option: cloneData,
           pay_amount: amount,
           state: 'booking' 
@@ -148,7 +148,7 @@ exports.postWekin = (req, res, next) => {
         let value = {}
         value.final_price = data.finalPrice
         value.start_date = moment(data.selectedDate).format()
-        value.start_time = moment(data.startTime[0]).format()
+        value.start_time = moment().set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6))
         value.select_option = cloneData
         value.pay_amount = amount
         model.WekinNew.update(value, { where: { wekin_key: wekin.wekin_key }, returning: true })
