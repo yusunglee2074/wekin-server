@@ -15,6 +15,12 @@ router.route('/front/category/:key')
 router.route('/front/period/:key/')
   .get(controllerf.findAllActivity)
 
+router.route('/admin')
+  .get(controllerf.findAllActivityForAdmin)
+
+router.route('/admin/:activity_key')
+  .delete(authChk, controllerf.forceDeleteActivity)
+
 router.route('/front/wekin')
   .get(controllerf.findAllWekinWithActivity)
 

@@ -106,6 +106,40 @@ exports.findAllActivity = (req, res, next) => {
     .catch( error => next(error) )
 }
 
+exports.findAllActivityForAdmin = (req, res, next) => {
+  model.ActivityNew.findAll({
+    include: [
+      {
+        model: model.Host,
+        include: {
+          model: model.User,
+        },
+      }, {
+        model: model.WekinNew,
+        where: { state: 'ready' || 'paid' },
+        required: false,
+        include: [
+          {
+            model: model.User,
+          },
+          {
+            model: model.Order,
+            attributes: ['order_key']
+          },
+        ],
+      }],
+    attributes: {
+      include: [
+        [model.Sequelize.fn('COUNT', model.Sequelize.fn('DISTINCT', model.Sequelize.col('WekinNews.wekin_key'))), 'wekinnew_count']
+      ]
+    },
+    group: ['ActivityNew.activity_key', 'Host.host_key', 'Host->User.user_key', 'WekinNews.wekin_key', 'WekinNews->Order.order_key', 'WekinNews->User.user_key'],
+  })
+    .then( activities => {
+      res.json(activities)
+    })
+    .catch( error => next(error) )
+}
 // 카테고리에 해당하는 acitivity만 불러옴
 // category = {
 // 0(특별한 경험): [ 투어/여행, 익스트림(레저), 스포츠(구기종목), 힐링, 아웃도어],
@@ -167,7 +201,7 @@ exports.createActivity = (req, res, next) => {
   let requestData = req.body
   let data= {
     host_key: user.Host.host_key,
-    main_image: { image: requestData.main_image },
+    main_image: requestData.main_image,
     title: requestData.title,
     intro_summary: requestData.intro_summary,
     intro_detail: requestData.intro_detail,
@@ -195,29 +229,26 @@ exports.createActivity = (req, res, next) => {
     is_it_ticket: requestData.is_it_ticket,
     ticket_due_date: requestData.ticket_due_date,
     ticket_max_apply: requestData.ticket_max_apply,
-    comision: requestData.comision
+    comision: requestData.comision,
+    detail_question: requestData.detail_question
   }
   let start_date_list = []
   let count_days = moment(data.end_date).diff(data.start_date, 'days')
   let week = {}
   let close_dates = []
   for (let i = 0; i < data.close_dates.length; i++) {
-    close_dates.push(moment(data.close_dates[i]).format('YYMMDD'))
+    close_dates.push(Number(moment(data.close_dates[i]).format('YYMMDD')))
   }
   for (i in data.base_week_option) {
     if (data.base_week_option[i].min_user > 0) {
       week[i] = 1
-      let time = data.base_week_option[i].start_time
-      for (let y in time) {
-        data.base_week_option[i].start_time[y] = moment().set('hour', time[y].split(':')[0]).set('minute', time[y].split(':')[1]).format()
-      }
     } else {
       week[i] = 0
     }
   }
   var start_day = moment(data.start_date).clone()
   for (let a = 0; a < count_days; a++) {
-    if (week[start_day.format('dddd').slice(0, 2)] === 1 && !close_dates.includes(start_day.format('YYMMDD'))) {
+    if (week[start_day.format('dddd').slice(0, 2)] === 1 && !close_dates.includes(Number(start_day.format('YYMMDD')))) {
       let clone_start_day = start_day.clone()
       start_date_list.push(clone_start_day.format())
       start_day = start_day.add(1, 'days')
@@ -323,8 +354,8 @@ exports.updateActivity = (req, res, next) => {
   let user = req.user
   let requestData = req.body
   let activityModelData = {
-    host_key: user.Host.host_key,
-    main_image: { image: requestData.main_image },
+    host_key: requestData.host_key,
+    main_image: requestData.main_image,
     title: requestData.title,
     intro_summary: requestData.intro_summary,
     intro_detail: requestData.intro_detail,
@@ -335,7 +366,7 @@ exports.updateActivity = (req, res, next) => {
     refund_policy: requestData.refund_policy,
     price: requestData.price,
     isteamorpeople: requestData.isteamorpeople,
-    status: service.activityStatus.request.code,
+    status: requestData.status,
     category: requestData.category1,
     category_two: requestData.category2,
     start_date: moment(requestData.start_date),
@@ -345,16 +376,16 @@ exports.updateActivity = (req, res, next) => {
     base_price: requestData.base_price,
     base_min_user: requestData.base_min_user,
     base_max_user: requestData.base_max_user,
-    base_price_option: JSON.parse(requestData.base_price_option),
+    base_price_option: requestData.base_price_option,
     base_extra_price_option: requestData.base_extra_price_option,
     base_week_option: requestData.base_week_option,
-    close_dates: JSON.parse(requestData.close_dates),
+    close_dates: requestData.close_dates,
     is_it_ticket: requestData.is_it_ticket,
     ticket_due_date: requestData.ticket_due_date,
     ticket_max_apply: requestData.ticket_max_apply,
     comision: requestData.comision
   }
-  return model.ActivityNew.update(activityModelData, { returning: true, where: { host_key: user.Host.host_key, activity_key: req.params.activity_key } })
+  return model.ActivityNew.update(activityModelData, { returning: true, where: { host_key: requestData.host_key || user.Host.host_key, activity_key: req.params.activity_key } })
     .then( result => {
       res.json({ message: "success", data: result[1][0] })
     })
@@ -368,7 +399,16 @@ exports.deleteActivity = (req, res, next) => {
   let queryOptions = {
     where: { activity_key: req.params.activity_key }
   }
-  model.Activity.update(modelData, queryOptions)
+  model.ActivityNew.update({ status: 5 }, queryOptions)
+    .then(result => res.json(result))
+    .catch(err => next(err))
+}
+
+exports.forceDeleteActivity = (req, res, next) => {
+  let queryOptions = {
+    where: { activity_key: req.params.activity_key }
+  }
+  model.ActivityNew.destroy(queryOptions)
     .then(result => res.json(result))
     .catch(err => next(err))
 }
