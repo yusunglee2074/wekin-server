@@ -88,10 +88,11 @@ exports.popularActivity = (req, res, next) => {
     },
     where: { status: 3 },
     include: [
-      { model: model.Doc, attributes: [], where: { type: 1 }, required: false },
-      { model: model.WekinNew, attributes: [], required: false },
-      { model: model.Host, attributes: ['host_key', 'profile_image'] }, { model: model.Favorite, attributes: ['fav_key'] }
-    ]
+      { model: model.Doc, attributes: [], where: { type: 1 }, required: false, duplicating: false },
+      { model: model.WekinNew, attributes: [], required: false, duplicating: false },
+      { model: model.Host, attributes: ['host_key', 'profile_image'], required: false, duplicating: false  }, { model: model.Favorite, attributes: ['fav_key'], required: false, duplicating: false }
+    ],
+    limit: 7,
   })
   .then(results => {
     returnMsg.success200RetObj(res, results)
@@ -104,7 +105,7 @@ exports.popularActivity = (req, res, next) => {
  * host: profile, name
  * activity: image, title
  */ 
-exports.popularMaker = (req, res) => {
+exports.popularMaker = (req, res, next) => {
   model.Host.findAll({
     order: [
       [model.Sequelize.fn('COUNT', model.Sequelize.col('User->Follows.follow_key')), 'DESC']
@@ -112,35 +113,28 @@ exports.popularMaker = (req, res) => {
     attributes: ['host_key', 'profile_image', 'name', 'introduce',
       [ model.Sequelize.fn('COUNT', model.Sequelize.col('User->Follows.follow_key')), 'follow_count' ]
     ],
-    group: ['Host.host_key', 'Activities.activity_key', 'User.user_key', 'Activities->Wekins.wekin_key'],
+    group: ['Host.host_key', 'ActivityNews.activity_key', 'User.user_key'],
     where: {status: 3},
     include: [
       {
         where: {status: 3 },
         attributes: ['activity_key', 'title', 'main_image'],
-        model: model.Activity,
-        required: true,
-        include: {
-          model: model.Wekin,
-          where: {
-            due_date: {
-              $gt: new Date()
-            }
-          }
-        }
+        model: model.ActivityNew,
       }, {
         attributes: ['user_key', 'name'],
         model: model.User,
-        include: { model: model.Follow, attributes: [] }
+        include: { model: model.Follow, attributes: [], required: false, duplicating: false },
        }
-    ]
+    ],
+    subQuery: false,
+    limit: 15 
   })
   .then(r => {
-    r.slice(0, 20 )
+    r.slice(0, 10)
     r = shuffleArray(r)
-    returnMsg.success200RetObj(res, r.slice(0, 10)) 
+    returnMsg.success200RetObj(res, r) 
   })
-  .catch(r => { console.log(r) })
+  .catch(r => { next(r) })
 }
 
 /** 검색일시 기준, 이전 한달 내에 작성 또는 좋아요가 눌러진 피드를 대상으로 누적 좋아요수 상위 10개 선정 후, 5개를 랜덤으로 표시
@@ -234,10 +228,11 @@ exports.newestActivity = (req, res, next) => {
     },
     where: { status: 3 },
     include: [
-      { model: model.Doc, attributes: [], where: { type: 1 }, required: false },
-      { model: model.WekinNew, attributes: [], required: false },
-      { model: model.Host, attributes: ['host_key', 'profile_image'] }, { model: model.Favorite, attributes: ['fav_key'] }
-    ]
+      { model: model.Doc, attributes: [], where: { type: 1 }, required: false, duplicating: false },
+      { model: model.WekinNew, attributes: [], required: false, duplicating: false },
+      { model: model.Host, attributes: ['host_key', 'profile_image'], required: false, duplicating: false }, { model: model.Favorite, attributes: ['fav_key'], required: false, duplicating: false }
+    ],
+    limit: 7
   })
   .then(results => {
     returnMsg.success200RetObj(res, results)
