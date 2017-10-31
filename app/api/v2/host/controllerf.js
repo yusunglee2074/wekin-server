@@ -65,10 +65,10 @@ exports.updateHost = (req, res, next) => {
 }
 
 exports.findAllActivity = (req, res, next) => {
-  model.Activity.findAll({
-    group: ['Activity.activity_key', 'Host.host_key', 'Favorites.fav_key'],
+  model.ActivityNew.findAll({
+    group: ['ActivityNew.activity_key', 'Host.host_key', 'Favorites.fav_key'],
     attributes: [
-      'activity_key', 'status', 'host_key', 'main_image', 'title', 'intro_summary', 'address', 'address_detail', 'price', 'created_at',
+      'activity_key', 'status', 'host_key', 'main_image', 'title', 'intro_summary', 'address', 'address_detail', 'base_price', 'created_at',
       [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
       [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count']
     ],
@@ -87,7 +87,6 @@ exports.findAllReview = (req, res, next) => {
       let activityKeys = results.map(activity => {
         return activity.activity_key
       })
-      console.log(activityKeys)
       // let activityKey = results.dataValues.activity_key
       let queryOptions = {
         where: { activity_key: { in: activityKeys }, type: 1 },
