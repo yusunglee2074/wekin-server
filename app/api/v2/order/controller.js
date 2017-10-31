@@ -168,7 +168,13 @@ exports.setOrderRefundRequest = (req, res) => {
     },
     returning: true
   })
-  .then(r => utilService.sendOrderCancellRequest(r[1][0]))
+  .then(r => { 
+    r.getWekinNew()
+    .then( wekin => {
+      wekin.update({ state: 'reqRef' })
+    })
+    utilService.sendOrderCancellRequest(r[1][0])
+  })
   .then(r => {
     returnMsg.success200RetObj(res, r)
   })
@@ -308,6 +314,7 @@ exports.setOrderBeen = (req, res) => {
   */
 }
 
+/* TODO:결제 리스트 나중에 봐야겠다 재미있는 코드가 있는거 같다.
 exports.getOrderListPageing = (req, res) => {
   let param = {
     include: [{ model: model.Wekin, include: { model: model.Activity } }, { model: model.User }],
@@ -390,6 +397,20 @@ exports.getOrderListPageing = (req, res) => {
   pageable(model.Order, req.query, param)
   .then(result => res.json(result))
   .catch(val => { console.log(val) })
+}
+*/
+
+exports.getOrderListPageing = (req, res, next) => {
+  // 전체 오더 정보를 가져온다. TODO: 페이지네이션에 대해 고민해보자 지금은 데이터가 얼마 없어서 상관은 없다.
+  model.Order.findAll({
+    include: [
+      { model: model.User }, { model: model.WekinNew }
+    ]
+  })
+    .then( orders => {
+      res.json({ message: "success", data: orders })
+    })
+    .catch(error => next(error))
 }
 
 exports.getOrderListPageingExcel = (req, res) => {
@@ -637,7 +658,7 @@ exports.getOneOrder = (req, res) => {
   model.Order.findOne({
     where: { order_key: req.params.order_key },
     include: [
-      { model: model.Wekin, include: model.Activity},
+      { model: model.WekinNew, include: model.ActivityNew },
       { model: model.User }]
   })
   .then(v => {
