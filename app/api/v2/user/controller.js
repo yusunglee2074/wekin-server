@@ -358,22 +358,6 @@ exports.postFrotUser = (req, res, next) => {
 exports.getFrontUserInfo = (req, res, next) => {
   let queryOptions = {
     where: { user_key: req.params.user_key },
-    attributes: [
-      'user_key',
-      'profile_image',
-      'name',
-      'introduce',
-      'gender',
-      'email',
-      'email_noti',
-      'push_noti',
-      'sms_noti',
-      'introduce',
-      'work_balance_point',
-      'work_balance_point_history',
-      'email',
-      // 추가로 불러와야 할 정보들 입력
-    ],
     include: [
       { model: model.WekinNew, include: { model: model.ActivityNew, attributes: [ 'category' ] } }
     ]
