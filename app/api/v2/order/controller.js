@@ -159,7 +159,7 @@ exports.putOrder = (req, res) => {
 /**
  * 예약취소 요청
  */
-exports.setOrderRefundRequest = (req, res) => {
+exports.setOrderRefundRequest = (req, res, next) => {
   model.Order.update({
     status: 'reqRef'
   }, {
@@ -169,17 +169,14 @@ exports.setOrderRefundRequest = (req, res) => {
     returning: true
   })
   .then(r => { 
-    r.getWekinNew()
-    .then( wekin => {
-      wekin.update({ state: 'reqRef' })
-    })
+    model.WekinNew.update({ state: 'reqRef' }, { where: { wekin_key: r[1][0].wekin_key }, returning: true })
     utilService.sendOrderCancellRequest(r[1][0])
   })
   .then(r => {
     returnMsg.success200RetObj(res, r)
   })
   .catch(e => {
-    returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', e)
+    next(e)
   })
 }
 
@@ -239,14 +236,16 @@ exports.setOrderCancelled = (req, res) => {
     })
   })
   .then(r => {
+    model.WekinNew.update({ state: 'cancelled' }, { where: { wekin_key: r[1][0].wekin_key } })
     // utilService.slackLog('취소 sms 전송')
     utilService.sendOrderConcellSuccess(r[1][0])
     return r
   })
   .then(r => {
     // utilService.slackLog('대기자 전송')
-    notiService.waitingBookable(r[1][0])
-    return waitingService.sendNoti(r[1][0].wekin_key)
+    // TODO: 환불 취소시 대기자들에게 문자 돌리는 로직 수정해야됨
+    //notiService.waitingBookable(r[1][0])
+    //return waitingService.sendNoti(r[1][0].wekin_key)
   })
   .then(r => {
     // utilService.slackLog('성공')

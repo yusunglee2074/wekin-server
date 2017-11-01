@@ -114,29 +114,6 @@ router.get('/pageing/', adminChk, controller.getOrderListPageing)
  */
 router.get('/refund/', adminChk, controller.getRefundOrderListPageing)
 
-/** @api {put} /order/refund/:order_key 환불요청 상태 변경
- * @apiParam {Number} order_key order key
- * 
- * @apiName setOrderRefundRequest
- * @apiGroup order
- *
- * @apiSuccessExample Success-Response:
- *     HTTP/1.1 200 OK
- * {
- *  1
- * }
- *
- * @apiError Bad Request 잘못된 요청
- *
- * @apiErrorExample Error-Response:
- *     HTTP/1.1 400 Bad Request
- *     {
- *       "errorCode": -2,
- *       "data": "ERROR_INVALID_PARAM"
- *     }
- */
-router.put('/refund/:order_key', authChk, controller.setOrderRefundRequest)
-
 /** @api {post} /order/refund/:order_key 환불(주문취소)
  * @apiParam {Number} order_key order key
  * @apiParam {Number} order_refund_price 환불금액
@@ -160,6 +137,30 @@ router.put('/refund/:order_key', authChk, controller.setOrderRefundRequest)
  *     }
  */
 router.post('/refund/:order_key', adminChk, controller.setOrderCancelled)
+
+/** @api {put} /order/refund/:order_key 환불요청 상태 변경
+ * @apiParam {Number} order_key order key
+ * 
+ * @apiName setOrderRefundRequest
+ * @apiGroup order
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ * {
+ *  1
+ * }
+ *
+ * @apiError Bad Request 잘못된 요청
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Bad Request
+ *     {
+ *       "errorCode": -2,
+ *       "data": "ERROR_INVALID_PARAM"
+ *     }
+ */
+router.put('/refund/:order_key', authChk, controller.setOrderRefundRequest)
+
 
 /** @api {post} /order/been/:order_id 주문정보 추가
  * @apiParam {Number} order_id order id
