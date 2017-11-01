@@ -383,7 +383,8 @@ exports.updateActivity = (req, res, next) => {
     is_it_ticket: requestData.is_it_ticket,
     ticket_due_date: requestData.ticket_due_date,
     ticket_max_apply: requestData.ticket_max_apply,
-    comision: requestData.comision
+    comision: requestData.comision,
+    start_date_list: requestData.start_date_list
   }
   return model.ActivityNew.update(activityModelData, { returning: true, where: { host_key: requestData.host_key || user.Host.host_key, activity_key: req.params.activity_key } })
     .then( result => {
@@ -565,4 +566,36 @@ exports.findWekiner = (req, res, next) => {
       res.json({ message: 'success', data: result })
     })
     .catch(err => next(err))
+}
+
+// 검색 api
+exports.searchAllactivies = (req, res, next) => {
+  model.ActivityNew.findAll({
+    order: [['count', 'DESC']],
+    where: {
+      status: 3
+    },
+    attributes: ['title', 'activity_key'],
+  })
+  .then( results => {
+    console.log("얍")
+    model.ActivityNew.findAll({
+      where: {
+        status: 3
+      },
+      include: [
+        { model: model.WekinNew, attributes: [], required: true, duplicating: false }
+      ],
+      attributes: ['title', 'activity_key', [model.Sequelize.fn('count', model.Sequelize.col('WekinNews.wekin_key')), 'wekins']],
+      group: ['ActivityNew.activity_key'],
+      order: [[model.Sequelize.col('ActivityNew.count'), 'DESC']]
+
+    })
+    .then(recommends => {
+      let popularActivities = []
+      let recommendActivities = []
+      res.json({ popularActivities: results.slice(0, 10), recommendActivities: recommends, allActivities: results })
+    })
+  })
+
 }

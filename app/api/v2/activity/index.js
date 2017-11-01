@@ -9,6 +9,9 @@ router.route('/front')
   .get(controllerf.findAllActivity)
   .post(authChk, controllerf.createActivity)
 
+router.route('/search')
+  .get(controllerf.searchAllactivies )
+
 router.route('/front/category/:key')
     .get(controllerf.getActivityWithCateogry)
 
