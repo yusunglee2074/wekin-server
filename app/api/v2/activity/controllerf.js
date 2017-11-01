@@ -74,9 +74,11 @@ exports.findAllActivity = (req, res, next) => {
 // 리펙토링
 // 엑티비티 리스트
 exports.findAllActivity = (req, res, next) => {
+  let keyword = req.query.keyword ? req.query.keyword : '%'
   model.ActivityNew.findAll({
     where: {
-      status: 3 || 5 
+      status: 3 || 5,
+      title: { $like: `%${keyword}%` }
     },
     include: [
       {
@@ -90,15 +92,15 @@ exports.findAllActivity = (req, res, next) => {
         model: model.Doc,
         attributes: [],
         where: { type: service.docType.review.code },
-        required: false
+        required: false,
       }],
     attributes: {
       include: [
         [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
-        [model.Sequelize.fn('COUNT', model.Sequelize.fn('DISTINCT', model.Sequelize.col('Docs.doc_key'))), 'review_count']
+        [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count']
       ]
     },
-    group: ['ActivityNew.activity_key', 'Docs.doc_key', 'Host.host_key'],
+    group: ['ActivityNew.activity_key', model.Sequelize.col('Docs.activity_key'), 'Host.host_key'],
   })
     .then( activities => {
       res.json(activities)
@@ -578,7 +580,6 @@ exports.searchAllactivies = (req, res, next) => {
     attributes: ['title', 'activity_key'],
   })
   .then( results => {
-    console.log("얍")
     model.ActivityNew.findAll({
       where: {
         status: 3
