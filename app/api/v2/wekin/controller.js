@@ -72,9 +72,12 @@ exports.getList = (req, res, next) => {
       },
       { model: model.Order }],
     where: {
-      user_key: req.params.user_key
-    }
-
+      user_key: req.params.user_key,
+      state: {
+        $notIn: ['booking']
+      }
+    },
+    order: [['created_at', 'DESC']]
   })
   .then(result => res.json({ message: 'success', data: result }))
   .catch(val => next(val))
