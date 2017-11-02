@@ -21,6 +21,7 @@ module.exports = function (sequelize, DataTypes) {
     birthday: { type: DataTypes.DATE, allowNull: true, defaultValue: null },
     email_company: { type: DataTypes.STRING, allowNull: true },
     email_company_valid: { type: DataTypes.BOOLEAN, defaultValue: false },
+    country: { type: DataTypes.STRING, defaultValue: 'Korea' },
   }, {
     classMethods: {},
     tableName: 'user',
