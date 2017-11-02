@@ -71,12 +71,12 @@ exports.createUser = (req, res, next) => {
         email: r.email,
         name: r.displayName,
         profile_image: r.photoURL || '/static/images/default-profile.png',
-        uuid: r.uid
+        uuid: r.uid,
+        country: req.body.country || 'Korea'
       }
     })
   })
   .then(user => {
-    console.log("설마~")
     if (user[1] === true) {
       utilService.slackLog(user + '님 회원가입 완료')
       utilService.sendJoinAfterMail(user[0])
