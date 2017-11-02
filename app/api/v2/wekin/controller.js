@@ -167,7 +167,7 @@ exports.postWekin = (req, res, next) => {
 exports.getCurrentNumberOfBookingUsers = (req, res, next) => {
   let activity_key = req.params.key
   let date = req.params.date
-  model.WekinNew.count(
+  model.WekinNew.findAll(
     {
       where: {
         activity_key: activity_key,
@@ -176,12 +176,21 @@ exports.getCurrentNumberOfBookingUsers = (req, res, next) => {
             $lt: new Date(moment(date).set('hour', 23).set('minute', 59).set('second', 59).format()),
             $gt: new Date(moment(date).set('hour', 0).set('minute', 0).set('second', 0).format())
           }
+        },
+        state: {
+          $in: ['booking', 'paid', 'ready']
         }
       }
     }
   )
-    .then( result => {
-      res.json({ message: 'success', data: result })
+    .then( wekins => {
+      let count = 0
+      let length = wekins.length
+      for (let i = 0; i < length; i++) {
+        let wekin = wekins[i]
+        count += wekin.pay_amount
+      }
+      res.json({ message: 'success', data: count })
     })
     .catch(error => next(error))
 }
