@@ -83,7 +83,7 @@ function readyDelete() {
     where: {
       status: 'ready',
       order_at: {
-        $lt: moment().add(-3, 'days')
+        $lt: moment().add(-1, 'days')
       }
     }
   })
@@ -118,7 +118,7 @@ function bookingDelete() {
       where: {
         state: 'booking',
         updated_at: {
-          $lt: moment().add(-3, 'days')
+          $lt: moment().add(-1, 'hours')
         }
       }
     })
