@@ -20,7 +20,7 @@ exports.getTargetData = (req, res) => {
   .catch(val => { returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', val) })
 }
 
-exports.getData = (req, res) => {
+exports.getData = (req, res, next) => {
   model.Follow.findAll({
     attributes: ['created_at'],
     where: { user_key: req.params.user_key },
@@ -28,11 +28,11 @@ exports.getData = (req, res) => {
       attributes: ['user_key', 'name', 'profile_image'],
       as: 'Follower',
       model: model.User,
-      include: { model: model.Host, attributes: ['status', 'type'] }
+      include: { model: model.Host, attributes: ['introduce', 'status', 'type'] }
     }]
   })
   .then(result => returnMsg.success200RetObj(res, result))
-  .catch(val => { returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', val) })
+  .catch(val => next(val) )
 }
 
 exports.putData = (req, res) => {
