@@ -6,13 +6,84 @@ const { authChk } = require('../service')
 const moment = require('moment')
 const controller = require('./controller')
 
-
+// 위킨을 카테고리와 함께 가져옴
+router.get('/category/:user_key', function (req, res, next) {
+  let category = {
+    1: '투어/여행', 2: '익스트림', 3: '스포츠', 4: '음악', 5: '댄스', 6: '뷰티', 
+    7: '요리', 8: '아트', 9: '힐링', 10: '아웃도어', 11: '요가/피트니스', 12: '소품제작'
+  }
+  let data = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0 }
+  model.WekinNew.findAll({
+    where: {
+      updated_at: {
+        $lt: moment(),
+        $gt: moment().add(-1, 'months')
+      },
+      state: 'paid',
+      user_key: req.params.user_key,
+    },
+    include: [ { model: model.ActivityNew, attributes: ['category'] } ]
+  })
+    .then(wekins => {
+      let length = wekins.length
+      for (let i = 0; i < length; i++) {
+        let wekin = wekins[i]
+        switch(wekin.ActivityNew.category) {
+          case '투어/여행':
+            data[0]++
+            break;
+          case '익스트림':
+            data[1]++
+            break;
+          case '스포츠':
+            data[2]++
+            break;
+          case '음악':
+            data[3]++
+            break;
+          case '댄스':
+            data[4]++
+            break;
+          case '뷰티':
+            data[5]++
+            break;
+          case '요리':
+            data[6]++
+            break;
+          case '아트':
+            data[7]++
+            break;
+          case '힐링':
+            data[8]++
+            break;
+          case '아웃도어':
+            data[9]++
+            break;
+          case '요가/피트니스':
+            data[10]++
+            break;
+          case '소품제작':
+            data[11]++
+            break;
+        }
+      }
+      data['total'] = length
+      data['categoryForm'] = {
+        1: '투어/여행', 2: '익스트림', 3: '스포츠', 4: '음악', 5: '댄스', 6: '뷰티', 
+        7: '요리', 8: '아트', 9: '힐링', 10: '아웃도어', 11: '요가/피트니스', 12: '소품제작'
+      }
+      res.json({ message: 'success', data: data })
+    })
+    .catch( error => {
+      next(error)
+    })
+})
 
 // TODO: 리펙토링 해야함 지금 많이 비효율적...
 router.get('/ranking', function (req, res, next) {
   model.WekinNew.findAll({
     where: {
-      state: 'booking',
+      state: 'paid',
     },
     include: [
       { model: model.User, attributes: [ 'name', 'user_key', 'profile_image' ] },
