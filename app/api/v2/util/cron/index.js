@@ -90,13 +90,7 @@ function readyDelete() {
     .then(r => {
       let stack = []
       r.forEach(v => {
-        stack.push(
-          model.WekinNew.destory({
-            where: {
-              wekin_key: v.wekin_key
-            }
-          })
-        )
+        stack.push(model.WekinNew.destroy({ where: { wekin_key: v.wekin_key } }))
         stack.push(
           model.Order.destroy({where: {
             order_key: v.order_key
