@@ -23,7 +23,7 @@ let dbconf = {
 
 var sequelize = new Sequelize(dbconf.db, dbconf.user, dbconf.password, {
   dialect: 'postgresql',
-  timezone: '+09:00',
+  timezone: 'Asia/Seoul',
   host: dbconf.host
 })
 
