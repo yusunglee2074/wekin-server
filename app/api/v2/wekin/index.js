@@ -240,7 +240,7 @@ router.post('/finish/:wekin_key', controller.setFinish)
 router.get('/activity/:key', controller.getSameActivity)
 
 // 특정 엑티비티 특정 날짜에 예약인원 수 가져오기
-router.get('/:key/:date', controller.getCurrentNumberOfBookingUsers )
+router.get('/current/:key/:date/:time', controller.getCurrentNumberOfBookingUsers )
 
 
 /**
