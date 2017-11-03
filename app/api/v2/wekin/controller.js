@@ -134,13 +134,14 @@ exports.postWekin = (req, res, next) => {
     }
   })
     .then( wekin => {
+      let tmpTime = moment('1991-04-12')
       if (wekin === null) {
         model.WekinNew.create({
           activity_key: data.activity_key,
           user_key: req.user.user_key,
           final_price: data.finalPrice,
           start_date: moment(data.selectedDate).format(),
-          start_time: moment().set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6)),
+          start_time: tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6)),
           select_option: cloneData,
           pay_amount: amount,
           state: 'booking' 
@@ -151,7 +152,7 @@ exports.postWekin = (req, res, next) => {
         let value = {}
         value.final_price = data.finalPrice
         value.start_date = moment(data.selectedDate).format()
-        value.start_time = moment().set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6))
+        value.start_time = tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6))
         value.select_option = cloneData
         value.pay_amount = amount
         model.WekinNew.update(value, { where: { wekin_key: wekin.wekin_key }, returning: true })
@@ -164,9 +165,12 @@ exports.postWekin = (req, res, next) => {
 }
 
 // 엑티비티 디테일 페이지 들어왔을때 activity_key, start_date 인자로 넘겨주면 남은 인원수 보여주는 api 작성
+// selected_time까지 로직 작성
 exports.getCurrentNumberOfBookingUsers = (req, res, next) => {
   let activity_key = req.params.key
   let date = req.params.date
+  let time = req.params.time
+  let tmpTime = moment('1991-04-12').set('hour', time.slice(0, 2)).set('minute', time.slice(3, 6))
   model.WekinNew.findAll(
     {
       where: {
@@ -179,6 +183,12 @@ exports.getCurrentNumberOfBookingUsers = (req, res, next) => {
         },
         state: {
           $in: ['booking', 'paid', 'ready']
+        },
+        start_time: {
+          $and: {
+            $gt: moment('1991-04-12').set('hour', time.slice(0, 2)).set('minute', time.slice(3, 6)).add(-10, 'minutes'),
+            $lt: moment('1991-04-12').set('hour', time.slice(0, 2)).set('minute', time.slice(3, 6)).add(10, 'minutes')
+          }
         }
       }
     }
