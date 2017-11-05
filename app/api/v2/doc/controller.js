@@ -270,6 +270,7 @@ exports.postComment = (req, res, next) => {
       })
       .catch(err => next(err))
   })
+  .catch(error => next(error))
 }
 
 exports.putComment = (req, res, next) => {
