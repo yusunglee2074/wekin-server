@@ -118,7 +118,7 @@ exports.findAllActivityForAdmin = (req, res, next) => {
         },
       }, {
         model: model.WekinNew,
-        where: { state: 'ready' || 'paid' },
+        where: { state: { $in: ['ready', 'paid'] } },
         required: false,
         include: [
           {
