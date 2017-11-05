@@ -7,11 +7,31 @@ exports.batch = _ => {
   schedule.scheduleJob('*/48 * * * *', readyDelete)
   schedule.scheduleJob('* */45 * * * *', bookingDelete)
   schedule.scheduleJob('* 0 * * *', checkPointDueDate)
+  schedule.scheduleJob('* 0 * * *', checkActivityDueDate)
 }
 
 
-// TODO: transaction 처리, 로직이 조금 이상함
+function checkActivityDueDate() {
+  model.ActivityNew.findAll({
+    where: {
+      end_date: {
+        $lt: moment()
+      }
+    }
+  })
+    .then(activities => {
+      let length = activities.length
+      for (let i = 0; i < length; i++) {
+        let activity = activities[i]
+        activity.update({ status: 5 })
+      }
+    })
+    .catch(error => {
+      console.log(error)
+    })
+}
 
+// TODO: transaction 처리, 로직이 조금 이상함
 function checkPointDueDate () {
   let endDueDatePoint = []
   model.Point.findAll({
