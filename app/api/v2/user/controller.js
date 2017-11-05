@@ -5,6 +5,26 @@ const { userService, utilService, fireHelper } = require('../service')
 const request = require('request')
 const moment = require('moment')
 
+function updateOrCreateUser(userId, email, displayName, photoURL, provider) {
+  console.log('updating or creating a firebase user');
+  const updateParams = {
+    provider: 'KAKAO',
+    displayName: displayName || 'defaultName',
+    photoURL: photoURL || 'http://we-kin.com/static/images/default-profile.png',
+  };
+  return fireHelper.admin.auth().updateUser(userId, updateParams)
+  .catch((error) => {
+    if (error.code === 'auth/user-not-found') {
+      updateParams['uid'] = userId;
+      if (email) {
+        updateParams['email'] = email;
+      }
+      return fireHelper.admin.auth().createUser(updateParams);
+    }
+    throw error;
+  });
+};
+
 exports.kakaoLogin = (req, res, next) => {
   if (req.params.type === "kakao") {
     request.post("https://kauth.kakao.com/oauth/token", {
@@ -16,43 +36,32 @@ exports.kakaoLogin = (req, res, next) => {
       }
     }, (err,httpResponse,body) => { 
       let userToken = JSON.parse(body)
+      let userRegistration = JSON.parse(body)
       var options = {
-        url: 'https://kapi.kakao.com/v1/user/signup',
+        url: 'https://kapi.kakao.com/v1/user/me',
         headers: {
           Authorization: 'Bearer ' + userToken.access_token
         }
       }
       request(options, (err, response, body) => {
-        let userRegistration = JSON.parse(body)
-        if (userRegistration.msg === "already registered") {
-          var options = {
-            url: 'https://kapi.kakao.com/v1/user/me',
-            headers: {
-              Authorization: 'Bearer ' + userToken.access_token
-            }
-          }
-          request(options, (err, response, body) => {
-            // 이미 앱과 연동이 되어있다면 엑세스 토큰을 이용해서 유저 정보를 가져온다음
-            let userInfo = JSON.parse(body)
-            console.log(userInfo)
-            let additionalClaims = {
-              email: userInfo.kaccount_email,
-              id: userInfo.id,
-              photo: userInfo.properties ? userInfo.properties.profile_image : null,
-              name: userInfo.properties ? userInfo.properties.nickname : null
-            }
-            fireHelper.createCustomToken(userInfo.id, additionalClaims)
-              .then( customToken => {
-
-                res.json({ customToken: customToken, userInfo: userInfo }) 
-              })
-              .catch( err => next(err))
+        let userInfo = JSON.parse(body)
+        updateOrCreateUser('wekin_' + userInfo.id, 
+          userInfo.kaccount_email, 
+          userInfo.properties ? userInfo.properties.nickname : 'defaultName', 
+          userInfo.properties ? userInfo.properties.thumbnail_image : null,
+          'KAKAO'
+        )
+          .then( userRecord => {
+            const userId = userRecord.uid;
+            console.log(`creating a custom firebase token based on uid ${userId}`);
+            return fireHelper.admin.auth().createCustomToken(userId, {provider: 'KAKAO'});
           })
-          // 유저 정보를 이용해서 커스텀 토큰을 만든 후 프론트에게 넘겨준 후 프론트에서 커스텀 토큰으로 signInWithCustomToken로 파배 가입시킨다.
-        } else {
-          console.log(userRegistration)
-        }
+          .then(customToken => {
+            res.json({ customToken: customToken, userInfo: userInfo }) 
+          })
+          .catch( err => next(err))
       })
+      // 유저 정보를 이용해서 커스텀 토큰을 만든 후 프론트에게 넘겨준 후 프론트에서 커스텀 토큰으로 signInWithCustomToken로 파배 가입시킨다.
     })
   } else if (req.params.type === "androidnaver") {
     let accessToken = req.header('access-token')
@@ -64,19 +73,21 @@ exports.kakaoLogin = (req, res, next) => {
     }
     request(options, (err, response, body) => {
       let userInfo = JSON.parse(body).response
-      let additionalClaims = {
-        email: userInfo.email,
-        id: userInfo.id,
-        photo: userInfo.profile_image || null,
-        name: userInfo.name
-      }
-      fireHelper.createCustomToken(userInfo.id, additionalClaims)
-        .then( customToken => {
-
+      updateOrCreateUser('wekin_' + userInfo.id, 
+        userInfo.email, 
+        userInfo.name, 
+        userInfo.profile_image,
+        'NAVER'
+      )
+        .then( userRecord => {
+          const userId = userRecord.uid;
+          console.log(`creating a custom firebase token based on uid ${userId}`);
+          return fireHelper.admin.auth().createCustomToken(userId, {provider: 'KAKAO'});
+        })
+        .then(customToken => {
           res.json({ customToken: customToken, userInfo: userInfo }) 
         })
         .catch( err => next(err))
-      // 유저 정보를 이용해서 커스텀 토큰을 만든 후 프론트에게 넘겨준 후 프론트에서 커스텀 토큰으로 signInWithCustomToken로 파배 가입시킨다.
     })
   } else if (req.params.type === "naver") {
     request.post("https://nid.naver.com/oauth2.0/token", {
@@ -97,35 +108,28 @@ exports.kakaoLogin = (req, res, next) => {
       }
       request(options, (err, response, body) => {
         let userInfo = JSON.parse(body).response
-        let additionalClaims = {
-          email: userInfo.email,
-          id: userInfo.id,
-          photo: userInfo.profile_image || null,
-          name: userInfo.name
-        }
-        fireHelper.admin.auth().getUserByEmail(userInfo.email)
-          .then(function(userRecord) {
-            let err = {
-              message: 'fail already email exist',
-              data: userRecord
-            }
-            next(err) 
+        updateOrCreateUser('wekin_' + userInfo.id, 
+          userInfo.email, 
+          userInfo.name, 
+          userInfo.profile_image,
+          'NAVER'
+        )
+          .then( userRecord => {
+            const userId = userRecord.uid;
+            console.log(`creating a custom firebase token based on uid ${userId}`);
+            return fireHelper.admin.auth().createCustomToken(userId, {provider: 'KAKAO'});
           })
-          .catch(function(error) {
-            fireHelper.createCustomToken(userInfo.id, additionalClaims)
-              .then( customToken => {
-
-                res.json({ customToken: customToken, userInfo: userInfo }) 
-              })
-              .catch( err => next(err))
-          });
+          .then(customToken => {
+            res.json({ customToken: customToken, userInfo: userInfo }) 
+          })
+          .catch( err => next(err))
       })
-      // 유저 정보를 이용해서 커스텀 토큰을 만든 후 프론트에게 넘겨준 후 프론트에서 커스텀 토큰으로 signInWithCustomToken로 파배 가입시킨다.
     })
   }
 }
 
 exports.dbCreateWithIdtoken = (req, res, next) => {
+  console.log(req.body.idToken)
   fireHelper.admin.auth().verifyIdToken(req.body.idToken)
     .then(decoded => {
       model.User.findOrCreate({
@@ -422,7 +426,7 @@ function createUserDBFromToken (jwtToken, name, profileImage) {
           email: decoded.email
         },
         defaults: {
-          email: decoded.email,
+          email: decoded.email || 'Undefinded Email',
           name: name || decoded.name,
           profile_image: profileImage || decoded.profile_image || '/static/images/default-profile.png',
           uuid: decoded.sub
