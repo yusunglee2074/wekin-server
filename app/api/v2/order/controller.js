@@ -705,15 +705,12 @@ exports.deleteOrderImpUid = (req, res) => {
   .catch(val => { returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', val) })
 }
 
-exports.getOrderImpUid = (req, res) => {
+exports.getOrderImpUid = (req, res, next) => {
   iamporter.findByImpUid(req.params.imp_uid)
   .then(v => {
-    returnMsg.success200RetObj(res, v)
+    res.json({ message: 'success', data: v })
   })
-  .then(v => {
-    returnMsg.success200RetObj(res, {result: 'done'})
-  })
-  .catch(val => { returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', val) })
+  .catch(val => { next(val) })
 }
 
 exports.getOrderByWekin = (req, res) => {
