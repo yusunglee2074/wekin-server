@@ -188,8 +188,8 @@ router.put('/refund/:order_key', authChk, controller.setOrderRefundRequest)
  */
 router.post('/been/:order_id', controller.setOrderBeen)
 
-router.delete('impid/:imp_uid', authChk, controller.deleteOrderImpUid)
-router.get('impid/:imp_uid', authChk, controller.getOrderImpUid)
+router.delete('/impid/:imp_uid', authChk, controller.deleteOrderImpUid)
+router.get('/impid/:imp_uid', authChk, controller.getOrderImpUid)
 
 
 /** @api {get} /order/:order_key 주문정보 조회
