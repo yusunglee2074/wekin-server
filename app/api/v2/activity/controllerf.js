@@ -93,14 +93,19 @@ exports.findAllActivity = (req, res, next) => {
         attributes: [],
         where: { type: service.docType.review.code },
         required: false,
-      }],
+      }, {
+        model: model.Favorite,
+        attributes: ['fav_key'],
+        required: false,
+      }
+    ],
     attributes: {
       include: [
         [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
         [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count']
       ]
     },
-    group: ['ActivityNew.activity_key', model.Sequelize.col('Docs.activity_key'), 'Host.host_key'],
+    group: ['ActivityNew.activity_key', model.Sequelize.col('Docs.activity_key'), 'Host.host_key', 'Favorites.fav_key'],
   })
     .then( activities => {
       res.json(activities)
@@ -458,7 +463,8 @@ exports.findOneActivity = (req, res, next) => {
     attributes: {
       include: [
         [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count'],
-        [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg']
+        [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
+        [model.Sequelize.fn('COUNT', model.Sequelize.col('Favorites.fav_key')), 'fav_count'],
       ]
     },
     include: [
@@ -473,7 +479,14 @@ exports.findOneActivity = (req, res, next) => {
         attributes: [],
         where: { type: service.docType.review.code },
         required: false
-      }]
+      },
+      {
+        model: model.Favorite,
+        attributes: [],
+        where: { activity_key: req.params.activity_key },
+        required: false
+      }
+    ]
   }
   model.ActivityNew.findOne(queryOptions)
     .then(result => {
