@@ -137,7 +137,7 @@ exports.getUsersDocuments = (req, res, next) => {
   let queryOptions = {
     where: { type: { in: [0, 1] } },
     order: [['created_at', 'DESC']],
-    group: ['Doc.doc_key', 'Likes.like_key', 'User.user_key'],
+    group: ['Doc.doc_key', 'User.user_key'],
     limit: req.query.size || 10,
     offset: (req.query.page || 0) * (req.query.size || 10),
     attributes: [
@@ -147,10 +147,6 @@ exports.getUsersDocuments = (req, res, next) => {
       [model.Sequelize.fn('COUNT', model.Sequelize.col('Comments.comment_key')), 'comment_count']
     ],
     include: [
-      {
-        model: model.Like,
-        duplicating: false
-      },
       {
         model: model.Comment,
         attributes: [],
