@@ -70,7 +70,7 @@ exports.getList = (req, res, next) => {
         model: model.ActivityNew,
         include: { model: model.Host },
       },
-      { model: model.Order }],
+      { model: model.Order, where: { status: { $not: 'order' } } }],
     where: {
       user_key: req.params.user_key,
       state: {
@@ -146,7 +146,7 @@ exports.postWekin = (req, res, next) => {
           pay_amount: amount,
           state: 'booking' 
         })
-          .then(result => res.json({ message: 'success', data: result }))
+          .then(result => res.json({ message: 'success', data: [0, [result]] }))
           .catch(error => next(error))
       } else {
         let value = {}
