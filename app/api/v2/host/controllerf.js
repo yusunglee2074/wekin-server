@@ -28,7 +28,8 @@ exports.createHost = (req, res, next) => {
     type: requestData.type,
     join_method: requestData.join_method,
     user_key: user.user_key,
-    status: 1
+    status: 1,
+    language: requestData.language
   }
   model.Host.create(modelData)
     .then(result => {
@@ -57,7 +58,8 @@ exports.updateHost = (req, res, next) => {
     business_registration: host.business_registration,
     license: host.license,
     type: host.type,
-    join_method: host.join_method
+    join_method: host.join_method,
+    language: requestData.language
   }
   model.Host.update(modelData, queryOptions)
     .then((results) => res.json(results))
