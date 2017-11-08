@@ -12,6 +12,7 @@ exports.batch = _ => {
 
 
 function checkActivityDueDate() {
+  console.log("엑티비티딜릿 시작 -크론")
   model.ActivityNew.findAll({
     where: {
       end_date: {
@@ -19,6 +20,7 @@ function checkActivityDueDate() {
       }
     }
   })
+  // TODO: 문자 보내게 해야됨
     .then(activities => {
       let length = activities.length
       for (let i = 0; i < length; i++) {
@@ -33,6 +35,7 @@ function checkActivityDueDate() {
 
 // TODO: transaction 처리, 로직이 조금 이상함
 function checkPointDueDate () {
+  console.log("포인트딜릿 시작 -크론")
   let endDueDatePoint = []
   model.Point.findAll({
     where: {
@@ -64,6 +67,7 @@ function checkPointDueDate () {
     })
 }
 function orderDelete () {
+  console.log("오더딜릿 시작 -크론")
   model.Order.findAll({
     where: {
       status: 'order',
@@ -99,6 +103,7 @@ function orderDelete () {
 
 
 function readyDelete() {
+  console.log("레디딜릿 시작 -크론")
   model.Order.findAll({
     where: {
       status: 'ready',
@@ -126,6 +131,7 @@ function readyDelete() {
 }
 
 function bookingDelete() {
+  console.log("북킹딜릿 시작 -크론")
   let stack= []
   model.WekinNew.findAll({
     where: {

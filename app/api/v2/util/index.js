@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const model = require('./../../../model')
 
 const controller = require('./controller')
 
@@ -54,5 +55,20 @@ router.post('/join/sms', controller.joinSms)
 router.post('/join/mail', controller.joinMail)
 
 router.post('/wekin', controller.confirmWekin)
+
+router.get('/share/:activity_key', 
+  function (req, res, next) {
+    // 엑티비티 공유를 위한 정보 가져온다.
+    model.ActivityNew.findOne({
+      where: {
+        activity_key: req.params.activity_key
+      },
+      attributes: [ 'title', 'detail_question', 'main_image' ]
+    })
+    .then(activity => {
+      res.send(activity)
+    })
+  }
+)
 
 module.exports = router
