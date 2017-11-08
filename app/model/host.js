@@ -18,7 +18,8 @@ module.exports = function (sequelize, DataTypes) {
     type: { type: DataTypes.INTEGER, allowNull: false },
     join_method: { type: DataTypes.STRING },
     home_page: { type: DataTypes.STRING },
-    status: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 }
+    status: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+    language: { type: DataTypes.STRING, allowNull: true }
     // create_date: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     // 추가
 
