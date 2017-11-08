@@ -59,7 +59,7 @@ exports.updateHost = (req, res, next) => {
     license: host.license,
     type: host.type,
     join_method: host.join_method,
-    language: requestData.language
+    language: host.language
   }
   model.Host.update(modelData, queryOptions)
     .then((results) => res.json(results))
