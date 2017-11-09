@@ -186,7 +186,8 @@ exports.getActivityWithCateogry = (req, res, next) => {
         model: model.Doc,
         attributes: [],
         where: { type: service.docType.review.code },
-        required: false
+        required: false,
+        duplicating: false
       }],
     attributes: {
       include: [
@@ -195,10 +196,14 @@ exports.getActivityWithCateogry = (req, res, next) => {
       ]
     },
     group: ['ActivityNew.activity_key', 'Docs.doc_key', 'Host.host_key'],
+    limit: req.params.how_many || 1000,
+    offset: req.params.offset * req.params.how_many || 0,
+    order: [['created_at', 'DESC']],
   })
-  .then( result => {
+  .then(result => {
     res.json({ message: 'success', data: result })
   })
+  .catch(error => next(error))
 }
 
 // 리펙토링

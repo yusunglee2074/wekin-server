@@ -12,7 +12,7 @@ router.route('/front')
 router.route('/search')
   .get(controllerf.searchAllactivies )
 
-router.route('/front/category/:key')
+router.route('/front/category/:key/:how_many/:offset')
     .get(controllerf.getActivityWithCateogry)
 
 router.route('/front/period/:key/')
