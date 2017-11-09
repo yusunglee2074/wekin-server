@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     sub_title: { type: DataTypes.STRING },
     thumbnail_url: { type: DataTypes.STRING },
     click_count: { type: DataTypes.INTEGER, defaultValue: 0 },
+    share_count: { type: DataTypes.INTEGER, defaultValue: 0 },
   }, {
     classMethods: {},
     tableName: 'news',
