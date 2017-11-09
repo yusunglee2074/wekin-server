@@ -49,13 +49,11 @@ exports.qnaListData = (req, res) => {
 }
 
 exports.getFrontDocuments = (req, res, next) => {
-  let options = req.fetchParameter(['type'])
-  if (req.checkParamErr(options)) return next(options)
-
+  console.log(req.query)
   let queryOptions = {
-    where: { type: { in: arraySeparator(options.type) } },
+    where: { type: { in: arraySeparator(req.query.type) } },
     order: [['created_at', 'DESC']],
-    group: ['Doc.doc_key', 'User.user_key'],
+    group: ['Doc.doc_key', 'User.user_key', 'ActivityNew.activity_key'],
     subQuery: false,
     limit: req.query.size || 10,
     offset: (req.query.page || 0) * (req.query.size || 10),
@@ -73,6 +71,18 @@ exports.getFrontDocuments = (req, res, next) => {
       {
         model: model.User,
         attributes: ['user_key', 'profile_image', 'name']
+      },
+      {
+        model: model.ActivityNew,
+        attributes: ['start_date_list', [model.Sequelize.fn('COUNT', model.Sequelize.col('ActivityNew->Favorites.fav_key')), 'fav_count']],
+        require: false,
+        include: [
+          {
+            model: model.Favorite,
+            attributes: [],
+            required: false,
+          }
+        ]
       }
     ]
   }
