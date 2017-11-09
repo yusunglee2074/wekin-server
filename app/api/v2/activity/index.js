@@ -1,6 +1,9 @@
 const express = require('express')
 const router = express.Router()
 const { authChk } = require('../service')
+const model = require('./../../../model')
+const Op = model.Sequelize.Op
+const moment = require('moment')
 
 const controller = require('./controller')
 const controllerf = require('./controllerf')
@@ -253,5 +256,86 @@ router.get('/:key', controller.getOne)
  * { "result": "err" }
  */
 router.put('/:key', controller.putOne)
+
+// 모바일용 필터 api입니다.:
+// 전부 query string으로 주세용
+// 사용자가 체크안한 값들은 어떤값도 아닌 그냥 쿼리스트링을 비워주세요 
+// location : ["경기", "서울", "전라" .... ] * 큰따옴표로 주3
+// category : '힐링'
+// date : [new Date('시작일').ISOString(), new Date('종료일').ISOString()]
+// price : [시작 가격, 끝가격(무제한은9999로 주세요, 만원단위)]
+// people : [최소인원, 최대인원]
+router.get('/filter/mobile', 
+  (req, res, next) => {
+    let query = req.query
+    let json = (string) => { return JSON.parse(string) }
+    let locations = json(query.location) || ['서울', '경기', '강원', '충청', '경상', '전라', '제주', '해외']
+    let category = query.category ? [query.category] : ['투어/여행', '익스트림', '스포츠', '음악', '댄스', '뷰티', '요리', '아트', '축제', '힐링', '아웃도어', '요가/피트니스', '소품제작']
+    model.ActivityNew.findAll(
+      { 
+        where: {
+          address_detail: {
+            area: {
+              [Op.in]: locations
+            }
+          },
+          category: {
+            [Op.in]: category 
+          },
+          base_price: {
+            [Op.gte]: json(query.price)[0] * 10000,
+            [Op.lte]: json(query.price)[1] * 10000
+          },
+          status: 3
+        },
+        attributes: [
+          [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
+          [model.Sequelize.fn('COUNT', model.Sequelize.fn('DISTINCT', model.Sequelize.col('Docs.doc_key'))), 'review_count'],
+          'activity_key', 'main_image', 'address', 'address_detail', 'base_price', 'title', 'status', 'start_date_list' 
+        ],
+        include: [
+          {
+            model: model.Host,
+            include: {
+              model: model.User,
+              attributes: []
+            },
+            group: ['User.user_key']
+          }, {
+            model: model.Doc,
+            attributes: [],
+            where: { type: 1 },
+            required: false,
+            duplicating: false
+          }
+        ],
+        group: ['ActivityNew.activity_key', 'Docs.doc_key', 'Host.host_key'],
+      },
+    )
+      .then(activities => {
+        if (query.date) {
+          let result = []
+          let length = activities.length
+          let startDate = moment(json(query.date)[0]) || moment('1991-04-12')
+          let endDate = moment(json(query.date)[1]) || moment('2074-01-01')
+          for (let i = 0; i < length; i++) {
+            let activity = activities[i]
+            // 시작일과 종료일 그리고 스타트 데이 리스트가 있다. 이를 어떻게 비교할것인가?
+            for (let ii = 0; ii < activity.start_date_list.length; ii++) {
+              let date = moment(activity.start_date_list[ii])
+              if (date > startDate && date < endDate) {
+                result.push(activity)
+                break;
+              }
+            }
+          }
+          res.json({ message: 'success', data: result })
+        } else {
+          res.json({ message: 'success', data: activities })
+        }
+      })
+      .catch(error => next(error))
+  }
+)
 
 module.exports = router 
