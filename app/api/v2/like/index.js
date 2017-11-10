@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const model = require('./../../../model') 
 
 const controller = require('./controller')
 
@@ -45,5 +46,59 @@ router.get('/:user_key', controller.getData)
  * }
  */
 router.put('/:user_key/:doc_key', controller.putData)
+
+router.put('/comment', 
+  (req, res, next) => {
+    let user_key = req.body.user_key
+    let comment_key = req.body.comment_key
+    console.log(user_key)
+    model.Like.findOrCreate({
+      where: {
+        user_key: user_key,
+        comment_key: comment_key
+      },
+      defaults: {
+        user_key: user_key,
+        comment_key: comment_key,
+      }
+    })
+    .spread((like, iscreated) => {
+      if (iscreated) {
+        res.json({ message: 'success', data: like })
+      } else {
+        like.destroy({ force: true })
+        res.json({ message: 'success', data: [] })
+        
+      }
+    })
+  }
+)
+
+router.put('/news',
+  (req, res, next) => {
+    let user_key = req.body.user_key
+    let news_key = req.body.news_key
+    console.log(user_key)
+    model.Like.findOrCreate({
+      where: {
+        user_key: user_key,
+        news_key: news_key
+      },
+      defaults: {
+        user_key: user_key,
+        news_key: news_key,
+      }
+    })
+    .spread((like, iscreated) => {
+      if (iscreated) {
+        res.json({ message: 'success', data: like })
+      } else {
+        like.destroy({ force: true })
+        res.json({ message: 'success', data: [] })
+        
+      }
+    })
+  }
+)
 
 module.exports = router
