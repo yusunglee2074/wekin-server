@@ -36,7 +36,7 @@ exports.putData = (req, res) => {
             returning: true,
             transaction: t
           })
-            .then(result => res.json(message: 'success', data: result))
+            .then(result => res.json({ message: 'success', data: result }))
             .catch(val => next(val))
 
         } else {    // 좋아요 추가
@@ -46,7 +46,7 @@ exports.putData = (req, res) => {
           }, {
             transaction: t
           })
-            .then(result => res.json(message: 'success', data: result))
+            .then(result => res.json({ message: 'success', data: result }))
             .catch(val => next(val) )
         }
       })
