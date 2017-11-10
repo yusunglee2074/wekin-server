@@ -46,8 +46,11 @@ var config = {
 
     db.Comment.belongsTo(db.Doc, { foreignKey: 'doc_key' })
     db.Comment.belongsTo(db.User, { foreignKey: 'user_key' })
+    db.Comment.hasOne(db.Like., { foreignKey: 'comment_key'})
 
     db.Like.belongsTo(db.Doc, { foreignKey: 'doc_key' })
+    db.Like.belongsTo(db.News, { foreignKey: 'news_key' })
+    db.Like.belongsTo(db.Comment, { foreignKey: 'comment_key' })
 
     db.Follow.belongsTo(db.User, { foreignKey: 'user_key', as: 'User' })
     db.Follow.belongsTo(db.User, { foreignKey: 'follower_user_key', as: 'Follower' })
@@ -61,6 +64,8 @@ var config = {
 
     db.Waiting.belongsTo(db.User, {foreignKey: 'user_key'})
     db.Waiting.belongsTo(db.Wekin, {foreignKey: 'wekin_key'})
+    
+    db.News.hasOne(db.Like., { foreignKey: 'news_key'})
 
   },
   initHooks: function (db) {
