@@ -9,7 +9,7 @@ exports.getTargetData = (req, res) => {
       attributes: ['user_key', 'name', 'profile_image'], 
       model: model.User,
       as: 'User',
-      include: { model: model.Host, attributes: ['status', 'type'] }
+      include: { model: model.Host, attributes: ['status', 'type', 'host_key'] }
     }, {
       attributes: ['user_key', 'name', 'profile_image'], 
       model: model.User,
@@ -28,7 +28,7 @@ exports.getData = (req, res, next) => {
       attributes: ['user_key', 'name', 'profile_image'],
       as: 'Follower',
       model: model.User,
-      include: { model: model.Host, attributes: ['introduce', 'status', 'type'] }
+      include: { model: model.Host, attributes: ['introduce', 'status', 'type', 'host_key'] }
     }]
   })
   .then(result => returnMsg.success200RetObj(res, result))
