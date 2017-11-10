@@ -593,7 +593,6 @@ exports.searchAllactivies = (req, res, next) => {
   model.ActivityNew.findAll({
     order: [['count', 'DESC']],
     where: {
-      status: 3
     },
     attributes: ['title', 'activity_key'],
   })
