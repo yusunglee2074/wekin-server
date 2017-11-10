@@ -67,7 +67,13 @@ router.delete('/delete/:news_key',
 router.get('/',
   function (req, res, next) {
     let body = req.body
-    model.News.findAll()
+    model.News.findAll({
+      include: [
+        { model: model.Like, attributes: [], required: false, duplicating: false }
+      ],
+      attributes: { include: [[model.Sequelize.fn('COUNT', model.Sequelize.fn('DISTINCT', model.Sequelize.col('Likes.like_key'))), 'like_count']] },
+      group: ['News.news_key']
+    })
       .then(result => {
         res.json({ message: 'success', data: result })
       })
