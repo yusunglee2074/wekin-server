@@ -1,6 +1,7 @@
 const model = require('../../../model')
 const service = require('../service')
 const moment = require('moment')
+const Op = model.Sequelize.Op
 
 /*
 // activity 조회
