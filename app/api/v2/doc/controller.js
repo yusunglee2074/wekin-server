@@ -74,7 +74,7 @@ exports.getFrontDocuments = (req, res, next) => {
       },
       {
         model: model.ActivityNew,
-        attributes: ['start_date_list', [model.Sequelize.fn('COUNT', model.Sequelize.col('ActivityNew->Favorites.fav_key')), 'fav_count']],
+        attributes: ['address_detail', 'category', 'start_date_list','base_price','main_image', [model.Sequelize.fn('COUNT', model.Sequelize.col('ActivityNew->Favorites.fav_key')), 'fav_count']],
         require: false,
         include: [
           {
@@ -245,11 +245,16 @@ exports.deleteDocuments = (req, res, next) => {
 
 exports.getComments = (req, res, next) => {
   let feedKey = req.params.doc_key
-  model.Comment.findAndCountAll({
+  model.Comment.findAll({
     order: [['created_at', 'DESC']],
     where: { doc_key: feedKey },
     limit: req.query.size || 3,
-    offset: (req.query.page || 0) * (req.query.size || 3)
+    offset: (req.query.page || 0) * (req.query.size || 3),
+    include: [
+      { model: model.Like, attributes: [], required: false, duplicating: false }
+    ],
+    attributes: { include: [[model.Sequelize.fn('COUNT', model.Sequelize.fn('DISTINCT', model.Sequelize.col('Likes.like_key'))), 'like_count']] },
+    group: ['Comment.comment_key']
   })
     .then(results => res.json(results))
     .catch(err => next(err))
