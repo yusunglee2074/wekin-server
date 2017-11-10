@@ -245,7 +245,7 @@ exports.deleteDocuments = (req, res, next) => {
 
 exports.getComments = (req, res, next) => {
   let feedKey = req.params.doc_key
-  model.Comment.findAll({
+  model.Comment.findAndCountAll({
     order: [['created_at', 'DESC']],
     where: { doc_key: feedKey },
     limit: req.query.size || 3,
