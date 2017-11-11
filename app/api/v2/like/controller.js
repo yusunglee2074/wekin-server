@@ -16,7 +16,7 @@ exports.getData = (req, res) => {
 }
 
 
-exports.putData = (req, res) => {
+exports.putData = (req, res, next) => {
   model.sequelize.transaction(t => {
 
     return model.Like.find({
