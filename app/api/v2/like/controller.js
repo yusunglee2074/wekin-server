@@ -17,16 +17,14 @@ exports.getData = (req, res) => {
 
 
 exports.putData = (req, res, next) => {
-  model.sequelize.transaction(t => {
-
-    return model.Like.find({
+    model.Like.find({
       where: {
         user_key: req.params.user_key,
         doc_key: req.params.doc_key
-      },
-      transaction: t
+      }
     })
       .then(v => {
+        console.log(v, "ㅍ브이")
         if(v) {   // 이미 좋아요한 경우 삭제
           model.Like.destroy({
             where: {
@@ -34,7 +32,6 @@ exports.putData = (req, res, next) => {
               doc_key: req.params.doc_key
             },
             returning: true,
-            transaction: t
           })
             .then(result => res.json({ message: 'success', data: result }))
             .catch(val => next(val))
@@ -43,13 +40,10 @@ exports.putData = (req, res, next) => {
           model.Like.create({
             user_key: req.params.user_key,
             doc_key: req.params.doc_key
-          }, {
-            transaction: t
           })
             .then(result => res.json({ message: 'success', data: result }))
             .catch(val => next(val) )
         }
       })
       .catch(error => next(error))
-  })
 }
