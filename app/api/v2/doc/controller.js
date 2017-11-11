@@ -3,6 +3,7 @@ const returnMsg = require('../../../return.msg')
 const { notiService } = require('../service')
 const { pageable } = require('../util/page')
 const datatable = require(`sequelize-datatables`)
+const util = require('util')
 
 /**
  * environment 타입 리스트
