@@ -148,6 +148,73 @@ exports.findAllActivityForAdmin = (req, res, next) => {
     })
     .catch( error => next(error) )
 }
+// ['투어/여행', '익스트림', '스포츠', '음악', '댄스', '뷰티', '요리', '아트', '축제', '힐링', '아웃도어', '요가/피트니스', '소품제작']
+// categoryDetail = {
+//0: '투어/여행',
+//1: '익스트림',
+//2: '스포츠',
+//3: '음악',
+//4: '댄스',
+//5: '뷰티',
+//6: '요리',
+//7: '아트',
+//8: '축제',
+//9: '힐링',
+//10: '아웃도어',
+//11: '요가/피트니스',
+//12: '소품제작'
+// }
+exports.getActivityWithDetailCateogry = (req, res, next) => {
+  categoryDetail = {
+    0: '투어/여행',
+    1: '익스트림',
+    2: '스포츠',
+    3: '음악',
+    4: '댄스',
+    5: '뷰티',
+    6: '요리',
+    7: '아트',
+    8: '축제',
+    9: '힐링',
+    10: '아웃도어',
+    11: '요가/피트니스',
+    12: '소품제작'
+  }
+  model.ActivityNew.findAll({
+    where: {
+      category: categoryDetail[req.params.key]
+    },
+    include: [
+      {
+        model: model.Host,
+        include: {
+          model: model.User,
+          attributes: []
+        },
+        group: ['User.user_key']
+      }, {
+        model: model.Doc,
+        attributes: [],
+        where: { type: service.docType.review.code },
+        required: false,
+        duplicating: false
+      }],
+    attributes: {
+      include: [
+        [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
+        [model.Sequelize.fn('COUNT', model.Sequelize.fn('DISTINCT', model.Sequelize.col('Docs.doc_key'))), 'review_count']
+      ]
+    },
+    group: ['ActivityNew.activity_key', 'Docs.doc_key', 'Host.host_key'],
+    limit: req.params.how_many || 1000,
+    offset: req.params.offset * req.params.how_many || 0,
+    order: [['created_at', 'DESC']],
+  })
+    .then(results => {
+      res.json({ message: 'success', data: results})
+    })
+    .catch(error => next(error))
+}
 // 카테고리에 해당하는 acitivity만 불러옴
 // category = {
 // 0(특별한 경험): [ 투어/여행, 익스트림(레저), 스포츠(구기종목), 힐링, 아웃도어],
