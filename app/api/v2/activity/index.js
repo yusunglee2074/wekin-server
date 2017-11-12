@@ -272,8 +272,16 @@ router.get('/filter/mobile',
   (req, res, next) => {
     let query = req.query
     let json = (string) => { return JSON.parse(string) }
-    let locations = json(query.location) || ['서울', '경기', '강원', '충청', '경상', '전라', '제주', '해외']
-    let category = query.category ? [query.category] : ['투어/여행', '익스트림', '스포츠', '음악', '댄스', '뷰티', '요리', '아트', '축제', '힐링', '아웃도어', '요가/피트니스', '소품제작']
+    if (query.location == '[]') {
+      var locations = ['서울', '경기', '강원', '충청', '경상', '전라', '제주', '해외']
+    } else {
+      var locations = json(query.location) 
+    }
+    if (query.category == '[]') {
+      var category = ['투어/여행', '익스트림', '스포츠', '음악', '댄스', '뷰티', '요리', '아트', '축제', '힐링', '아웃도어', '요가/피트니스', '소품제작']
+    } else {
+      var category = json(query.category) 
+    }
     model.ActivityNew.findAll(
       { 
         where: {
