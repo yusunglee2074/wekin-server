@@ -324,7 +324,12 @@ router.get('/filter/mobile',
       },
     )
       .then(activities => {
-        if (query.date) {
+        if (query.date == '[]') {
+          var date = []
+        } else {
+          var date = json(query.date) 
+        }
+        if (date.length > 0) {
           let result = []
           let length = activities.length
           let startDate = moment(json(query.date)[0]) || moment('1991-04-12')
