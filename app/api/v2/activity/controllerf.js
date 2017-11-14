@@ -531,11 +531,10 @@ exports.findOneActivity = (req, res, next) => {
 // 엑티비티 디테일
 exports.findOneActivity = (req, res, next) => {
   let queryOptions = {
-    group: ['ActivityNew.activity_key', 'Host.host_key', 'Host->User.user_key'],
+    group: ['ActivityNew.activity_key', 'Host.host_key', 'Host->User.user_key', 'Docs.doc_key'],
     where: { activity_key: req.params.activity_key },
     attributes: {
       include: [
-        [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count'],
         [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
         [model.Sequelize.fn('COUNT', model.Sequelize.col('Favorites.fav_key')), 'fav_count'],
       ]
@@ -549,7 +548,7 @@ exports.findOneActivity = (req, res, next) => {
         }
       }, {
         model: model.Doc,
-        attributes: [],
+        attributes: ['doc_key'],
         where: { type: service.docType.review.code },
         required: false
       },
@@ -564,7 +563,10 @@ exports.findOneActivity = (req, res, next) => {
   model.ActivityNew.findOne(queryOptions)
     .then(result => {
       model.ActivityNew.update({ count: result.count + 1 }, { where: { activity_key: req.params.activity_key, status: service.activityStatus.activity.code } })
-        .then(r => res.json(result))
+        .then(r => {
+          result.dataValues.review_count = result.Docs.length
+          res.json(result)
+        })
         .catch(err => next(err))
     }).catch(err => {
       next(err)
