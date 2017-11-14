@@ -56,6 +56,20 @@ router.post('/join/mail', controller.joinMail)
 
 router.post('/wekin', controller.confirmWekin)
 
+router.get('/share/doc/:doc_key', 
+  function (req, res, next) {
+    // 엑티비티 공유를 위한 정보 가져온다.
+    model.Doc.findOne({
+      where: {
+        doc_key: req.params.doc_key
+      }
+    })
+    .then(activity => {
+      res.send(activity)
+    })
+  }
+)
+
 router.get('/share/:activity_key', 
   function (req, res, next) {
     // 엑티비티 공유를 위한 정보 가져온다.
