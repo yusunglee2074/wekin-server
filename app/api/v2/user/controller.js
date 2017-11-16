@@ -11,7 +11,7 @@ function updateOrCreateUser(userId, email, displayName, photoURL, provider) {
     provider: 'KAKAO',
     displayName: displayName || 'defaultName',
     photoURL: photoURL || 'http://we-kin.com/static/images/default-profile.png',
-  };
+  }
   return fireHelper.admin.auth().updateUser(userId, updateParams)
   .catch((error) => {
     if (error.code === 'auth/user-not-found') {
@@ -36,7 +36,6 @@ exports.kakaoLogin = (req, res, next) => {
       }
     }, (err,httpResponse,body) => { 
       let userToken = JSON.parse(body)
-      let userRegistration = JSON.parse(body)
       var options = {
         url: 'https://kapi.kakao.com/v1/user/me',
         headers: {
@@ -51,7 +50,7 @@ exports.kakaoLogin = (req, res, next) => {
           userInfo.properties ? userInfo.properties.thumbnail_image : null,
           'KAKAO'
         )
-          .then( userRecord => {
+          .then(userRecord => {
             const userId = userRecord.uid;
             console.log(`creating a custom firebase token based on uid ${userId}`);
             return fireHelper.admin.auth().createCustomToken(userId, {provider: 'KAKAO'});
@@ -59,7 +58,13 @@ exports.kakaoLogin = (req, res, next) => {
           .then(customToken => {
             res.json({ customToken: customToken, userInfo: userInfo }) 
           })
-          .catch( err => next(err))
+          .catch(err => {
+            if (err.errorInfo.code === "auth/email-already-exists") {
+              res.status(501).json({ message: 'Already signin with this email', data: userInfo.email })
+            } else {
+              next(err)
+            }
+          })
       })
       // 유저 정보를 이용해서 커스텀 토큰을 만든 후 프론트에게 넘겨준 후 프론트에서 커스텀 토큰으로 signInWithCustomToken로 파배 가입시킨다.
     })
@@ -79,7 +84,7 @@ exports.kakaoLogin = (req, res, next) => {
         userInfo.profile_image,
         'NAVER'
       )
-        .then( userRecord => {
+        .then(userRecord => {
           const userId = userRecord.uid;
           console.log(`creating a custom firebase token based on uid ${userId}`);
           return fireHelper.admin.auth().createCustomToken(userId, {provider: 'KAKAO'});
@@ -87,7 +92,7 @@ exports.kakaoLogin = (req, res, next) => {
         .then(customToken => {
           res.json({ customToken: customToken, userInfo: userInfo }) 
         })
-        .catch( err => next(err))
+        .catch(err => next(err))
     })
   } else if (req.params.type === "naver") {
     request.post("https://nid.naver.com/oauth2.0/token", {
@@ -122,14 +127,19 @@ exports.kakaoLogin = (req, res, next) => {
           .then(customToken => {
             res.json({ customToken: customToken, userInfo: userInfo }) 
           })
-          .catch( err => next(err))
+          .catch(err => {
+            if (err.errorInfo.code === "auth/email-already-exists") {
+              res.status(501).json({ message: 'Already signin with this email', data: userInfo.email })
+            } else {
+              next(err)
+            }
+          })
       })
     })
   }
 }
 
 exports.dbCreateWithIdtoken = (req, res, next) => {
-  console.log(req.body.idToken)
   fireHelper.admin.auth().verifyIdToken(req.body.idToken)
     .then(decoded => {
       model.User.findOrCreate({
