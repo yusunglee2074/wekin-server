@@ -83,10 +83,9 @@ router.get('/',
 
 // 뉴스 조회수 1 늘리기 
 // 필요 인자 = none
-router.put('/',
+router.get('/:news_key',
   function (req, res, next) {
-    let body = req.body
-    model.News.increment('click_count', { where: { news_key: body.id } })
+    model.News.increment('click_count', { where: { news_key: req.params.news_key } })
       .then(result => {
         res.json({ message: 'success', data: result })
       })
