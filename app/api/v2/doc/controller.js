@@ -30,7 +30,7 @@ exports.docDelete = (req, res) => {
 exports.listData = (req, res) => {
   model.Doc.findAll({
     where: { type: { $notIn: [2] } },
-    include: [{ model: model.Activity, include: { model: model.Host } }, { model: model.User }]
+    include: [{ model: model.ActivityNew, include: { model: model.Host } }, { model: model.User }]
   })
     .then(result => {
       returnMsg.success200RetObj(res, result)
@@ -42,7 +42,7 @@ exports.qnaListData = (req, res) => {
   model.Doc.findAll({
     where: { type: 2 },
     include: [
-      { model: model.Activity, include: { model: model.Host } }, { model: model.User }
+      { model: model.ActivityNew, include: { model: model.Host } }, { model: model.User }
     ]
   })
     .then(result => returnMsg.success200RetObj(res, result))
