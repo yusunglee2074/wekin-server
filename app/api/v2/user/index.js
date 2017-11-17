@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const { authChk } = require('../service')
+const model = require('./../../../model')
 
 const controller = require('./controller')
 
@@ -17,6 +18,18 @@ const controller = require('./controller')
  *     HTTP/1.1 500 ServerError
  */
 router.get('/', controller.getList)
+router.get('/email/:email', 
+  function (req, res, next) {
+    model.User.findOne({ where: { email: req.params.email } })
+      .then(result => {
+        if (result === null) {
+          res.json({ message: 'notExist' })
+        } else {
+          res.json({ message: 'exist' })
+        }
+      })
+      .catch(err => next(err))
+})
 
 /**
  * @api {get} /user/:user_key 사용자 조회
