@@ -392,7 +392,8 @@ exports.putFrontUserInfo = (req, res, next) => {
       email_noti: user.email_noti,
       push_noti: user.push_noti,
       phone: user.phone,
-      phone_valid: user.phone_valid
+      phone_valid: user.phone_valid,
+      sms_noti: user.sms_noti,
     }
     if (user.profile_image) {
       modelData.profile_image = user.profile_image
