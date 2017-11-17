@@ -146,9 +146,9 @@ exports.searchDocuments = (req, res, next) => {
 
 exports.getUsersDocuments = (req, res, next) => {
   let queryOptions = {
-    where: { type: { in: [0, 1] } },
+    where: { type: { in: [0, 1] }, user_key: req.params.user_key },
     order: [['created_at', 'DESC']],
-    group: ['Doc.doc_key', 'User.user_key'],
+    group: ['Doc.doc_key', 'User.user_key', 'ActivityNew.activity_key'],
     limit: req.query.size || 10,
     offset: (req.query.page || 0) * (req.query.size || 10),
     attributes: [
@@ -167,8 +167,15 @@ exports.getUsersDocuments = (req, res, next) => {
         model: model.User,
         where: { user_key: req.params.user_key },
         attributes: ['user_key', 'profile_image', 'name'],
-        duplicating: false
-      }]
+        duplicating: false,
+        required: false,
+      },
+      {
+        model: model.ActivityNew,
+        attributes: ['address_detail', 'base_price', 'category', 'main_image', 'start_date_list'],
+        duplicating: false,
+      }
+    ]
   }
 
   model.Doc.findAll(queryOptions)
