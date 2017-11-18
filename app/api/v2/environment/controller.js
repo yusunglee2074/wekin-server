@@ -4,8 +4,9 @@ const returnMsg = require('../../../return.msg')
 /**
  * environment 타입 리스트
  */
-const NAME_MAP = ['notice', 'faq', 'main', 'conf']
+const NAME_MAP = ['notice', 'faq', 'main', 'conf', 'mobile']
 
+// type 
 exports.getData = (req, res) => {
   typeConverter(req)
   .then(val => model.Env.findAll({
@@ -69,7 +70,7 @@ let typeConverter = req => {
     NAME_MAP.includes(req.params.type) ? 
     resolve(req.params.type) :
     reject({
-      code: 'ERROR_INVALID_PARAM',
-      msg: 'ERROR_INVALID_PARAM'})
+      code: 'ERROR_INVALID_type of param ',
+      msg: 'ERROR_INVALID_type of param'})
   })
 }
