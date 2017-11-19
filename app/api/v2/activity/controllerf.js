@@ -447,7 +447,7 @@ exports.updateActivity = (req, res, next) => {
     price: requestData.price,
     isteamorpeople: requestData.isteamorpeople,
     status: requestData.status,
-    category: requestData.category1,
+    category: requestData.category,
     category_two: requestData.category2,
     start_date: moment(requestData.start_date),
     end_date: moment(requestData.end_date),
