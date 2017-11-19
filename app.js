@@ -6,9 +6,9 @@ fireHelper.init()
 
 
 const { utilService } = require('./app/api/v1/service')
-const cron = require('./app/api/v2/util/cron')
+//const cron = require('./app/api/v2/util/cron')
 
-cron.batch()
+//cron.batch()
 
 app.set('port', port)
 
