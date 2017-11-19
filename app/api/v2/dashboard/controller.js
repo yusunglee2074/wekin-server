@@ -31,9 +31,9 @@ exports.getDashboard = (req, res) => {
     })
     .then(r => {
       result.todaysUser = r
-      return model.Wekin.count({
+      return model.WekinNew.count({
         transaction: t,
-        include: [{ model: model.Activity, where: {status: 3} }],
+        include: [{ model: model.ActivityNew, where: {status: 3} }],
         where: {
           due_date: { $gt: date }
         }
@@ -59,7 +59,7 @@ exports.getDashboard = (req, res) => {
 }
 
 exports.getActivity = (req, res) => {
-  model.Activity.findAll({
+  model.ActivityNew.findAll({
     order: [['activity_key', 'DESC']],
     attributes: ['activity_key', 'status', 'created_at', 'title'],
     include: {
