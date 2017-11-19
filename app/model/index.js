@@ -5,33 +5,37 @@ var Sequelize = require('sequelize')
 
 const DB_PROD = {
   host: '35.189.139.31',
-  user: 'postgres'
+  user: 'postgres',
 }
 const DB_DEV = {
   host: '35.189.153.138',
   user: 'wekin'
 }
+const yusungDEV = {
+  host: '13.125.79.168',
+  user: 'ubuntu',
+  dbName: 'test',
+  password: 'sjdmlrl4',
+}
 
-const dbTarget = DB_PROD
+const dbTarget = DB_PROD 
 
 let dbconf = {
-  db: process.env.SQL_DATABASE || 'wekin',
+  db: process.env.SQL_DATABASE || dbTarget.dbName || 'wekin',
   user: process.env.SQL_USER || dbTarget.user,
-  password: process.env.SQL_PASSWORD || 'dnlzlsjwmfru!',
-  host: (process.env.INSTANCE_CONNECTION_NAME !== undefined) ? `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}` : dbTarget.host, 
+  password: process.env.SQL_PASSWORD || dbTarget.password || 'dnlzlsjwmfru!',
+  host: (process.env.INSTANCE_CONNECTION_NAME !== undefined) ? `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}` : dbTarget.host,
 }
 
 var sequelize = new Sequelize(dbconf.db, dbconf.user, dbconf.password, {
   dialect: 'postgresql',
   timezone: 'Asia/Seoul',
-  host: dbconf.host
+  host: dbconf.host 
 })
 
 var db = {
   User: sequelize.import(path.join(__dirname, 'user.js')),
   Host: sequelize.import(path.join(__dirname, 'host.js')),
-  Activity: sequelize.import(path.join(__dirname, 'activity.js')),
-  Wekin: sequelize.import(path.join(__dirname, 'wekin.js')),
   Order: sequelize.import(path.join(__dirname, 'order.js')),
   Doc: sequelize.import(path.join(__dirname, 'doc.js')),
   Comment: sequelize.import(path.join(__dirname, 'comment.js')),
@@ -59,11 +63,12 @@ fs.readdirSync(__dirname)
 
 config.initAssociations(db)
 
+/*
+db.User.sync()
+db.Host.sync()
 db.News.sync()
-db.Activity.sync()
 db.Point.sync()
 db.ActivityNew.sync()
-db.Wekin.sync()
 db.WekinNew.sync()
 db.Order.sync()
 db.Board.sync()
@@ -75,6 +80,7 @@ db.Noti.sync()
 db.Like.sync()
 db.Favorite.sync()
 db.Waiting.sync()
+*/
 
 db.sequelize = sequelize
 db.Sequelize = Sequelize
