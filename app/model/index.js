@@ -12,7 +12,7 @@ const DB_DEV = {
   user: 'wekin'
 }
 
-const dbTarget = DB_DEV
+const dbTarget = DB_PROD
 
 let dbconf = {
   db: process.env.SQL_DATABASE || 'wekin',
@@ -59,20 +59,22 @@ fs.readdirSync(__dirname)
 
 config.initAssociations(db)
 
-// db.User.sync()
-// db.Host.sync()
-// db.Activity.sync()
-// db.Wekin.sync()
-// db.Order.sync()
-// db.Board.sync()
-// db.Doc.sync()
-// db.Comment.sync()
-// db.Follow.sync()
-// db.Env.sync()
-// db.Noti.sync()
-// db.Like.sync()
-// db.Favorite.sync()
-// db.Waiting.sync()
+db.News.sync()
+db.Activity.sync()
+db.Point.sync()
+db.ActivityNew.sync()
+db.Wekin.sync()
+db.WekinNew.sync()
+db.Order.sync()
+db.Board.sync()
+db.Doc.sync()
+db.Comment.sync()
+db.Follow.sync()
+db.Env.sync()
+db.Noti.sync()
+db.Like.sync()
+db.Favorite.sync()
+db.Waiting.sync()
 
 db.sequelize = sequelize
 db.Sequelize = Sequelize
