@@ -6,7 +6,7 @@ const iamporter = new Iamporter({
   apiKey: '4401466536780514',
   secret: 'PDNJ0Cws2yDvdk5AXOp0nxu5kbKh70gWE3GEFc6ILKdY4iy26Y2uwwzQHk8PkoMYrsC7FJQqt3oxmXAs'
 })
-exports.importHook = (req, res) => {
+exports.importHook = (req, res, next) => {
   let body = req.body
   iamporter.findByImpUid(req.body.imp_uid)
     .then(r => {
@@ -15,8 +15,12 @@ exports.importHook = (req, res) => {
         model.Order.update({ status: r.data.status, order_pay_price: r.data.amount }, { where: { order_id: r.data.merchant_uid }, returning: true })
           .then(r => {
             if (r[1][0].status === 'paid') {
-              utilService.sendOrderConfirmSms(r[1][0])
-              utilService.sendOrderConfirmSmsToMaker(r[1][0])
+              model.WekinNew.update({ state: 'paid' }, { where: { wekin_key: r[1][0].wekin_key } })
+                .then(result => {
+                  utilService.sendOrderConfirmSms(r[1][0])
+                  utilService.sendOrderConfirmSmsToMaker(r[1][0])
+                })
+                .catch(error => next(error))
             } else if (r.status === 'ready') {
               utilService.sendOrderReadySms(r[1][0])
             }
