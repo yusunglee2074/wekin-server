@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <!-- <script type=“text/javascript” src=“js/jquery-1.12.4.min.js”></script>
+    <script type=“text/javascript” src=“https://service.iamport.kr/js/iamport.payment-1.1.2.js“></script> -->
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+    <script src='https://service.iamport.kr/js/iamport.payment-1.1.5.js'></script>
+  </head>
+  <body>
+ <p id="demo"></p>
+  
+    <div><h1>눈 와야 뛰어내릴텐데</h1></div>
+  
+  
+    <script>
+      document.getElementById("demo").innerHTML = "Hello JavaScript!";
+console.log("이유성")
+$(document).ready(function($) {
+
+  console.log('checkout.html 열렸다');
+  function getQueryVariable(variable) {
+    var query = window.location.search.substring(1);
+    console.log(query);
+    var vars = query.split('&');
+    for (var i = 0; i < vars.length; i++) {
+      var pair = vars[i].split('=');
+      if (decodeURIComponent(pair[0]) == variable) {
+        return decodeURIComponent(pair[1]);
+      }
+    }
+
+    return null;
+  }
+
+  IMP.init(getQueryVariable('user-code'));
+});
+    </script>
+  </body>
+</html>

@@ -19,7 +19,7 @@ module.exports = function (sequelize, DataTypes) {
 
     user_phone: { type: DataTypes.STRING(14), allowNull: true },
     // 위킨키
-    wekin_key: { type: DataTypes.INTEGER, allowNull: false, references: { model: model.Wekin, key: 'wekin_key' } },
+    wekin_key: { type: DataTypes.INTEGER, allowNull: false, references: { model: model.WekinNew, key: 'wekin_key' } },
     // 위킨
     wekin_name: { type: DataTypes.STRING(128), allowNull: false },
     // 위킨 가격

@@ -17,11 +17,13 @@ module.exports = function (sequelize, DataTypes) {
     phone_valid: { type: DataTypes.BOOLEAN, defaultValue: false },
     notification: { type: DataTypes.STRING, allowNull: true },
     last_login_date: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-    point: { type: DataTypes.JSON, defaultValue: { point: 0, point_special: 0 }, allowNull: false },
+    point: { type: DataTypes.JSON, defaultValue: { point: 0, point_special: 0, percentage: 100 }, allowNull: true },
     birthday: { type: DataTypes.DATE, allowNull: true, defaultValue: null },
     email_company: { type: DataTypes.STRING, allowNull: true },
     email_company_valid: { type: DataTypes.BOOLEAN, defaultValue: false },
     country: { type: DataTypes.STRING, defaultValue: 'Korea' },
+    work_balance_point: { type: DataTypes.INTEGER, defaultValue: 0 },
+    work_balance_point_history: { type: DataTypes.ARRAY(DataTypes.DATE), defaultValue: [] }
   }, {
     classMethods: {},
     tableName: 'user',
