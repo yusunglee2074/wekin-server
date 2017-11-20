@@ -6,13 +6,13 @@ const { notiService, userService, docService } = require('../service')
  * environment 타입 리스트
  */
 
-exports.getData = (req, res) => {
+exports.getData = (req, res, next) => {
   model.Like.findAll({
     where: { user_key: req.params.user_key },
     include: {model: model.Doc}
   })
     .then(result => returnMsg.success200RetObj(res, result))
-    .catch(val => { returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', val) })
+    .catch(val => { next(val) })
 }
 
 

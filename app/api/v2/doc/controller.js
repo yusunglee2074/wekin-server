@@ -11,7 +11,7 @@ const util = require('util')
 const NAME_MAP = ['notice', 'faq']
 
 
-exports.docDelete = (req, res) => {
+exports.docDelete = (req, res, next) => {
   model.Doc.destroy({
     where: {
       doc_key: req.params.doc_key
@@ -23,11 +23,11 @@ exports.docDelete = (req, res) => {
       returnMsg.success200RetObj(res, { res: data })
     })
     .catch(e => {
-      console.log(e)
+      console.log(next)
     })
 }
 
-exports.listData = (req, res) => {
+exports.listData = (req, res, next) => {
   model.Doc.findAll({
     where: { type: { $notIn: [2] } },
     include: [{ model: model.ActivityNew, include: { model: model.Host } }, { model: model.User }]
@@ -35,10 +35,10 @@ exports.listData = (req, res) => {
     .then(result => {
       returnMsg.success200RetObj(res, result)
     })
-    .catch(val => { console.log(val) })
+    .catch(val => { next(val) })
 }
 
-exports.qnaListData = (req, res) => {
+exports.qnaListData = (req, res, next) => {
   model.Doc.findAll({
     where: { type: 2 },
     include: [
@@ -46,7 +46,7 @@ exports.qnaListData = (req, res) => {
     ]
   })
     .then(result => returnMsg.success200RetObj(res, result))
-    .catch(val => { console.log(val) })
+    .catch(val => { next(val) })
 }
 
 exports.getFrontDocuments = (req, res, next) => {

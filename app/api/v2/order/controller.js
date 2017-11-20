@@ -18,7 +18,7 @@ const TYPE_MAP = {
   order: 'order'
 }
 
-exports.getHostsInfo = (req, res) => {
+exports.getHostsInfo = (req, res, next) => {
   let monthStart = moment(req.params.month, 'MM')
   let monthEnd = monthStart.clone().endOf('month')
   model.Order.findAll({
@@ -49,10 +49,10 @@ exports.getHostsInfo = (req, res) => {
     tmp.list = r
     returnMsg.success200RetObj(res, tmp)
   })
-  .catch(e => console.log(e))
+  .catch(e => next(e))
 }
 
-exports.importHook = (req, res) => {
+exports.importHook = (req, res, next) => {
   let body = req.body
 
   iamporter.findByImpUid(req.body.imp_uid)
@@ -69,7 +69,7 @@ exports.importHook = (req, res) => {
   .then(r => {
     returnMsg.success200RetObj(res, r)
   })
-  .catch(val => { returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', val) })
+  .catch(val => { next(val) })
 }
 
 
@@ -141,7 +141,7 @@ exports.confirmOrder = (req, res, next) => {
 }
 
 
-exports.putOrder = (req, res) => {
+exports.putOrder = (req, res, next) => {
   let body = req.body
 
   model.Order.update({
@@ -153,7 +153,7 @@ exports.putOrder = (req, res) => {
       }
     })
   .then(result => returnMsg.success200RetObj(res, result))
-  .catch(val => { returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', val) })
+  .catch(val => next(val) })
 }
 
 /**
@@ -196,7 +196,7 @@ let cancelVbank = (imp_uid) => {
   
 }
 
-exports.setOrderCancelled = (req, res) => {
+exports.setOrderCancelled = (req, res, next) => {
   // utilService.slackLog('주문취소')
   model.Order.findById(req.params.order_key)
   .then(orderObj => {
@@ -254,11 +254,11 @@ exports.setOrderCancelled = (req, res) => {
   .catch(e => {
     // utilService.slackLog('실패')
     // utilService.slackLog(e)
-    returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', e.raw.message)
+    next(e)
   })
 }
 
-exports.setOrderBeen = (req, res) => {
+exports.setOrderBeen = (req, res, next) => {
   let tmp = {}
   model.Order.findOne({
     where: {order_id :req.params.order_id }} )
@@ -291,8 +291,7 @@ exports.setOrderBeen = (req, res) => {
     returnMsg.success200RetObj(res, r)
   })
   .catch(e => {
-    console.log(e)
-    returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', e)
+    next(e)
   })
 
 /*
@@ -412,7 +411,7 @@ exports.getOrderListPageing = (req, res, next) => {
     .catch(error => next(error))
 }
 
-exports.getOrderListPageingExcel = (req, res) => {
+exports.getOrderListPageingExcel = (req, res, next) => {
   let param = {
     include: [{ model: model.Wekin, include: { model: model.Activity } }, { model: model.User }],
     where: {status: {$notIn: ['reqRef', 'been']}}
@@ -553,19 +552,19 @@ exports.getRefundOrderListPageing = (req, res) => {
 
   pageable(model.Order, req.query, param)
   .then(result => res.json(result))
-  .catch(val => { console.log(val) })
+  .catch(val => { next(val) })
 }
 
 
-exports.getList = (req, res) => {
+exports.getList = (req, res, next) => {
   model.Order.findAll({
     include: [{ model: model.Wekin }, { model: model.User }]
   })
   .then(result => returnMsg.success200RetObj(res, result))
-  .catch(val => { console.log(val) })
+  .catch(val => { next(val) })
 }
 
-exports.putOrder = (req, res) => {
+exports.putOrder = (req, res, next) => {
   let body = req.body
 
   model.Order.update({
@@ -577,7 +576,7 @@ exports.putOrder = (req, res) => {
       }
     })
   .then(result => returnMsg.success200RetObj(res, result))
-  .catch(val => { returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', val) })
+  .catch(val => { next(val) })
 }
 
 exports.postOrder = (req, res, next) => {
@@ -653,7 +652,7 @@ exports.getOneByUser = (req, res, next) => {
   })
   .catch(err => next(err))
 }
-exports.getOneOrder = (req, res) => {
+exports.getOneOrder = (req, res, next) => {
   model.Order.findOne({
     where: { order_key: req.params.order_key },
     include: [
@@ -663,9 +662,9 @@ exports.getOneOrder = (req, res) => {
   .then(v => {
     returnMsg.success200RetObj(res, v)
   })
-  .catch(val => { returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', val) })
+  .catch(val => { next(val) })
 }
-exports.deleteOrder = (req, res) => {
+exports.deleteOrder = (req, res, next) => {
   model.Order.findOne({
     where: { order_key: req.params.order_key }
   })
@@ -682,10 +681,10 @@ exports.deleteOrder = (req, res) => {
   .then(v => {
     returnMsg.success200RetObj(res, {result: 'done'})
   })
-  .catch(val => { returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', val) })
+  .catch(val => { next(val) })
 }
 
-exports.deleteOrderImpUid = (req, res) => {
+exports.deleteOrderImpUid = (req, res, next) => {
   model.Order.findOne({
     where: { imp_uid: req.params.imp_uid }
   })
@@ -702,7 +701,7 @@ exports.deleteOrderImpUid = (req, res) => {
   .then(v => {
     returnMsg.success200RetObj(res, {result: 'done'})
   })
-  .catch(val => { returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', val) })
+  .catch(val => { next(val) })
 }
 
 exports.getOrderImpUid = (req, res, next) => {
@@ -756,25 +755,25 @@ exports.getDashboard = (req, res) => {
     })
   })
 }
-exports.listData = (req, res) => {
+exports.listData = (req, res, next) => {
   model.Doc.findAll({
     where: { type: { $notIn: [2] } },
     include: [{ model: model.Activity }, { model: model.User }]
   })
   .then(result => returnMsg.success200RetObj(res, result))
-  .catch(val => { console.log(val) })
+  .catch(val => { next(val) })
 }
 
-exports.qnaListData = (req, res) => {
+exports.qnaListData = (req, res, next) => {
   model.Doc.findAll({
     where: { type: 2 },
     include: [{ model: model.Activity }, { model: model.User }]
   })
   .then(result => returnMsg.success200RetObj(res, result))
-  .catch(val => { console.log(val) })
+  .catch(val => { next(val) })
 }
 
-exports.getData = (req, res) => {
+exports.getData = (req, res, next) => {
 
   typeConverter(req)
   .then(val => model.Env.findAll({
@@ -783,11 +782,11 @@ exports.getData = (req, res) => {
   }))
   .then(result => returnMsg.success200RetObj(res, result))
   .catch(val => {
-    returnMsg.error400InvalidCall(res, val.code, val.msg)
+    next(val)
   })
 }
 
-exports.postData = (req, res) => {
+exports.postData = (req, res, next) => {
 
   typeConverter(req)
   .then(val => model.Env.create({
@@ -796,11 +795,11 @@ exports.postData = (req, res) => {
     value: req.body.value
   }))
   .then(result => returnMsg.success200RetObj(res, result))
-  .catch(val => { console.log(val) })
+  .catch(val => { next(val) })
   // .catch(val => { returnMsg.error400InvalidCall(res, val.code, val.msg) })
 }
 
-exports.putData = (req, res) => {
+exports.putData = (req, res, next) => {
   typeConverter(req)
   .then(val => model.Env.update({
     value: req.body.value
@@ -811,11 +810,11 @@ exports.putData = (req, res) => {
     returning: true
   }))
   .then(result => returnMsg.success200RetObj(res, result))
-  .catch(val => { console.log(val) })
+  .catch(val => { next(val) })
 
 }
 
-exports.deleteData = (req, res) => {
+exports.deleteData = (req, res, next) => {
   typeConverter(req)
   .then(val => model.Env.destroy({
     where: {
@@ -824,7 +823,7 @@ exports.deleteData = (req, res) => {
     returning: true
   }))
   .then(result => returnMsg.success200RetObj(res, result))
-  .catch(val => { console.log(val) })
+  .catch(val => { next(val) })
 
 }
 

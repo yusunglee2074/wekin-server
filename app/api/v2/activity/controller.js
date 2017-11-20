@@ -45,7 +45,7 @@ exports.getApproveList = (req, res, next) => {
     .catch( error => next(error) )
 }
 
-exports.getList = (req, res) => {
+exports.getList = (req, res, next) => {
   model.Activity.findAll({
     order: [['created_at', 'DESC']],
     include: { model: model.Host },
@@ -53,17 +53,17 @@ exports.getList = (req, res) => {
   }).then((results) => {
     res.json(results)
   }).catch((err) => {
-    console.log(err)
+    next(err)
   })
 }
 
-exports.getOne = (req, res) => {
+exports.getOne = (req, res, next) => {
   model.Activity.findById(req.params.key)
   .then(result => res.json(result))
-  .catch(err => console.log(err))
+  .catch(err => next(err))
 }
   
-exports.putOne = (req, res) => {
+exports.putOne = (req, res, next) => {
   let body = req.body
   model.Activity.update({
     title: body.title,
@@ -84,7 +84,7 @@ exports.putOne = (req, res) => {
     } 
   })
   .then(result => { returnMsg.success200RetObj(res, req.body) })
-  .catch(err => console.log(err))
+  .catch(err => next(err))
   
 }
 
@@ -128,7 +128,7 @@ exports.getApproveActivity = (req, res) => {
 }
 */
 
-exports.deleteAvtivity = (req, res) => {
+exports.deleteAvtivity = (req, res, next) => {
 
   model.Activity.find({
     where: {
@@ -155,13 +155,13 @@ exports.deleteAvtivity = (req, res) => {
       returnMsg.success200RetObj(res, {msg: '액티비티 삭제 완료'})
     }
   })
-  .catch(err => console.log(err))
+  .catch(err => next(err))
 }
 
-exports.rejectActivity = (req, res) => {
+exports.rejectActivity = (req, res, next) => {
 
   activityService.getActivityByKey(req.params.activity_key)
   .then(r => activityService.putActivity(r.activity_key, { status: 2 }) )
   .then(v => { returnMsg.success200RetObj(res, {msg: '액티비티 반려 완료'}) })
-  .catch(err => console.log(err))
+  .catch(err => next(err))
 }

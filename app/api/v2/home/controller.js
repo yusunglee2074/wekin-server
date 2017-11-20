@@ -143,7 +143,7 @@ exports.popularMaker = (req, res, next) => {
  * like : 좋아요수
  * comment : 댓글수
  */ 
-exports.popularFeed = (req, res) => {
+exports.popularFeed = (req, res, next) => {
   let daybefore30 = moment().add({days: -30})
   
   model.Doc.findAll({
@@ -169,7 +169,7 @@ exports.popularFeed = (req, res) => {
     r = shuffleArray(r)
     returnMsg.success200RetObj(res, r.slice(0, 5))
   })
-  .catch(r => { console.log(r) })
+  .catch(r => { next(r) })
 
 }
 
@@ -247,5 +247,4 @@ function shuffleArray(array) {
     array[i] = array[j]
     array[j] = temp
   }
-  return array
-}
+  return array}

@@ -176,16 +176,16 @@ exports.dbCreateWithIdtoken = (req, res, next) => {
     .catch( error => next(error) )
 }
 
-exports.getList = (req, res) => {
+exports.getList = (req, res, next) => {
   model.User.findAll({paranoid: false})
     .then((results) => {
       returnMsg.success200RetObj(res, results) 
     })
     .catch((err) => {
-      returnMsg.error500Server(res, err)
+      next(err)
     })
 }
-exports.getOne = (req, res) => {
+exports.getOne = (req, res, next) => {
   let tmp = {}
   model.User.findById(req.params.user_key, {paranoid: false})
   .then(u => {
@@ -206,9 +206,9 @@ exports.getOne = (req, res) => {
     return tmp
   })
   .then(result => returnMsg.success200RetObj(res, result))
-  .catch(err => returnMsg.error500Server(res, err))
+  .catch(err => next(err))
 }
-exports.withdraw = (req, res) => {
+exports.withdraw = (req, res, next) => {
   userService.getUserByToken(req)
   .then(r => {
     return model.User.destroy({
@@ -222,7 +222,7 @@ exports.withdraw = (req, res) => {
     returnMsg.success200RetObj(res, {result: true})
   })
   .catch(e => {
-    returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', {result: false, msg: 'already deleted'})
+    next(e)
   })
 }
 
@@ -348,7 +348,7 @@ exports.postVerifyPhone = (req, res, next) => {
   .then(r => {
     res.sendStatus(200)
   })
-  .catch(e => { console.log(e) })
+  .catch(e => { next(e) })
 }
 exports.postFrotUser = (req, res, next) => {
   var options = req.fetchParameter(['profile_image', 'name', 'gender', 'introduce', 'email', 'phone'])
