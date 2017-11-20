@@ -107,6 +107,18 @@ router.delete('/front/:doc_key/comment/:comment_key', service.authChk, controlle
 
 router.get('/front/:doc_key/like', controller.getLikes)
 
+router.get('/front/:doc_key/like', controller.getLikes)
+
+router.get('/share/:doc_key', 
+  function (req, res, next) {
+    model.Doc.increment('share_count', { where: { news_key: body.id } })
+      .then(result => {
+        res.json({ message: 'success', data: result })
+      })
+      .catch(error => next(error))
+  }
+)
+
 
 
 module.exports = router

@@ -95,10 +95,9 @@ router.get('/:news_key',
 
 // 뉴스 공유 횟수 1 늘리기 
 // 필요 인자 = none
-router.put('/share',
+router.get('/share/:news_key',
   function (req, res, next) {
-    let body = req.body
-    model.News.increment('share_count', { where: { news_key: body.id } })
+    model.News.increment('share_count', { where: { news_key: req.params.news_key } })
       .then(result => {
         res.json({ message: 'success', data: result })
       })
