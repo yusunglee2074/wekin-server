@@ -1,4 +1,5 @@
 
+const model = require('./../../../model')
 const express = require('express')
 const router = express.Router()
 const service = require('../service')
@@ -111,7 +112,7 @@ router.get('/front/:doc_key/like', controller.getLikes)
 
 router.get('/share/:doc_key', 
   function (req, res, next) {
-    model.Doc.increment('share_count', { where: { news_key: body.id } })
+    model.Doc.increment('share_count', { where: { doc_key: req.params.doc_key} })
       .then(result => {
         res.json({ message: 'success', data: result })
       })
