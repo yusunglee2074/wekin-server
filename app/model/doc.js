@@ -16,7 +16,7 @@ module.exports = function (sequelize, DataTypes) {
     status: { type: DataTypes.INTEGER, allowNull: true },
     type: { type: DataTypes.INTEGER, allowNull: false },
     answer: { type: DataTypes.TEXT, allowNull: true },
-    host_key: { type: DataTypes.INTEGER, references: { model: model.Host, key: 'host_key' } }
+    host_key: { type: DataTypes.INTEGER, references: { model: model.Host, key: 'host_key' } },
 
     share_count: { type: DataTypes.INTEGER, defaultValue: 0 }
   }, {
