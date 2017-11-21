@@ -562,7 +562,7 @@ exports.findOneActivity = (req, res, next) => {
   }
   model.ActivityNew.findOne(queryOptions)
     .then(result => {
-      model.ActivityNew.update({ count: result.count + 1 }, { where: { activity_key: req.params.activity_key, status: service.activityStatus.activity.code } })
+      model.ActivityNew.increment('count', { where: { activity_key: req.params.activity_key } })
         .then(r => {
           result.dataValues.review_count = result.Docs.length
           res.json(result)
