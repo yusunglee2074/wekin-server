@@ -7,15 +7,15 @@ const returnMsg = require('../../../return.msg')
 const NAME_MAP = ['notice', 'faq', 'main', 'conf', 'mobile']
 
 // type 
-exports.getData = (req, res) => {
+exports.getData = (req, res, next) => {
   typeConverter(req)
   .then(val => model.Env.findAll({
-    where: { type: val, name: req.params.name},
+    where: { type: val, name: req.params.name },
     attributes: ['value', 'env_key', 'description']
   }))
   .then(result => returnMsg.success200RetObj(res, result))
   .catch(val => {
-    returnMsg.error400InvalidCall(res, val.code, val.msg)
+    next(val)
   })
 }
 
