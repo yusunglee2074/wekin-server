@@ -1,7 +1,7 @@
 const model = require('../../../model')
 const returnMsg = require('../../../return.msg')
 
-exports.getTargetData = (req, res) => {
+exports.getTargetData = (req, res, next) => {
   model.Follow.findAll({
     attributes: ['created_at'],
     where: { follower_user_key: req.params.user_key, user_key: {$ne: req.params.user_key} },
@@ -17,7 +17,7 @@ exports.getTargetData = (req, res) => {
     }]
   })
   .then(result => returnMsg.success200RetObj(res, result))
-  .catch(val => { returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', val) })
+  .catch(val => { next(val) })
 }
 
 exports.getData = (req, res, next) => {
@@ -35,7 +35,7 @@ exports.getData = (req, res, next) => {
   .catch(val => next(val) )
 }
 
-exports.putData = (req, res) => {
+exports.putData = (req, res, next) => {
   model.sequelize.transaction(t => {
     
     return model.Follow.find({
@@ -56,7 +56,7 @@ exports.putData = (req, res) => {
           transaction: t
         })
         .then(result => returnMsg.success200RetObj(res, result))
-        .catch(val => { returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', val) })
+        .catch(val => next(val) )
         
       } else {
         return model.Follow.create({
@@ -66,7 +66,7 @@ exports.putData = (req, res) => {
           transaction: t
         })
         .then(result => returnMsg.success200RetObj(res, result))
-        .catch(val => { returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', val) })
+        .catch(val => next(val) )
       }
     })
   })
