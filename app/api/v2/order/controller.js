@@ -153,7 +153,7 @@ exports.putOrder = (req, res, next) => {
       }
     })
   .then(result => returnMsg.success200RetObj(res, result))
-  .catch(val => next(val) })
+  .catch(val => next(val) )
 }
 
 /**
