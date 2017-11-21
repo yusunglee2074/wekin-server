@@ -1,61 +1,88 @@
 const model = require('../../../model')
+const moment = require('moment')
 const returnMsg = require('../../../return.msg')
 
-exports.getDashboard = (req, res) => {
-  let date = new Date()
-  date.setHours(0)
-  date.setMinutes(0)
-  date.setSeconds(0)
-  
-  let today = date.getTime()
-  date.setDate(date.getDate() + 1)
-  let tomorrow = date.getTime()  
-
+exports.getDashboard = (req, res, next) => {
   let result = {}
-
-  model.sequelize.transaction(t => {
-    return model.User.count({
-      transaction: t
-    })
-    .then(r => {
-      result.userCount = r
+  model.User.count()
+    .then(numberOfUser => {
+      result.numberOfUser = numberOfUser
       return model.User.count({
-        transaction: t,
         where: {
-          created_at: { $gt: today },
-          $and: {
-            created_at: { $lt: tomorrow }
+          created_at: {
+            $gt: moment().set('hours', 0).set('minutes', 0)
           }
         }
       })
     })
-    .then(r => {
-      result.todaysUser = r
-      return model.WekinNew.count({
-        transaction: t,
-        include: [{ model: model.ActivityNew, where: {status: 3} }],
+    .then(NumberOfTodayUser => {
+      result.NumberOfTodayUser = NumberOfTodayUser
+      return model.ActivityNew.count({
         where: {
-          due_date: { $gt: date }
+          status: 3
         }
       })
     })
-    .then(r => {
-      result.todayActivateWekin = r
-      return model.Order.count({
-        transaction: t,
+    .then(numberOfActiveActivity => {
+      result.numberOfActiveActivity = numberOfActiveActivity
+      return model.ActivityNew.findAll({
         where: {
-          created_at: { $gt: today },
-          $and: {
-            created_at: { $lt: tomorrow }
+          status: 1
+        },
+        include: [
+          { model: model.Host, attributes: ['name'] }
+        ]
+      })
+    })
+    .then(toBeConfirmedActivities => {
+      result.toBeConfirmedActivities = toBeConfirmedActivities 
+      return model.Host.findAll({
+        where: {
+          status: 1
+        }
+      })
+    })
+    .then(toBeConfirmedMakers => {
+      result.toBeConfirmedMakers = toBeConfirmedMakers 
+      return model.ActivityNew.findAll({
+        where: {
+          end_date: {
+            $lt: moment().add(11, 'days')
+          },
+          status: 3
+        }
+      })
+    })
+    .then(activityThatEndsSoon => {
+      result.activityThatEndsSoon = activityThatEndsSoon
+      return model.WekinNew.findAll({
+        order: [[ 'wekin_key', 'DESC' ]],
+        limit: 10,
+        where: {
+          state: {
+            $in: ['paid', 'reqRef', 'cancelled']
           }
-        }
+        },
+        include: [
+          { model: model.User, attributes: ['name'] }
+        ]
       })
     })
-    .then(r => {
-      result.todaysOrderCount = r
-      returnMsg.success200RetObj(res, result)
+    .then(recentWekinNew => {
+      result.recentWekinNew = recentWekinNew
+      return model.Doc.findAll({
+        order: [[ 'doc_key', 'DESC' ]],
+        limit: 10,
+        include: [
+          { model: model.User, attributes: ['name'] }
+        ]
+      })
     })
-  })
+    .then(recentDoc => {
+      result.recentDoc = recentDoc
+      res.json({ message: 'success', data: result })
+    })
+      .catch(error => next(error))
 }
 
 exports.getActivity = (req, res) => {
