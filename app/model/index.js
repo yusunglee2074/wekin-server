@@ -18,7 +18,7 @@ const yusungDEV = {
   password: 'sjdmlrl4',
 }
 
-const dbTarget = DB_DEV
+const dbTarget = DB_PROD
 
 let dbconf = {
   db: process.env.SQL_DATABASE || dbTarget.dbName || 'wekin',
