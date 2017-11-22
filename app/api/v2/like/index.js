@@ -74,6 +74,25 @@ router.put('/comment',
   }
 )
 
+router.get('/news/:user_key',
+  (req, res, next) => {
+    let user_key = req.params.user_key
+    model.Like.findAll({
+      where: {
+        user_key: user_key,
+        news_key: {
+          $gt: 0 
+        }
+      }
+    })
+      .then(likes => {
+        res.json({ message: 'success', data: likes })
+      })
+      .catch(error => {
+        next(error)
+      })
+  }
+)
 router.put('/news',
   (req, res, next) => {
     let user_key = req.body.user_key
