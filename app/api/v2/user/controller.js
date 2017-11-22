@@ -31,7 +31,7 @@ exports.kakaoLogin = (req, res, next) => {
       form: { 
         grant_type: 'authorization_code',
         client_id: '75c0694ad636bcca94fa48cbc7c9d8cf',
-        redirect_url: 'http://175.195.139.99:8080/auth/kakao',
+        redirect_url: 'http://we-kin.com/auth/kakao',
         code: req.params.code 
       }
     }, (err,httpResponse,body) => { 
@@ -77,7 +77,7 @@ exports.kakaoLogin = (req, res, next) => {
       }
     }
     request(options, (err, response, body) => {
-      let userInfo = JSON.parse(body).response
+      let userInfo = JSON.parse(body)
       updateOrCreateUser('wekin_' + userInfo.id, 
         userInfo.email, 
         userInfo.name, 
@@ -99,7 +99,7 @@ exports.kakaoLogin = (req, res, next) => {
       form: { 
         grant_type: 'authorization_code',
         client_id: 'rTHYGlmyZuVKSzR4_45d',
-        redirect_url: 'http://175.195.139.99:8080/auth/naver',
+        redirect_url: 'http://we-kin.com',
         code: req.params.code,
         client_secret: '5Wo2kSoe2R'
       }
@@ -159,8 +159,8 @@ exports.dbCreateWithIdtoken = (req, res, next) => {
             displayName: decoded.name,
             email: decoded.email
           })
-            .then( user => {
-              res.send(user)
+            .then(result => {
+              res.send(user[0])
             })
             .catch( err => {
               fireHelper.admin.auth().getUser(uuid)
