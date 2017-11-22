@@ -29,9 +29,6 @@ exports.getDashboard = (req, res, next) => {
         where: {
           status: 1
         },
-        include: [
-          { model: model.Host, attributes: ['name'] }
-        ]
       })
     })
     .then(toBeConfirmedActivities => {
