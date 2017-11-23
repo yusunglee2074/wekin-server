@@ -466,6 +466,10 @@ exports.updateActivity = (req, res, next) => {
     comision: requestData.comision,
     start_date_list: requestData.start_date_list
   }
+  for (let i = 0; i < activityModelData.close_dates.length; i++) {
+    let item = activityModelData.close_dates
+    item[i] = Number(moment(item[i]).format('YYMMDD'))
+  }
   return model.ActivityNew.update(activityModelData, { returning: true, where: { host_key: requestData.host_key || user.Host.host_key, activity_key: req.params.activity_key } })
     .then( result => {
       res.json({ message: "success", data: result[1][0] })
