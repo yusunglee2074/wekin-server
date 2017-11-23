@@ -31,7 +31,7 @@ exports.kakaoLogin = (req, res, next) => {
       form: { 
         grant_type: 'authorization_code',
         client_id: '75c0694ad636bcca94fa48cbc7c9d8cf',
-        redirect_url: 'http://we-kin.com/auth/kakao',
+        redirect_url: `${model.SNSLoginUrl}/auth/kakao`,
         code: req.params.code 
       }
     }, (err,httpResponse,body) => { 
