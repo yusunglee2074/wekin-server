@@ -652,7 +652,8 @@ exports.findWekiner = (req, res, next) => {
   let queryOptions = {
     where: { activity_key: req.params.wekin_key, state: 'paid' },
     include: [
-      { model: model.User, attributes: ['profile_image', 'user_key'] }
+      { model: model.User, attributes: ['profile_image', 'user_key', 'name', 'phone'] },
+      { model: model.ActivityNew }
     ]
   }
   model.WekinNew.findAll(queryOptions)
