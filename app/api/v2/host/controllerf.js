@@ -70,7 +70,7 @@ exports.findAllActivity = (req, res, next) => {
   model.ActivityNew.findAll({
     group: ['ActivityNew.activity_key', 'Host.host_key', 'Favorites.fav_key'],
     attributes: [
-      'activity_key', 'status', 'host_key', 'main_image', 'title', 'intro_summary', 'address', 'address_detail', 'base_price', 'created_at', 'cagtegory',
+      'activity_key', 'status', 'host_key', 'main_image', 'title', 'intro_summary', 'address', 'address_detail', 'base_price', 'created_at', 'category',
       [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
       [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count']
     ],
@@ -79,6 +79,7 @@ exports.findAllActivity = (req, res, next) => {
   }).then(results => res.json({ results: results }))
     .catch(err => next(err))
 }
+
 exports.findAllReview = (req, res, next) => {
   let queryOptions = {
     where: { host_key: req.params.host_key },
