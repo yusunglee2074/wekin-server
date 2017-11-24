@@ -3,16 +3,16 @@ const model = require('../../../../model')
 const moment = require('moment')
 
 exports.batch = _ => {
-  schedule.scheduleJob('*/50 * * * *', orderDelete)
-  schedule.scheduleJob('*/48 * * * *', readyDelete)
+  schedule.scheduleJob('* */50 * * * *', orderDelete)
+  schedule.scheduleJob('* */48 * * * *', readyDelete)
   schedule.scheduleJob('* */45 * * * *', bookingDelete)
-  schedule.scheduleJob('* 0 * * *', checkPointDueDate)
-  schedule.scheduleJob('* 0 * * *', checkActivityDueDate)
+  schedule.scheduleJob('* */52 * * * *', checkPointDueDate)
+  schedule.scheduleJob('* */53 * * * *', checkActivityDueDate)
 }
 
 
 function checkActivityDueDate() {
-  console.log("엑티비티딜릿 시작 -크론")
+  console.log("엑티비티종료 시작 -크론")
   model.ActivityNew.findAll({
     where: {
       end_date: {
