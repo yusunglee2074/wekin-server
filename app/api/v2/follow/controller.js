@@ -28,7 +28,7 @@ exports.getData = (req, res, next) => {
       attributes: ['user_key', 'name', 'profile_image'],
       as: 'Follower',
       model: model.User,
-      include: { model: model.Host, attributes: ['introduce', 'status', 'type', 'host_key', 'name', 'profile_image'] }
+      include: { model: model.Host, attributes: ['introduce', 'status', 'type', 'host_key', 'name', 'profile_image', 'user_key'] }
     }]
   })
   .then(result => returnMsg.success200RetObj(res, result))
