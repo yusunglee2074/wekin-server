@@ -443,6 +443,7 @@ exports.updateActivity = (req, res, next) => {
     inclusion: requestData.inclusion,
     preparation: requestData.preparation,
     address_detail: requestData.address_detail,
+    address: requestData.address,
     refund_policy: requestData.refund_policy,
     price: requestData.price,
     isteamorpeople: requestData.isteamorpeople,
