@@ -49,6 +49,16 @@ router.post('/mail', controller.sendMail)
  */
 router.post('/sms', controller.sendSms)
 
+router.get('/mobile/version', (req, res, next) => {
+  model.Environment.findOne({
+    where: {
+      env_key: 1
+    }
+  })
+    .then(version => {
+      res.json({ message: "success", data: version.description })
+    })
+})
 
 router.post('/join/sms', controller.joinSms)
 
