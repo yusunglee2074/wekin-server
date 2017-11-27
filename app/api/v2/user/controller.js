@@ -31,7 +31,7 @@ exports.kakaoLogin = (req, res, next) => {
       form: { 
         grant_type: 'authorization_code',
         client_id: '75c0694ad636bcca94fa48cbc7c9d8cf',
-        redirect_url: `${model.SNSLoginUrl}/auth/kakao`,
+        redirect_url: `${model.SNSLoginUrl}/social/naver`,
         code: req.params.code 
       }
     }, (err,httpResponse,body) => { 
@@ -99,7 +99,7 @@ exports.kakaoLogin = (req, res, next) => {
       form: { 
         grant_type: 'authorization_code',
         client_id: 'rTHYGlmyZuVKSzR4_45d',
-        redirect_url: 'http://we-kin.com',
+        redirect_url: 'http://we-kin.com/social/naver',
         code: req.params.code,
         client_secret: '5Wo2kSoe2R'
       }
