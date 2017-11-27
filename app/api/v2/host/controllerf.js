@@ -70,7 +70,7 @@ exports.findAllActivity = (req, res, next) => {
   model.ActivityNew.findAll({
     group: ['ActivityNew.activity_key', 'Host.host_key', 'Favorites.fav_key'],
     attributes: [
-      'activity_key', 'status', 'host_key', 'main_image', 'title', 'intro_summary', 'address', 'address_detail', 'base_price', 'created_at', 'category',
+      'activity_key', 'status', 'host_key', 'main_image', 'title', 'intro_summary', 'address', 'address_detail', 'base_price', 'created_at', 'category', 'price_before_discount',
       [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
       [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count']
     ],

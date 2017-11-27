@@ -40,6 +40,7 @@ module.exports = function (sequelize, DataTypes) {
     comision: { type: DataTypes.INTEGER, defaultValue: 0},
     start_date_list: { type: DataTypes.JSON, allowNull: true },
     detail_question: { type: DataTypes.JSON, allowNull: true },
+    price_before_discount: { type: DataTypes.INTEGER, allowNull: true },
   }, {
     classMethods: {},
     tableName: 'activitynew',
