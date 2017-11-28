@@ -8,7 +8,7 @@ exports.batch = _ => {
   schedule.scheduleJob('* */48 * * * *', readyDelete)
   schedule.scheduleJob('* */45 * * * *', bookingDelete)
   schedule.scheduleJob('* */52 * * * *', checkPointDueDate)
-  schedule.scheduleJob('* */53 * * * *', checkActivityDueDate)
+  schedule.scheduleJob('* * */20 * * *', checkActivityDueDate)
   schedule.scheduleJob('* * */19 * * *', sendSMSToMakerWhenStartDayOnPaidUserExist)
 }
 
@@ -51,7 +51,6 @@ function sendSMSToMakerWhenStartDayOnPaidUserExist () {
       }
     })
 }
-sendSMSToMakerWhenStartDayOnPaidUserExist()
 
 function checkActivityDueDate() {
   console.log("엑티비티종료 시작 -크론")
@@ -59,14 +58,17 @@ function checkActivityDueDate() {
     where: {
       end_date: {
         $lt: moment()
-      }
-    }
+      },
+      status: 3
+    },
+    include: [{ model: model.Host }]
   })
   // TODO: 문자 보내게 해야됨
     .then(activities => {
       let length = activities.length
       for (let i = 0; i < length; i++) {
         let activity = activities[i]
+        service.sendSms(activity.Host.tel, `안녕하세요. 메이커님\n${ activity.title } 활동이 종료되었습니다.\n날짜는 웹사이트의 [메이커 > 위킨설정]에서 수정, 추가가 가능합니다.\n자세한 사항은 http://www.we-kin.com 에서 살펴보실 수 있습니다.\n감사합니다.`)
         activity.update({ status: 5 })
       }
     })
