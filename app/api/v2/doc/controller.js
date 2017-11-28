@@ -74,14 +74,27 @@ exports.getFrontDocuments = (req, res, next) => {
       },
       {
         model: model.ActivityNew,
-        attributes: ['address_detail', 'category', 'start_date_list','base_price','main_image', [model.Sequelize.fn('COUNT', model.Sequelize.col('ActivityNew->Favorites.fav_key')), 'fav_count']],
+        attributes: [[model.Sequelize.fn('COUNT', model.Sequelize.fn('DISTINCT', model.Sequelize.col('ActivityNew->Favorites.fav_key'))), 'fav_count'], 'address_detail', 'category', 'start_date_list','base_price','main_image', [model.Sequelize.fn('COUNT', model.Sequelize.fn('DISTINCT', model.Sequelize.col('ActivityNew->Docs.doc_key'))), 'review_count']],
         require: false,
         include: [
           {
             model: model.Favorite,
             attributes: [],
             required: false,
+            duplicating: false,
+          },
+          {
+            model: model.Doc,
+            where: {
+              type: {
+                $in: [0, 1]
+              }
+            },
+            attributes: [],
+            required: false,
+            duplicating: false,
           }
+          
         ]
       }
     ]
