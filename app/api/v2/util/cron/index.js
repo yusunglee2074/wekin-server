@@ -1,6 +1,7 @@
 const schedule = require('node-schedule')
 const model = require('../../../../model')
 const moment = require('moment')
+const service = require('./../service.js')
 
 exports.batch = _ => {
   schedule.scheduleJob('* */50 * * * *', orderDelete)
@@ -8,8 +9,49 @@ exports.batch = _ => {
   schedule.scheduleJob('* */45 * * * *', bookingDelete)
   schedule.scheduleJob('* */52 * * * *', checkPointDueDate)
   schedule.scheduleJob('* */53 * * * *', checkActivityDueDate)
+  schedule.scheduleJob('* * */19 * * *', sendSMSToMakerWhenStartDayOnPaidUserExist)
 }
 
+/*
+ *  결제유저가 있을 경우 시작일 하루 전 저녁에 인원들을 모아서 몽땅 보내준다.
+ *  WekinNew를 긁어서 paid인 경우 그리고 시작일이 내일인 경우를 찾아서 메이커에게 문자를 보내준다.
+ *  sample = { 'makerTelephone' { maker: 'makerPhone', PaidList: [ ..... ] }, .... }
+ */
+function sendSMSToMakerWhenStartDayOnPaidUserExist () {
+  console.log("참가인원 명단 문자보내기")
+  model.WekinNew.findAll({
+    where: {
+      state: 'paid',
+      start_date: {
+        $and: {
+          $lt: moment().set('hour', 23).set('minute', 59),
+          $gt: moment().set('hour', 0).set('minute', 1)
+        }
+      }
+    },
+    include: [{ model: model.ActivityNew, include: [{ model: model.Host, attributes: ['tel', 'name', 'email'] }] }, { model: model.User }]
+  })
+    .then(wekins => {
+      let result = {}
+      for (let i = 0; i < wekins.length; i++) {
+        let item = wekins[i]
+        // { 메이커명 : { makerTel: 메이커 폰번, makerEmail: 메이커 메일, paidUsers: [[유저명, 유저폰번], [유저명2, 유저폰번2]....] }
+        result[item.ActivityNew.Host.tel] 
+          ? result[item.ActivityNew.Host.tel]['paidUsers'].push([item.User.name, item.User.phone]) 
+          : result[item.ActivityNew.Host.tel] = { activityTitle: item.ActivityNew.title, makerName: item.ActivityNew.Host.name, makerEmail: item.ActivityNew.Host.email, paidUsers: [[item.User.name, item.User.phone]] }
+      }
+      for (item in result) {
+        let user = ''
+        for (let i = 0; i < result[item].paidUsers.length; i++) {
+          let wekiner = result[item].paidUsers[i]
+          user = user + wekiner[0] + ' 님' + wekiner[1] + '\n'
+        }
+        let msg = `안녕하세요. ${ result[item].makerName }님 위킨입니다.\n [${ result[item].activityTitle }] 활동 내일 참여 위키너 명단입니다.\n특이사항 있으시면 유선전화나 카카오톡 @위킨으로 연락바랍니다.\n\n참여 위키너 목록\n${ user }\n감사합니다.`
+        service.sendSms(item, msg, "[위킨] 참여자명단")
+      }
+    })
+}
+sendSMSToMakerWhenStartDayOnPaidUserExist()
 
 function checkActivityDueDate() {
   console.log("엑티비티종료 시작 -크론")
