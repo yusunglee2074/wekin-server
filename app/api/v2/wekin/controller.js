@@ -125,73 +125,91 @@ exports.postWekin = (req, res, next) => {
   for (i in data.selectedExtraOption) {
     amount += data.selectedExtraOption[i]
   }
-  console.log(data)
-  // 만약에 해당 엑티비티에 해당 날짜 부킹이 꽉차면 예약 안되고 안되는 메세지 전달해줘야된다.
-  model.WekinNew.count({
-    where: {
-      activity_key: data.activity_key,
-      start_date: {
-        $and: {
-          $lt: new Date(moment(data.selectedDate).set('hour', 23).set('minute', 59).set('second', 59).format()),
-          $gt: new Date(moment(data.selectedDate).set('hour', 0).set('minute', 0).set('second', 0).format())
+  // event Activity List
+  let eventAvtivityKeyList = [471]
+  if (eventAvtivityKeyList.includes(data.activity_key)) {
+    model.WekinNew.count({
+      where: {
+        activity_key: data.activity_key,
+        user_key: req.user.user_key,
+        state: {
+          $in: ['paid', 'ready']
         }
-      },
-      state: {
-        $in: ['booking', 'paid', 'ready']
-      },
-      start_time: {
-        $and: {
-          $gt: moment('1991-04-12').set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6)).add(-10, 'minutes'),
-          $lt: moment('1991-04-12').set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6)).add(10, 'minutes')
-        }
-      }
-    }
-  })
-    .then(count => {
-      if (count + amount < data.max_user) {
-        model.WekinNew.findOne({
-          where: {
-            user_key: req.user.user_key,
-            activity_key: req.body.params.activity_key,
-            state: 'booking'
-          }
-        })
-          .then(wekin => {
-            let tmpTime = moment('1991-04-12')
-            if (wekin === null) {
-              model.WekinNew.create({
-                activity_key: data.activity_key,
-                user_key: req.user.user_key,
-                final_price: data.finalPrice,
-                start_date: moment(data.selectedDate).format(),
-                start_time: tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6)),
-                select_option: cloneData,
-                pay_amount: amount,
-                state: 'booking' 
-              })
-                .then(result => res.json({ message: 'success', data: [0, [result]] }))
-                .catch(error => next(error))
-            } else {
-              let value = {}
-              value.final_price = data.finalPrice
-              value.start_date = moment(data.selectedDate).format()
-              value.start_time = tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6))
-              value.select_option = cloneData
-              value.pay_amount = amount
-              model.WekinNew.update(value, { where: { wekin_key: wekin.wekin_key }, returning: true })
-                .then(result => {
-                  res.json({ message: 'success', data: result })
-                })
-                .catch(error => next(error))
-            }
-          })
-          .catch(error => next(error))
-      } else {
-        res.json({ message: "error", data: "Already full in this date" })
       }
     })
-    .catch(error => next(error))
-  // 한 사람당 한 엑티비티에 대해서 하나의 북킹 위킨만 생성가능
+      .then(number => {
+        if (number > 0 || amount > 1) {
+          res.json({ message: 'fail/Not possible to booking twice to eventActivity', data: null })
+          throw Error
+        } else {
+          return model.WekinNew.count({
+            where: {
+              activity_key: data.activity_key,
+              start_date: {
+                $and: {
+                  $lt: new Date(moment(data.selectedDate).set('hour', 23).set('minute', 59).set('second', 59).format()),
+                  $gt: new Date(moment(data.selectedDate).set('hour', 0).set('minute', 0).set('second', 0).format())
+                }
+              },
+              state: {
+                $in: ['booking', 'paid', 'ready']
+              },
+              start_time: {
+                $and: {
+                  $gt: moment('1991-04-12').set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6)).add(-10, 'minutes'),
+                  $lt: moment('1991-04-12').set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6)).add(10, 'minutes')
+                }
+              }
+            }
+          })
+        }
+      })
+      .then(count => {
+        if (count + amount < data.max_user) {
+          model.WekinNew.findOne({
+            where: {
+              user_key: req.user.user_key,
+              activity_key: req.body.params.activity_key,
+              state: 'booking'
+            }
+          })
+            .then(wekin => {
+              let tmpTime = moment('1991-04-12')
+              if (wekin === null) {
+                model.WekinNew.create({
+                  activity_key: data.activity_key,
+                  user_key: req.user.user_key,
+                  final_price: data.finalPrice,
+                  start_date: moment(data.selectedDate).format(),
+                  start_time: tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6)),
+                  select_option: cloneData,
+                  pay_amount: amount,
+                  state: 'booking' 
+                })
+                  .then(result => res.json({ message: 'success', data: [0, [result]] }))
+                  .catch(error => next(error))
+              } else {
+                let value = {}
+                value.final_price = data.finalPrice
+                value.start_date = moment(data.selectedDate).format()
+                value.start_time = tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6))
+                value.select_option = cloneData
+                value.pay_amount = amount
+                model.WekinNew.update(value, { where: { wekin_key: wekin.wekin_key }, returning: true })
+                  .then(result => {
+                    res.json({ message: 'success', data: result })
+                  })
+                  .catch(error => next(error))
+              }
+            })
+            .catch(error => next(error))
+        } else {
+          res.json({ message: "error", data: "Already full in this date" })
+        }
+      })
+      .catch(error => next(error))
+    // 한 사람당 한 엑티비티에 대해서 하나의 북킹 위킨만 생성가능
+  }
 }
 
 // 엑티비티 디테일 페이지 들어왔을때 activity_key, start_date 인자로 넘겨주면 남은 인원수 보여주는 api 작성
