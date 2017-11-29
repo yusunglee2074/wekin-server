@@ -115,6 +115,7 @@ exports.getFinishList = (req, res) => {
 
 // 리펙토링
 // 신청하기 눌렀을떄 위킨 생성
+// TODO: 로직 이상함 작동은 하나 코드가 비효율
 exports.postWekin = (req, res, next) => {
   let data = req.body.params
   let cloneData = Object.assign({}, data)
@@ -209,6 +210,74 @@ exports.postWekin = (req, res, next) => {
       })
       .catch(error => next(error))
     // 한 사람당 한 엑티비티에 대해서 하나의 북킹 위킨만 생성가능
+  } else {
+    console.log("여기들어옴")
+
+    model.WekinNew.count({
+      where: {
+        activity_key: data.activity_key,
+        start_date: {
+          $and: {
+            $lt: new Date(moment(data.selectedDate).set('hour', 23).set('minute', 59).set('second', 59).format()),
+            $gt: new Date(moment(data.selectedDate).set('hour', 0).set('minute', 0).set('second', 0).format())
+          }
+        },
+        state: {
+          $in: ['booking', 'paid', 'ready']
+        },
+        start_time: {
+          $and: {
+            $gt: moment('1991-04-12').set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6)).add(-10, 'minutes'),
+            $lt: moment('1991-04-12').set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6)).add(10, 'minutes')
+          }
+        }
+      }
+    })
+      .then(count => {
+        if (count + amount < data.max_user) {
+          model.WekinNew.findOne({
+            where: {
+              user_key: req.user.user_key,
+              activity_key: req.body.params.activity_key,
+              state: 'booking'
+            }
+          })
+            .then(wekin => {
+              let tmpTime = moment('1991-04-12')
+              if (wekin === null) {
+                model.WekinNew.create({
+                  activity_key: data.activity_key,
+                  user_key: req.user.user_key,
+                  final_price: data.finalPrice,
+                  start_date: moment(data.selectedDate).format(),
+                  start_time: tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6)),
+                  select_option: cloneData,
+                  pay_amount: amount,
+                  state: 'booking' 
+                })
+                  .then(result => res.json({ message: 'success', data: [0, [result]] }))
+                  .catch(error => next(error))
+              } else {
+                let value = {}
+                value.final_price = data.finalPrice
+                value.start_date = moment(data.selectedDate).format()
+                value.start_time = tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6))
+                value.select_option = cloneData
+                value.pay_amount = amount
+                model.WekinNew.update(value, { where: { wekin_key: wekin.wekin_key }, returning: true })
+                  .then(result => {
+                    res.json({ message: 'success', data: result })
+                  })
+                  .catch(error => next(error))
+              }
+            })
+            .catch(error => next(error))
+        } else {
+          res.json({ message: "error", data: "Already full in this date" })
+        }
+      })
+      .catch(error => next(error))
+
   }
 }
 
