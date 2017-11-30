@@ -125,7 +125,7 @@ function orderDelete () {
 
       r.forEach(v => {
         stack.push(
-          model.WekinNew.destory({
+          model.WekinNew.destroy({
             where: {
               wekin_key: v.wekin_key
             }
