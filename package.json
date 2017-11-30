@@ -23,6 +23,7 @@
     "iamporter": "^1.4.2",
     "json2xls": "^0.1.2",
     "moment": "^2.18.1",
+    "node-excel-export": "^1.4.2",
     "node-schedule": "^1.2.3",
     "nodemailer": "^4.1.0",
     "nodemailer-smtp-pool": "^2.8.3",
