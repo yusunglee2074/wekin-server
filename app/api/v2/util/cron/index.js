@@ -127,7 +127,10 @@ function orderDelete () {
         stack.push(
           model.WekinNew.destroy({
             where: {
-              wekin_key: v.wekin_key
+              wekin_key: v.wekin_key,
+              state: {
+                $not: 'paid'
+              }
             }
           })
         )
