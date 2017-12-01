@@ -477,10 +477,6 @@ exports.updateActivity = (req, res, next) => {
   let start_date_list = []
   let count_days = moment(activityModelData.end_date).diff(activityModelData.start_date, 'days')
   let week = {}
-  let close_dates = []
-  for (let i = 0; i < activityModelData.close_dates.length; i++) {
-    close_dates.push(Number(moment(activityModelData.close_dates[i]).format('YYMMDD')))
-  }
   for (i in activityModelData.base_week_option) {
     if (activityModelData.base_week_option[i].min_user > 0) {
       week[i] = 1
@@ -490,7 +486,7 @@ exports.updateActivity = (req, res, next) => {
   }
   var start_day = moment(activityModelData.start_date).clone()
   for (let a = 0; a < count_days + 1; a++) {
-    if (week[start_day.format('dddd').slice(0, 2)] === 1 && !close_dates.includes(Number(start_day.format('YYMMDD')))) {
+    if (week[start_day.format('dddd').slice(0, 2)] === 1 && !activityModelData.close_dates.includes(Number(start_day.format('YYMMDD')))) {
       let clone_start_day = start_day.clone()
       start_date_list.push(clone_start_day)
       start_day = start_day.add(1, 'days')
@@ -498,7 +494,6 @@ exports.updateActivity = (req, res, next) => {
       start_day = start_day.add(1, 'days')
     }
   }
-  activityModelData.close_dates = close_dates
   activityModelData.start_date_list = start_date_list
 
   return model.ActivityNew.update(activityModelData, { returning: true, where: { host_key: requestData.host_key || user.Host.host_key, activity_key: req.params.activity_key } })
