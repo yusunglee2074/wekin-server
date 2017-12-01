@@ -295,8 +295,8 @@ exports.createActivity = (req, res, next) => {
     status: requestData.status || service.activityStatus.request.code,
     category: requestData.category1,
     category_two: requestData.category2,
-    start_date: moment(requestData.start_date).format(),
-    end_date: moment(requestData.end_date).format(),
+    start_date: moment(requestData.start_date),
+    end_date: moment(requestData.end_date),
     due_date: requestData.due_date,
     base_start_time: moment().set(1, 'hours').set(00, 'minites'),
     base_price: requestData.base_price,
@@ -331,7 +331,7 @@ exports.createActivity = (req, res, next) => {
   for (let a = 0; a < count_days + 1; a++) {
     if (week[start_day.format('dddd').slice(0, 2)] === 1 && !close_dates.includes(Number(start_day.format('YYMMDD')))) {
       let clone_start_day = start_day.clone()
-      start_date_list.push(clone_start_day.format())
+      start_date_list.push(clone_start_day)
       start_day = start_day.add(1, 'days')
     } else {
       start_day = start_day.add(1, 'days')
@@ -492,7 +492,7 @@ exports.updateActivity = (req, res, next) => {
   for (let a = 0; a < count_days + 1; a++) {
     if (week[start_day.format('dddd').slice(0, 2)] === 1 && !close_dates.includes(Number(start_day.format('YYMMDD')))) {
       let clone_start_day = start_day.clone()
-      start_date_list.push(clone_start_day.format())
+      start_date_list.push(clone_start_day)
       start_day = start_day.add(1, 'days')
     } else {
       start_day = start_day.add(1, 'days')
