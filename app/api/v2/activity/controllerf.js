@@ -95,6 +95,12 @@ exports.findAllActivity = (req, res, next) => {
         where: { type: service.docType.review.code },
         required: false,
       }, {
+        model: model.WekinNew,
+        attributes: [],
+        where: { state: 'paid' },
+        required: false,
+        duplicating: false
+      }, {
         model: model.Favorite,
         attributes: ['fav_key'],
         required: false,
@@ -103,7 +109,8 @@ exports.findAllActivity = (req, res, next) => {
     attributes: {
       include: [
         [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
-        [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count']
+        [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count'],
+        [model.Sequelize.fn('sum', model.Sequelize.fn('DISTINCT', model.Sequelize.col('WekinNews.pay_amount'))), 'wekinnew_count']
       ]
     },
     group: ['ActivityNew.activity_key', model.Sequelize.col('Docs.activity_key'), 'Host.host_key', 'Favorites.fav_key'],

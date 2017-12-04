@@ -83,13 +83,14 @@ exports.popularActivity = (req, res, next) => {
     attributes: {
       include: [
         [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
-        [model.Sequelize.fn('COUNT', model.Sequelize.fn('DISTINCT', model.Sequelize.col('Docs.doc_key'))), 'review_count']
+        [model.Sequelize.fn('COUNT', model.Sequelize.fn('DISTINCT', model.Sequelize.col('Docs.doc_key'))), 'review_count'],
+        [model.Sequelize.fn('sum', model.Sequelize.fn('DISTINCT', model.Sequelize.col('WekinNews.pay_amount'))), 'wekinnew_count']
       ]
     },
     where: { status: 3 },
     include: [
       { model: model.Doc, attributes: [], where: { type: 1 }, required: false, duplicating: false },
-      { model: model.WekinNew, attributes: [], required: false, duplicating: false },
+      { model: model.WekinNew, attributes: [], required: false, duplicating: false, where: { state: 'paid' } },
       { model: model.Host, attributes: ['host_key', 'profile_image'], required: false, duplicating: false  }, { model: model.Favorite, attributes: ['fav_key'], required: false, duplicating: false }
     ],
     limit: 20,
@@ -223,13 +224,14 @@ exports.newestActivity = (req, res, next) => {
     attributes: {
       include: [
         [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
-        [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count']
+        [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count'],
+        [model.Sequelize.fn('sum', model.Sequelize.fn('DISTINCT', model.Sequelize.col('WekinNews.pay_amount'))), 'wekinnew_count']
       ]
     },
     where: { status: 3 },
     include: [
       { model: model.Doc, attributes: [], where: { type: 1 }, required: false, duplicating: false },
-      { model: model.WekinNew, attributes: [], required: false, duplicating: false },
+      { model: model.WekinNew, attributes: [], required: false, duplicating: false, where: { state: 'paid' } },
       { model: model.Host, attributes: ['host_key', 'profile_image'], required: false, duplicating: false }, { model: model.Favorite, attributes: ['fav_key'], required: false, duplicating: false }
     ],
     limit: 7
