@@ -79,11 +79,11 @@ exports.popularActivity = (req, res) => {
 exports.popularActivity = (req, res, next) => {
   model.ActivityNew.findAll({
     order: [[model.Sequelize.fn('COUNT', model.Sequelize.col('WekinNews.wekin_key')), 'desc']],
-    group: ['ActivityNew.activity_key', 'Host.host_key', 'Favorites.fav_key', 'Docs.doc_key'],
+    group: ['ActivityNew.activity_key', 'Host.host_key', 'Favorites.fav_key'],
     attributes: {
       include: [
-        [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
-        [model.Sequelize.fn('COUNT', model.Sequelize.fn('DISTINCT', model.Sequelize.col('Docs.doc_key'))), 'review_count'],
+        [model.Sequelize.fn('avg', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
+        [model.Sequelize.fn('count', model.Sequelize.fn('DISTINCT', model.Sequelize.col('Docs.doc_key'))), 'review_count'],
         [model.Sequelize.fn('sum', model.Sequelize.fn('DISTINCT', model.Sequelize.col('WekinNews.pay_amount'))), 'wekinnew_count']
       ]
     },
@@ -224,7 +224,7 @@ exports.newestActivity = (req, res, next) => {
     attributes: {
       include: [
         [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
-        [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count'],
+        [model.Sequelize.fn('count', model.Sequelize.fn('DISTINCT', model.Sequelize.col('Docs.doc_key'))), 'review_count'],
         [model.Sequelize.fn('sum', model.Sequelize.fn('DISTINCT', model.Sequelize.col('WekinNews.pay_amount'))), 'wekinnew_count']
       ]
     },
