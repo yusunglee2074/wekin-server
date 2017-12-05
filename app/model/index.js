@@ -18,9 +18,9 @@ const yusungDEV = {
   password: 'sjdmlrl4',
 }
 
-const dbTarget = DB_PROD
+// const dbTarget = DB_PROD
 exports.SNSLoginUrl = 'http://we-kin.com'
-// const dbTarget = DB_DEV
+const dbTarget = DB_DEV
 // exports.SNSLoginUrl = 'http://175.195.139.99:8080'
 
 let dbconf = {
