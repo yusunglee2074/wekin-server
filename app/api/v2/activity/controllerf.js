@@ -246,8 +246,8 @@ exports.getActivityWithCateogry = (req, res, next) => {
     where: {
       category: {
         $in: category[categoryKey],
-        status: 3
-      }
+      },
+      status: 3
     },
     include: [
       {
