@@ -83,8 +83,7 @@ exports.popularActivity = (req, res, next) => {
     attributes: {
       include: [
         [model.Sequelize.fn('avg', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
-        [model.Sequelize.fn('count', model.Sequelize.fn('DISTINCT', model.Sequelize.col('Docs.doc_key'))), 'review_count'],
-        [model.Sequelize.fn('sum', model.Sequelize.fn('DISTINCT', model.Sequelize.col('WekinNews.pay_amount'))), 'wekinnew_count']
+        [model.Sequelize.fn('sum', model.Sequelize.col('WekinNews.pay_amount')), 'wekinnew_count']
       ]
     },
     where: { status: 3 },
