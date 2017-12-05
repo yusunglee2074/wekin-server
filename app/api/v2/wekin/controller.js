@@ -249,7 +249,6 @@ exports.postWekin = (req, res, next) => {
             }
           })
             .then(wekin => {
-              console.log('시작시각####', data.startTime[0])
               let tmpTime = moment('1991-04-12')
               if (wekin === null) {
                 model.WekinNew.create({
