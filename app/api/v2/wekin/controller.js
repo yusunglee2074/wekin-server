@@ -79,7 +79,12 @@ exports.getList = (req, res, next) => {
     },
     order: [['created_at', 'DESC']]
   })
-  .then(result => res.json({ message: 'success', data: result }))
+  .then(result => 
+    for (let i = 0, length = result.length; i < length; i++) {
+      let item = result[i]
+      item.start_time = moment(item.start_time).add(-9, 'hour')
+    }
+    res.json({ message: 'success', data: result }))
   .catch(val => next(val))
 }
 
