@@ -2,7 +2,6 @@ const express = require('express')
 const router = express.Router()
 const { authChk } = require('../service')
 const model = require('./../../../model')
-const Op = model.Sequelize.Op
 const moment = require('moment')
 
 const controller = require('./controller')
@@ -287,15 +286,15 @@ router.get('/filter/mobile',
         where: {
           address_detail: {
             area: {
-              [Op.in]: locations
+              $in: locations
             }
           },
           category: {
-            [Op.in]: category 
+            $in: category 
           },
           base_price: {
-            [Op.gte]: json(query.price)[0] * 10000,
-            [Op.lte]: json(query.price)[1] * 10000
+            $gte: json(query.price)[0] * 10000,
+            $lte: json(query.price)[1] * 10000
           },
           status: 3
         },

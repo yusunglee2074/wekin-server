@@ -1,7 +1,6 @@
 const model = require('../../../model')
 const service = require('../service')
 const moment = require('moment')
-const Op = model.Sequelize.Op
 
 /*
 // activity 조회
@@ -246,7 +245,8 @@ exports.getActivityWithCateogry = (req, res, next) => {
   model.ActivityNew.findAll({
     where: {
       category: {
-        $in: category[categoryKey]
+        $in: category[categoryKey],
+        status: 3
       }
     },
     include: [
@@ -702,7 +702,7 @@ exports.searchAllactivies = (req, res, next) => {
     order: [['count', 'DESC']],
     where: {
       status: {
-        [Op.in]: [3,5]
+        $in: [3,5]
       }
     },
     attributes: ['title', 'activity_key'],

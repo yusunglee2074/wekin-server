@@ -148,8 +148,8 @@ exports.postWekin = (req, res, next) => {
               activity_key: data.activity_key,
               start_date: {
                 $and: {
-                  $lt: new Date(moment(data.selectedDate).set('hour', 23).set('minute', 59).set('second', 59).format()),
-                  $gt: new Date(moment(data.selectedDate).set('hour', 0).set('minute', 0).set('second', 0).format())
+                  $lt: moment(data.selectedDate).set('hour', 23).set('minute', 59).set('second', 59),
+                  $gt: moment(data.selectedDate).set('hour', 0).set('minute', 0).set('second', 0)
                 }
               },
               state: {
@@ -175,14 +175,14 @@ exports.postWekin = (req, res, next) => {
             }
           })
             .then(wekin => {
-              let tmpTime = moment('1991-04-12')
+             let tmpTime = moment('1991-04-12')
               if (wekin === null) {
                 model.WekinNew.create({
                   activity_key: data.activity_key,
                   user_key: req.user.user_key,
                   final_price: data.finalPrice,
                   start_date: moment(data.selectedDate).format(),
-                  start_time: tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6)),
+                  start_time: tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6)).add(9, 'hour'),
                   select_option: cloneData,
                   pay_amount: amount,
                   state: 'booking' 
@@ -193,7 +193,7 @@ exports.postWekin = (req, res, next) => {
                 let value = {}
                 value.final_price = data.finalPrice
                 value.start_date = moment(data.selectedDate).format()
-                value.start_time = tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6))
+                value.start_time = tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6)).add(9, 'hour'),
                 value.select_option = cloneData
                 value.pay_amount = amount
                 model.WekinNew.update(value, { where: { wekin_key: wekin.wekin_key }, returning: true })
@@ -218,8 +218,8 @@ exports.postWekin = (req, res, next) => {
         activity_key: data.activity_key,
         start_date: {
           $and: {
-            $lt: new Date(moment(data.selectedDate).set('hour', 23).set('minute', 59).set('second', 59).format()),
-            $gt: new Date(moment(data.selectedDate).set('hour', 0).set('minute', 0).set('second', 0).format())
+            $lt: moment(data.selectedDate).set('hour', 23).set('minute', 59).set('second', 59),
+            $gt: moment(data.selectedDate).set('hour', 0).set('minute', 0).set('second', 0)
           }
         },
         state: {
@@ -249,8 +249,8 @@ exports.postWekin = (req, res, next) => {
                   activity_key: data.activity_key,
                   user_key: req.user.user_key,
                   final_price: data.finalPrice,
-                  start_date: moment(data.selectedDate).format(),
-                  start_time: tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6)),
+                  start_date: moment(data.selectedDate),
+                  start_time: tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6)).add(9, 'hour'),
                   select_option: cloneData,
                   pay_amount: amount,
                   state: 'booking' 
@@ -261,7 +261,7 @@ exports.postWekin = (req, res, next) => {
                 let value = {}
                 value.final_price = data.finalPrice
                 value.start_date = moment(data.selectedDate).format()
-                value.start_time = tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6))
+                value.start_time = tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 6)).add(9, 'hour'),
                 value.select_option = cloneData
                 value.pay_amount = amount
                 model.WekinNew.update(value, { where: { wekin_key: wekin.wekin_key }, returning: true })
@@ -287,15 +287,14 @@ exports.getCurrentNumberOfBookingUsers = (req, res, next) => {
   let activity_key = req.params.key
   let date = req.params.date
   let time = req.params.time
-  let tmpTime = moment('1991-04-12').set('hour', time.slice(0, 2)).set('minute', time.slice(3, 6))
   model.WekinNew.findAll(
     {
       where: {
         activity_key: activity_key,
         start_date: {
           $and: {
-            $lt: new Date(moment(date).set('hour', 23).set('minute', 59).set('second', 59).format()),
-            $gt: new Date(moment(date).set('hour', 0).set('minute', 0).set('second', 0).format())
+            $lt: moment(date).set('hour', 23).set('minute', 59).set('second', 59),
+            $gt: moment(date).set('hour', 0).set('minute', 0).set('second', 0)
           }
         },
         state: {
@@ -303,14 +302,14 @@ exports.getCurrentNumberOfBookingUsers = (req, res, next) => {
         },
         start_time: {
           $and: {
-            $gt: moment('1991-04-12').set('hour', time.slice(0, 2)).set('minute', time.slice(3, 6)).add(-10, 'minutes'),
-            $lt: moment('1991-04-12').set('hour', time.slice(0, 2)).set('minute', time.slice(3, 6)).add(10, 'minutes')
+            $gt: moment('1991-04-12').set('hour', time.slice(0, 2)).set('minute', time.slice(3, 5)).add(-10, 'minutes'),
+            $lt: moment('1991-04-12').set('hour', time.slice(0, 2)).set('minute', time.slice(3, 5)).add(10, 'minutes')
           }
         }
       }
     }
   )
-    .then( wekins => {
+    .then(wekins => {
       let count = 0
       let length = wekins.length
       for (let i = 0; i < length; i++) {
