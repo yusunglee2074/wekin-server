@@ -84,8 +84,8 @@ exports.getList = (req, res, next) => {
       let item = result[i]
       item.start_time = moment(item.start_time).add(-9, 'hour')
     }
-    res.json({ message: 'success', data: result }
-  }))
+    res.json({ message: 'success', data: result })
+  })
   .catch(val => next(val))
 }
 
