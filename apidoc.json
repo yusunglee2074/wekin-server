@@ -1,7 +1,7 @@
 {
-  "name": "example",
-  "version": "0.1.0",
-  "description": "apiDoc basic example",
-  "title": "Custom apiDoc browser title",
-  "url" : "http://192.168.0.5:8888/v1"
+  "name": "WEKIN",
+  "version": "0.2.0",
+  "description": "윜킨즐겨",
+  "title": "위킨 API V2",
+  "url" : "http://175.195.139.99:8888/v1"
 }
