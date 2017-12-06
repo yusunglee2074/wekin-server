@@ -36,6 +36,21 @@ let getUserByToken = (req) => {
   })
 }
 
+/** @api {post} /point/create [어드민]포인스 생성
+ * @apiParam {Number} user_key userkey
+ * @apiParam {Number} value 포인트 변화량 양수음수
+ * @apiParam {String} due_date 유효기간 StringDate
+ * @apiParam {Number} type 타입(기업포인트, 일반포인트)
+ * 
+ * @apiName createPoint
+ * @apiGroup point
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ * {
+ *     "message": "success",
+ * }
+ */
 router.post('/create',
   function (req, res, next) {
     // 헤더에 있는 토큰으로 어드민 유저인지 판단 후 
@@ -93,15 +108,31 @@ router.post('/create',
             })
         })
       })
-      .then( result => res.send(result + 'success'))
-      .catch( err => next(err) )
+      .then(result => res.json({ message: 'success' }))
+      .catch(err => next(err) )
   })
 
+/** @api {get} /point/create 포인트 조회
+ * @apiParam {Number} user_key userkey
+ * 
+ * @apiName getPoint
+ * @apiGroup point
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ * {
+ *     "point": {
+ *         "point": 0,
+ *         "point_special": 0,
+ *         "percentage": 100
+ *     }
+ * }
+ */
 router.get('/front/:user_key',
   function (req, res, next) {
     // 주소의 파라미터로 유저를 가져온다. 
-    model.User.findById(req.params.user_key)
-      .then( user => {
+    model.User.findOne({ where: { user_key: 37 } })
+      .then(user => {
         model.Point.findOne({
           where: {
             type: 20,
@@ -110,15 +141,15 @@ router.get('/front/:user_key',
           order: [['created_at', 'DESC']],
           limit: 1
         })
-          .then( point => {
+          .then(point => {
             let result = {}
             if (point == null) {
               result.point = user.point
-              res.send(JSON.stringify(result))
+              res.json(result)
               return
             }
             result.point = user.point
-            res.send(JSON.stringify(result))
+            res.json(result)
           })
           .catch( err => {
             next(err)
@@ -129,6 +160,22 @@ router.get('/front/:user_key',
       })
   })
 
+/** @api {post} /point/front/use 포인트 사용
+ * @apiParam {Number} value 포인트 변화량 양수음수
+ * @apiParam {Number} type 타입(기업포인트, 일반포인트)
+ * @apiName usePoint
+ * @apiGroup point
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ * {
+ *     "point": {
+ *         "point": 0,
+ *         "point_special": 0,
+ *         "percentage": 100
+ *     }
+ * }
+ */
 router.post('/front/use', 
   function (req, res, next) {
     // 사용할 유저의 정보를 헤더의 토큰을 통해서 가져온다.

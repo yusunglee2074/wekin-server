@@ -4,91 +4,87 @@ const router = express.Router()
 const controller = require('./controller')
 
 
-/**
- * @api {get} /follow/:user_key 나를 팔로하는 사람들
- * @apiParam {Number} user_key 사용자키
- * @apiName getData
+/** @api {get} /follow/:user_key 유저 팔로잉 조회
+ * 
+ * @apiName getData 
  * @apiGroup follow
+ * @apiParam {Number} user_key 유저키
  *
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
  * [
  *     {
- *         "fav_key": 3,
- *         "user_key": 0,
- *         "activity_key": 3,
- *         "created_at": "2017-06-15T06:01:30.933Z",
- *         "updated_at": "2017-06-15T06:01:30.933Z"
- *     }
+ *         "created_at": "2017-07-06T11:08:53.241Z",
+ *         "Follower": {
+ *             "user_key": 127,
+ *             "name": "SS승마클럽",
+ *             "profile_image": "https://firo/img%2Fimage730%2F2017%2F7%2F6%2F29886.png?alt=media",
+ *             "Host": {
+ *                 "introduce": "서울에서 10분거리 승마장",
+ *                 "status": 3,
+ *                 "type": 1,
+ *                 "host_key": 11,
+ *                 "name": "SS승마클럽",
+ *                 "profile_image": "https://img%2Fimage730%2F2017%2F7%2F7%2F9232.png?alt=media",
+ *                 "user_key": 127
+ *             }
+ *         }
+ *     }, ..
  * ]
- *
- * @apiError Bad Request 잘못된 요청
- * @apiErrorExample Error-Response:
- *     HTTP/1.1 400 Bad Request
- * {
- *     "errorCode": -2,
- *     "data": {...}
- * }
- */
-router.get('/target/:user_key', controller.getTargetData)
-
-
-/**
- * @api {get} /follow/:user_key 내 팔로 조회
- * @apiParam {Number} user_key 사용자키
- * @apiName getData
- * @apiGroup follow
- *
- * @apiSuccessExample Success-Response:
- *     HTTP/1.1 200 OK
- * [
- *     {
- *         "fav_key": 3,
- *         "user_key": 0,
- *         "activity_key": 3,
- *         "created_at": "2017-06-15T06:01:30.933Z",
- *         "updated_at": "2017-06-15T06:01:30.933Z"
- *     }
- * ]
- *
- * @apiError Bad Request 잘못된 요청
- * @apiErrorExample Error-Response:
- *     HTTP/1.1 400 Bad Request
- * {
- *     "errorCode": -2,
- *     "data": {...}
- * }
  */
 router.get('/:user_key', controller.getData)
 
-/**
- * @api {put} /follow/:user_key/:follower_user_key 팔로 추가 / 제거
- * @apiParam {Number} user_key 사용자키
- * @apiParam {Number} follower_user_key 대상 사용자키
+/** @api {get} /follow/target/:user_key 유저 팔로워 조회
+ * 
+ * @apiName getTargetData 
+ * @apiGroup follow
+ * @apiParam {Number} user_key 유저키
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ * [
+ *     {
+ *         "created_at": "2017-07-07T10:07:25.318Z",
+ *         "User": {
+ *             "user_key": 18,
+ *             "name": "진시호",
+ *             "profile_image": "https://firebasestorage.googleapis2F2017%2F7%2F26%2F46608.png?alt=media",
+ *             "Host": {
+ *                 "status": 3,
+ *                 "type": 0,
+ *                 "host_key": 80,
+ *                 "name": "진시호",
+ *                 "profile_image": "https://firebasestorage.googleapis.com/%2F8%2F11%2F35461.png?alt=media"
+ *             }
+ *         },
+ *         "Follower": {
+ *             "user_key": 37,
+ *             "name": "유니",
+ *             "profile_image": "https://firebasestorage.googleapis.com/v0/b2F2017%2F7%2F20%2F21323.png?alt=media"
+ *         }
+ *     }, ...
+ * ]
+ */
+router.get('/target/:user_key', controller.getTargetData)
+
+/** @api {put} /follow/:user_key/:follower_user_key 유저 팔로워 토글
+ * 
  * @apiName putData
  * @apiGroup follow
+ * @apiParam {Number} user_key 유저키
+ * @apiParam {Number} follower_user_key 팔로잉할 유저키
  *
- * @apiSuccessExample 추가 성공시: 
+ * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
  * {
- *     "follow_key": 3,
- *     "user_key": 0,
- *     "follower_user_key": 8,
- *     "updated_at": "2017-06-15T06:51:05.984Z",
- *     "created_at": "2017-06-15T06:51:05.984Z"
+ *     "follow_key": 467,
+ *     "user_key": 37,
+ *     "follower_user_key": 18,
+ *     "updated_at": "2017-12-06T07:33:40.149Z",
+ *     "created_at": "2017-12-06T07:33:40.149Z"
  * }
- * 
- * @apiSuccessExample 삭제 성공시:
- *     HTTP/1.1 200 OK
- *     1
- *
- * @apiError Bad Request 잘못된 요청
- * @apiErrorExample Error-Response:
- *     HTTP/1.1 400 Bad Request
- * {
- *     "errorCode": -2,
- *     "data": {...}
- * }
+ * or
+ * 1
  */
 router.put('/:user_key/:follower_user_key', controller.putData)
 

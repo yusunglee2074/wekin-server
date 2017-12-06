@@ -7,86 +7,73 @@ const router = express.Router()
 
 const controller = require('./controller')
 
-/** @api {get} /env/:type/:name 해당 설정 정보들
- * @apiParam {String="notice","faq", "notice"} type 타입
- * @apiParam {String="category","banner"} name 종류
+/** @api {get} /env/:type/:name enviroment 조회
  * 
- * @apiName getData
- * @apiGroup environment
+ * @apiName getData 
+ * @apiParam {String} type 예)main
+ * @apiParam {String} name 예)banner
+ * @apiGroup enviroment 
  *
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
  * [
  *     {
  *         "value": {
- *             "name": "공지사항",
- *             "color": "D51254"
+ *             "url": "https://firebasestorage.googleapis.com/v0/b/wekin-9111d.appspot.com/o/images%2Ftest%2F2017%2F9%2F1%2F21791.png?alt=media",
+ *             "detailUrl": "https://firebasestorage.googleapis.com/v0/b/wekin-9111d.appspot.com/o/images%2Ftest%2F2017%2F9%2F1%2F24761.png?alt=media",
+ *             "order": "5"
  *         },
- *         "env_key": 1
- *     }
- * ]
- * @apiErrorExample Error-Response:
- *     HTTP/1.1 403 Bad Request
- * { "result": "err" }
+ *         "env_key": 58,
+ *         "description": "메이커 위킨 등록 수수료 무료!"
+ *     }, ...
+ *]
  */
 router.get('/:type/:name', controller.getData)
 
-/** @api {post} /env/:type/:name 해당 설정 추가
- * @apiParam {String="notice","faq", "notice"} type 타입
- * @apiParam {Json} value 내용
+/** @api {post} /env/:type/:name [어드민] enviroment 작성
  * 
- * @apiName postData
- * @apiGroup environment
+ * @apiName getData 
+ * @apiParam {String} type 예)main
+ * @apiParam {String} name 예)banner
+ * @apiParam {String} value 내용
+ * @apiParam {String} description 부가설명
+ * @apiGroup enviroment 
  *
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
- *     {
- *         "value": {
- *             "name": "공지사항",
- *             "color": "D51254"
- *         },
- *         "env_key": 1
- *     }
- * @apiErrorExample Error-Response:
- *     HTTP/1.1 403 Bad Request
- * { "result": "err" }
+ *{
+ *  "value": {
+ *     "url": "https://firebasestorage.googleapis.com/v0/b/wekin-9111d.appspot.com/o/images%2Ftest%2F2017%2F9%2F1%2F21791.png?alt=media",
+ *     "detailUrl": "https://firebasestorage.googleapis.com/v0/b/wekin-9111d.appspot.com/o/images%2Ftest%2F2017%2F9%2F1%2F24761.png?alt=media",
+ *     "order": "5"
+ *   },
+ *  "env_key": 58,
+ *  "description": "메이커 위킨 등록 수수료 무료!"
+ *}
  */
 router.post('/:type/:name', controller.postData)
 
-/** @api {put} /env/:type/:name 해당 설정 수정
- * @apiParam {String="notice","faq", "notice"} type 타입
- * @apiParam {Json} value 내용
- * 
- * @apiName putData
- * @apiGroup environment
- *
- * @apiSuccessExample Success-Response:
- *     HTTP/1.1 200 OK
- *     {
- *         1
- *     }
- * @apiErrorExample Error-Response:
- *     HTTP/1.1 403 Bad Request
- * { "result": "err" }
- */
 router.put('/:type/:name', controller.putData)
 
-/** @api {delete} /env/:type/:name/:key 해당 설정 삭제
- * @apiParam {String="notice","faq", "notice"} type 타입
- * @apiParam {Json} value 내용
- * @apiParam {Number} key 설정키
+/** @api {delete} /env/:type/:name/:key [어드민] enviroment 삭제
  * 
- * @apiName deleteData
- * @apiGroup environment
+ * @apiName getData 
+ * @apiParam {String} type 예)main
+ * @apiParam {String} name 예)banner
+ * @apiParam {String} key env 키
+ * @apiGroup enviroment 
  *
  * @apiSuccessExample Success-Response:
  *     HTTP/1.1 200 OK
- *     {
- *         1
- *     }
- * @apiErrorExample Error-Response:
- *     HTTP/1.1 403 Bad Request
- * { "result": "err" }
+ *{
+ *  "value": {
+ *     "url": "https://firebasestorage.googleapis.com/v0/b/wekin-9111d.appspot.com/o/images%2Ftest%2F2017%2F9%2F1%2F21791.png?alt=media",
+ *     "detailUrl": "https://firebasestorage.googleapis.com/v0/b/wekin-9111d.appspot.com/o/images%2Ftest%2F2017%2F9%2F1%2F24761.png?alt=media",
+ *     "order": "5"
+ *   },
+ *  "env_key": 58,
+ *  "description": "메이커 위킨 등록 수수료 무료!"
+ *}
  */
 router.delete('/:type/:name/:key', controller.deleteData)
 

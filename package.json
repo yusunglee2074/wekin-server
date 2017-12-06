@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "node --inspect app.js",
-    "apidoc": "apidoc -i app/ -o public/",
+    "apidoc": "apidoc -i app/api/v2 -o public/",
     "local": "export SQL_USER=postgres && export SQL_PASSWORD=dnlzlsjwmfru! && export SQL_DATABASE=wekin && export INSTANCE_CONNECTION_NAME=127.0.0.1 && export SQL_CLIENT=pg && npm run start"
   },
   "author": "",

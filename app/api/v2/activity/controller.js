@@ -4,17 +4,6 @@ const { activityService, utilService, notiService } = require('../service')
 
 
 
-exports.getChildWekin = (req, res) => {
-  model.Wekin.findAll({
-    order: [['wekin_key', 'desc']],
-    where: { activity_key: req.params.activity_key },
-  }).then((result) => {
-    returnMsg.success200RetObj(res, result)
-  }).catch((err) => {
-    console.log(err)
-  })
-}
-
 /*
 exports.getApproveList = (req, res) => {
   model.Activity.findAll({
@@ -43,49 +32,6 @@ exports.getApproveList = (req, res, next) => {
       res.json(result)
     })
     .catch( error => next(error) )
-}
-
-exports.getList = (req, res, next) => {
-  model.Activity.findAll({
-    order: [['created_at', 'DESC']],
-    include: { model: model.Host },
-    where: { status: { $in: [3, 4, 5] }}
-  }).then((results) => {
-    res.json(results)
-  }).catch((err) => {
-    next(err)
-  })
-}
-
-exports.getOne = (req, res, next) => {
-  model.Activity.findById(req.params.key)
-  .then(result => res.json(result))
-  .catch(err => next(err))
-}
-  
-exports.putOne = (req, res, next) => {
-  let body = req.body
-  model.Activity.update({
-    title: body.title,
-    intro_summary: body.intro_summary,
-    intro_detail: body.intro_detail,
-    schedule: body.schedule,
-    inclusion: body.inclusion,
-    preparation: body.preparation,
-    address: body.address,
-    address_detail: body.address_detail,
-    refund_policy: body.refund_policy,
-    main_image: body.main_image,
-    price: body.price,
-    category: body.category
-  }, {
-    where: {
-      activity_key: body.activity_key
-    } 
-  })
-  .then(result => { returnMsg.success200RetObj(res, req.body) })
-  .catch(err => next(err))
-  
 }
 
 //리펙토링

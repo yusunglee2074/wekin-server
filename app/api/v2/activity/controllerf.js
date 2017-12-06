@@ -636,51 +636,7 @@ exports.findAllRecentlyActivityOfHost = (req, res, next) => {
     .then(result => res.json(result))
     .catch(err => next(err))
 }
-// wekin 조회
-exports.findAllWekin = (req, res, next) => {
-  let queryOptions = {
-    order: [['start_date', 'ASC']],
-    group: ['Wekin.wekin_key'],
-    attributes: ['wekin_key', 'activity_key', 'min_user', 'max_user', 'start_date', 'due_date', 'commission',
-      [model.Sequelize.fn('SUM', model.Sequelize.col('Orders.wekin_amount')), 'current_user']
-      // [model.Sequelize.fn('SUM', (model.Sequelize.fn('COALESCE', (model.Sequelize.col('current_user')), 0), model.Sequelize.literal('+'), model.Sequelize.fn('COALESCE', (model.Sequelize.col('Orders.wekin_amount')), 0))), 'current_user']
-    ],
-    where: { activity_key: req.params.activity_key },
-    include: { model: model.Order, attributes: [], where: { status: { $in: ['order', 'ready', 'paid'] } }, required: false }
-  }
-  model.Wekin.findAll(queryOptions)
-    .then(result => res.json(result))
-    .catch(err => next(err))
-}
-exports.findOneWekin = (req, res, next) => {
-  let queryOptions = {
-    group: ['Wekin.wekin_key'],
-    attributes: ['wekin_key', 'activity_key', 'min_user', 'max_user', 'start_date', 'due_date', 'commission',
-      [model.Sequelize.fn('SUM', model.Sequelize.col('Orders.wekin_amount')), 'current_user']
-      // [model.Sequelize.fn('COUNT', model.Sequelize.col('Orders.order_key')), 'current_user']
-    ],
-    where: { activity_key: req.params.activity_key, wekin_key: req.params.wekin_key },
-    include: { model: model.Order, attributes: [], where: { status: { $in: ['order', 'ready', 'paid'] } } }
-  }
-  model.Wekin.findOne(queryOptions)
-    .then(result => res.json(result))
-    .catch(err => next(err))
-}
-exports.findAllWekinWithActivity = (req, res, next) => {
-  let queryOptions = {
-    // group: ['Wekin.wekin_key'],
-    // attributes: ['wekin_key', 'activity_key', 'min_user', 'max_user', 'start_date', 'due_date', 'commission',
-    //   [model.Sequelize.fn('SUM', model.Sequelize.col('Orders.wekin_amount')), 'current_user']
-    // [model.Sequelize.fn('COUNT', model.Sequelize.col('Orders.order_key')), 'current_user']
-    // ],
-    // where: { activity_key: req.params.activity_key, wekin_key: req.params.wekin_key },
-    where: { start_date: {$gt: new Date()}, $and: {start_date: {$lt: nextMonth}} },
-    include: { model: model.Activity, attributes: ['activity_key', 'main_image', 'title', 'intro_summary', 'address', 'price'], where: { status: service.activityStatus.activity.code } }
-  }
-  model.Wekin.findAll(queryOptions)
-    .then(result => res.json(result))
-    .catch(err => next(err))
-}
+
 exports.findWekiner = (req, res, next) => {
   let queryOptions = {
     where: { activity_key: req.params.wekin_key, state: 'paid' },

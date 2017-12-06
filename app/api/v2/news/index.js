@@ -8,12 +8,22 @@ const Model = require('./../../../model')
 
 const router = express.Router()
 
-/*
-  뉴스 API입니다.
- */
 
-// 뉴스 생성
-// 필요 인자 = title, thumbnail_url, link_url, (optional) sub_title
+/** @api {post} /news/create 뉴스생성
+ * @apiParam {String} title 제목
+ * @apiParam {String} thumbnail_url 썸네일 이미지 url
+ * @apiParam {String} link_url 뉴스 링크 url
+ * @apiParam {String} sub_title 내용 요약
+ * 
+ * @apiName createNews
+ * @apiGroup news
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ * {
+ *     {{ news }}
+ * }
+ */
 router.post('/create',
   function (req, res, next) {
     let body = req.body
@@ -31,8 +41,21 @@ router.post('/create',
   }
 )
 
-// 뉴스 수정 
-// 필요 인자 = id, (optional) title, thumbnail_url, link_url, sub_title
+/** @api {put} /news/update 뉴스 수정
+ * @apiParam {String} title 제목
+ * @apiParam {String} thumbnail_url 썸네일 이미지 url
+ * @apiParam {String} link_url 뉴스 링크 url
+ * @apiParam {String} sub_title 내용 요약
+ * 
+ * @apiName createNews
+ * @apiGroup news
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ * {
+ *     {{ news }}
+ * }
+ */
 router.put('/update',
   function (req, res, next) {
     let body = req.body
@@ -50,8 +73,18 @@ router.put('/update',
   }
 )
 
-// 뉴스 삭제 
-// 필요 인자 = id 
+/** @api {delete} /news/delete/:news_key 뉴스 삭제
+ * @apiParam {Number} news_key 뉴스키
+ * 
+ * @apiName deleteNews
+ * @apiGroup news
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ * {
+ *     {{ news }}
+ * }
+ */
 router.delete('/delete/:news_key',
   function (req, res, next) {
     model.News.destroy({ where: { news_key: req.params.news_key } })
@@ -62,8 +95,32 @@ router.delete('/delete/:news_key',
   }
 )
 
-// 뉴스 가져오기 
-// 필요 인자 = none
+/** @api {get} /news 뉴스 조회
+ * 
+ * @apiName getNews
+ * @apiGroup news
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ * {
+ *     "message": "success",
+ *     "data": [
+ *         {
+ *             "news_key": 6,
+ *             "link_url": "https://www.koroad.or.kr/kp_web/onlineSignalzineList.do?board_code=BRBBS_040",
+ *             "title": "신호등",
+ *             "sub_title": "신호등을 잘 지키세요 쑤파수파",
+ *             "thumbnail_url": "https://firebasestorage.googleapis.com/v0/b/wekin-9111d.appspot.com/o/images%2Ftest%2F2017%2F11%2F22%2F22981.png?alt=media",
+ *             "click_count": 0,
+ *             "share_count": 5,
+ *             "created_at": "2017-11-22T05:55:39.226Z",
+ *             "updated_at": "2017-11-28T02:35:08.035Z",
+ *             "deleted_at": null,
+ *             "like_count": "1"
+ *         }, ...
+ *     ]
+ * }
+ */
 router.get('/',
   function (req, res, next) {
     let body = req.body
@@ -81,8 +138,33 @@ router.get('/',
   }
 )
 
-// 뉴스 조회수 1 늘리기 
-// 필요 인자 = none
+/** @api {get} /news/:news_key 뉴스 조회수 1
+ * 
+ * @apiName countNews
+ * @apiGroup news
+ * @apiParam {Number} news_key 뉴스키
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ * {
+ *     "message": "success",
+ *     "data": [
+ *         {
+ *             "news_key": 6,
+ *             "link_url": "https://www.koroad.or.kr/kp_web/onlineSignalzineList.do?board_code=BRBBS_040",
+ *             "title": "신호등",
+ *             "sub_title": "신호등을 잘 지키세요 쑤파수파",
+ *             "thumbnail_url": "https://firebasestorage.googleapis.com/v0/b/wekin-9111d.appspot.com/o/images%2Ftest%2F2017%2F11%2F22%2F22981.png?alt=media",
+ *             "click_count": 0,
+ *             "share_count": 5,
+ *             "created_at": "2017-11-22T05:55:39.226Z",
+ *             "updated_at": "2017-11-28T02:35:08.035Z",
+ *             "deleted_at": null,
+ *             "like_count": "1"
+ *         }, ...
+ *     ]
+ * }
+ */
 router.get('/:news_key',
   function (req, res, next) {
     model.News.increment('click_count', { where: { news_key: req.params.news_key } })
@@ -93,8 +175,33 @@ router.get('/:news_key',
   }
 )
 
-// 뉴스 공유 횟수 1 늘리기 
-// 필요 인자 = none
+/** @api {get} /news/share/:news_key 뉴스 공유횟수 1
+ * 
+ * @apiName countNews
+ * @apiGroup news
+ * @apiParam {Number} news_key 뉴스키
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ * {
+ *     "message": "success",
+ *     "data": [
+ *         {
+ *             "news_key": 6,
+ *             "link_url": "https://www.koroad.or.kr/kp_web/onlineSignalzineList.do?board_code=BRBBS_040",
+ *             "title": "신호등",
+ *             "sub_title": "신호등을 잘 지키세요 쑤파수파",
+ *             "thumbnail_url": "https://firebasestorage.googleapis.com/v0/b/wekin-9111d.appspot.com/o/images%2Ftest%2F2017%2F11%2F22%2F22981.png?alt=media",
+ *             "click_count": 0,
+ *             "share_count": 5,
+ *             "created_at": "2017-11-22T05:55:39.226Z",
+ *             "updated_at": "2017-11-28T02:35:08.035Z",
+ *             "deleted_at": null,
+ *             "like_count": "1"
+ *         }, ...
+ *     ]
+ * }
+ */
 router.get('/share/:news_key',
   function (req, res, next) {
     model.News.increment('share_count', { where: { news_key: req.params.news_key } })

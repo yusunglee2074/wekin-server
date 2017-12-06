@@ -5,7 +5,7 @@ exports.findAllHost = (req, res, next) => {
   model.Host.findAll({
     attributes: ['host_key', 'profile_image', 'name'],
     where: { status: 3 },
-    include: { model: model.Activity }
+    include: { model: model.ActivityNew }
   }).then((results) => res.json(results))
     .catch((err) => next(err))
 }

@@ -5,18 +5,6 @@ const model = require('./../../../model')
 
 const controller = require('./controller')
 
-/**
- * @api {get} /user 유저 리스트
- * @apiName getList
- * @apiGroup user
- *
- * @apiSuccessExample 성공시:
- *     HTTP/1.1 200 OK
- * 
- * @apiError Bad Request 잘못된 요청
- * @apiErrorExample Error-Response:
- *     HTTP/1.1 500 ServerError
- */
 router.get('/', controller.getList)
 router.get('/email/:email', 
   function (req, res, next) {
@@ -31,45 +19,8 @@ router.get('/email/:email',
       .catch(err => next(err))
 })
 
-/**
- * @api {get} /user/:user_key 사용자 조회
- * @apiParam {Number} user_key 사용자키
- * @apiName getUserData
- * @apiGroup user
- *
- * @apiSuccessExample 성공시:
- *     HTTP/1.1 200 OK
- * 
- * @apiError Bad Request 잘못된 요청
- * @apiErrorExample Error-Response:
- *     HTTP/1.1 500 ServerError
- */
 router.get('/:user_key', controller.getOne)
 
-/**
- * @api {delete} /user/ 회원 탈퇴
- * @apiName withdraw
- * @apiGroup user
- *
- * @apiSuccessExample 성공시:
- *     HTTP/1.1 200 OK
- * {
- *  result: true
- * }
- * 
- * @apiError Bad Request 이미 삭제된 회원에 대한 요청
- * @apiErrorExample Error-Response:
- *     HTTP/1.1 500 ServerError
- * 
- * {
- *   "errorCode": -2,
- *   "data": {
- *       "result": false,
- *       "msg": "already deleted"
- *   }
- * }
- * 
- */
 router.delete('/', controller.withdraw)
 
 router.post('/front/join', controller.createUser)
