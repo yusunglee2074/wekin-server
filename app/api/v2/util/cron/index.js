@@ -8,8 +8,8 @@ exports.batch = _ => {
   schedule.scheduleJob('* */48 * * * *', readyDelete)
   schedule.scheduleJob('* */45 * * * *', bookingDelete)
   schedule.scheduleJob('* */52 * * * *', checkPointDueDate)
-  schedule.scheduleJob('* * */20 * * *', checkActivityDueDate)
-  schedule.scheduleJob('* * */19 * * *', sendSMSToMakerWhenStartDayOnPaidUserExist)
+  //schedule.scheduleJob('* * */20 * * *', checkActivityDueDate)
+  //schedule.scheduleJob('* * */19 * * *', sendSMSToMakerWhenStartDayOnPaidUserExist)
 }
 
 /*
