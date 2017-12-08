@@ -255,7 +255,7 @@ let sendOrderConfirmMail = (objectData) => {
         `<img src="${wekin.ActivityNew.main_image.image[0]}" width="500px">
         <div style="width: 400px; text-align: left; margin: 0 auto;">
           <h3 style="color: #851A1B; text-align: center;">${objectData.wekin_name}</h3>
-          위킨 시간 : ${moment(wekin.start_date).format('YYYY-MM-DD HH:mm')}<br>
+          위킨 시간 : ${moment(wekin.start_date).format('YYYY-MM-DD')} ${moment(wekin.start_time).format('HH:mm')}<br>
           메이커 :${objectData.wekin_host_name}<br>
           장소 :${wekin.ActivityNew.address_detail.meet_area}<br>
           준비물 :${wekin.ActivityNew.preparation}<br>
