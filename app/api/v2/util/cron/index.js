@@ -4,12 +4,12 @@ const moment = require('moment')
 const service = require('./../service.js')
 
 exports.batch = _ => {
-  schedule.scheduleJob('* */50 * * * *', orderDelete)
-  schedule.scheduleJob('* */48 * * * *', readyDelete)
-  schedule.scheduleJob('* */45 * * * *', bookingDelete)
-  schedule.scheduleJob('* */52 * * * *', checkPointDueDate)
-  //schedule.scheduleJob('* * */20 * * *', checkActivityDueDate)
-  //schedule.scheduleJob('* * */19 * * *', sendSMSToMakerWhenStartDayOnPaidUserExist)
+  schedule.scheduleJob('1 38 * * * *', orderDelete)
+  schedule.scheduleJob('1 38 * * * *', readyDelete)
+  schedule.scheduleJob('1 38 * * * *', bookingDelete)
+  schedule.scheduleJob('1 38 * * * *', checkPointDueDate)
+  //schedule.scheduleJob('1 1 20 * * *', checkActivityDueDate)
+  //schedule.scheduleJob('1 1 19 * * *', sendSMSToMakerWhenStartDayOnPaidUserExist)
 }
 
 /*

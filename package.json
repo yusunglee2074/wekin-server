@@ -24,13 +24,13 @@
     "json2xls": "^0.1.2",
     "moment": "^2.19.3",
     "node-excel-export": "^1.4.2",
-    "node-schedule": "^1.2.5",
+    "node-schedule": "1.2.0",
     "nodemailer": "^4.4.0",
     "nodemailer-smtp-pool": "^2.8.3",
     "nodemailer-smtp-transport": "^2.7.4",
     "pg": "^6.2.3",
     "request": "^2.83.0",
-    "sequelize": "^4.26.0",
+    "sequelize": "^4.27.0",
     "sequelize-datatables": "^1.2.0",
     "util": "^0.10.3"
   }
