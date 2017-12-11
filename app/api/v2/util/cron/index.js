@@ -8,7 +8,7 @@ exports.batch = _ => {
   schedule.scheduleJob('1 38 * * * *', readyDelete)
   schedule.scheduleJob('1 38 * * * *', bookingDelete)
   schedule.scheduleJob('1 38 * * * *', checkPointDueDate)
-  // schedule.scheduleJob('1 1 * * * *', checkActivityDueDate)
+  // schedule.scheduleJob('1 1 19 * * *', checkActivityDueDate)
   //schedule.scheduleJob('1 1 19 * * *', sendSMSToMakerWhenStartDayOnPaidUserExist)
 }
 
@@ -63,7 +63,6 @@ function checkActivityDueDate() {
     },
     include: [{ model: model.Host }]
   })
-  // TODO: 문자 보내게 해야됨
     .then(activities => {
       let length = activities.length
       for (let i = 0; i < length; i++) {
