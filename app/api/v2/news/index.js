@@ -125,6 +125,7 @@ router.get('/',
   function (req, res, next) {
     let body = req.body
     model.News.findAll({
+      order: [['created_at', 'DESC']],
       include: [
         { model: model.Like, attributes: [], required: false, duplicating: false }
       ],
