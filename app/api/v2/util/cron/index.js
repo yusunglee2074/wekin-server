@@ -8,7 +8,7 @@ exports.batch = _ => {
   schedule.scheduleJob('1 38 * * * *', readyDelete)
   schedule.scheduleJob('1 38 * * * *', bookingDelete)
   schedule.scheduleJob('1 38 * * * *', checkPointDueDate)
-  // schedule.scheduleJob('1 1 19 * * *', checkActivityDueDate)
+  schedule.scheduleJob('1 1 19 * * *', checkActivityDueDate)
   //schedule.scheduleJob('1 1 19 * * *', sendSMSToMakerWhenStartDayOnPaidUserExist)
 }
 
@@ -67,11 +67,12 @@ function checkActivityDueDate() {
       let length = activities.length
       for (let i = 0; i < length; i++) {
         let activity = activities[i]
-        service.sendSms(activity.Host.tel, `안녕하세요. 메이커님\n${ activity.title } 활동이 종료되었습니다.\n날짜는 웹사이트의 [메이커 > 위킨설정]에서 수정, 추가가 가능합니다.\n자세한 사항은 http://www.we-kin.com 에서 살펴보실 수 있습니다.\n감사합니다.`)
         activity.update({ status: 5 })
+        service.sendSms(activity.Host.tel, `안녕하세요. 메이커님\n${ activity.title } 활동이 종료되었습니다.\n날짜는 웹사이트의 [메이커 > 위킨설정]에서 수정, 추가가 가능합니다.\n자세한 사항은 http://www.we-kin.com 에서 살펴보실 수 있습니다.\n감사합니다.`)
       }
     })
     .catch(error => {
+      console.log("에러")
       console.log(error)
     })
 }
