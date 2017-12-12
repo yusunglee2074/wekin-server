@@ -126,13 +126,12 @@ exports.postReply = (req, res, next) => {
     }
     let doc = req.body
     let user = req.user
-    let docKey = req.params.docKey
+    let docKey = req.params.doc_key
 
     let modelData = {
       answer: doc.answer
     }
     let queryOptions = { // 답변이 달려있지 않아야한다.
-      include: { model: model.Activity, where: { host_key: user.host_key } },
       where: { doc_key: docKey, answer: null }
     }
     model.Doc.findOne(queryOptions)
@@ -144,7 +143,7 @@ exports.postReply = (req, res, next) => {
           })
           .catch(err => next(err))
       })
-      .catch(() => res.status(403).send('올바르지 않은 요청입니다.'))
+      .catch((error) => next(error))
   })
 }
 exports.putReply = (req, res, next) => {
@@ -156,13 +155,12 @@ exports.putReply = (req, res, next) => {
     }
     let doc = req.body
     let user = req.user
-    let docKey = req.params.docKey
+    let docKey = req.params.doc_key
 
     let modelData = {
       answer: doc.answer
     }
     let queryOptions = { // 답변이 달려있어야만 한다.
-      include: { model: model.Activity, where: { host_key: user.host_key } },
       where: { doc_key: docKey, answer: { $ne: null } }
     }
     model.Doc.findOne(queryOptions)
@@ -171,6 +169,6 @@ exports.putReply = (req, res, next) => {
           .then(result => res.status(200).send('답변이 수정되었습니다.'))
           .catch(err => next(err))
       })
-      .catch(() => res.status(403).send('올바르지 않은 요청입니다.'))
+      .catch(err => next(err))
   })
 }

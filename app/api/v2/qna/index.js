@@ -100,7 +100,7 @@ router.post('/:activity_key', service.authChk, controller.postQna)
  */
 router.delete('/:doc_key', service.authChk,controller.deleteQna)
 
-/** @api {post} /qna/:activity_key qna 답변 
+/** @api {post} /qna/:doc_key/reply qna 답변 
  * @apiParam {Number} doc_key doc_key
  * @apiParam {String} answer 답변내용 
  * 
@@ -132,7 +132,7 @@ router.delete('/:doc_key', service.authChk,controller.deleteQna)
  */
 router.post('/:doc_key/reply', service.authChk,controller.postReply)
 
-/** @api {put} /qna/:activity_key qna 답변 수정
+/** @api {put} /qna/:doc_key/reply qna 답변 수정
  * @apiParam {Number} doc_key doc_key
  * @apiParam {String} answer 답변내용 
  * 
