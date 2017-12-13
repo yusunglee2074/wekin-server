@@ -333,7 +333,7 @@ exports.createActivity = (req, res, next) => {
       week[i] = 0
     }
   }
-  var start_day = moment(data.start_date).clone()
+  var start_day = moment(data.start_date).add(9, 'hour').clone()
   for (let a = 0; a < count_days + 1; a++) {
     if (week[start_day.format('dddd').slice(0, 2)] === 1 && !close_dates.includes(Number(start_day.format('YYMMDD')))) {
       let clone_start_day = start_day.clone()
@@ -490,7 +490,7 @@ exports.updateActivity = (req, res, next) => {
       week[i] = 0
     }
   }
-  var start_day = moment(activityModelData.start_date).clone()
+  var start_day = moment(activityModelData.start_date).add(9, 'hour').clone()
   for (let a = 0; a < count_days + 1; a++) {
     if (week[start_day.format('dddd').slice(0, 2)] === 1 && !activityModelData.close_dates.includes(Number(start_day.format('YYMMDD')))) {
       let clone_start_day = start_day.clone()
