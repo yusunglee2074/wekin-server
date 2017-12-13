@@ -327,7 +327,7 @@ exports.createActivity = (req, res, next) => {
     close_dates.push(Number(moment(data.close_dates[i]).format('YYMMDD')))
   }
   for (i in data.base_week_option) {
-    if (data.base_week_option[i].min_user > 0) {
+    if (data.base_week_option[i].start_time.length) {
       week[i] = 1
     } else {
       week[i] = 0
@@ -484,7 +484,7 @@ exports.updateActivity = (req, res, next) => {
   let count_days = moment(activityModelData.end_date).diff(activityModelData.start_date, 'days')
   let week = {}
   for (i in activityModelData.base_week_option) {
-    if (activityModelData.base_week_option[i].min_user > 0) {
+    if (activityModelData.base_week_option[i].start_time.length) {
       week[i] = 1
     } else {
       week[i] = 0
