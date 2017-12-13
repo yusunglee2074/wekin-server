@@ -603,7 +603,13 @@ exports.findOneActivity = (req, res, next) => {
           result.dataValues.review_count = result.Docs.length
           res.json(result)
         })
-        .catch(err => next(err))
+        .catch(err => {
+          if (err.message == "Cannot read property 'dataValues' of null") {
+            res.status(502).json({ message: "Given activity_key is not match any activity in DB", data: null})
+            return
+          }
+          next(err)
+        })
     }).catch(err => {
       next(err)
     })
