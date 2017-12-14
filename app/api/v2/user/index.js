@@ -222,6 +222,7 @@ router.post('/front/signUp/dbCreateWithIdtoken', controller.dbCreateWithIdtoken)
  */
 router.post('/front/createCustomToken', controller.createCustomToken)
 router.post('/front/signUpWithCustomToken', controller.signUpWithCustomToken)
+router.get('/check/email', controller.isThereAnyEmailAddress)
 
 /** @api {get} /user/front/verify 엑세스토큰->DB유저정보
  * 

@@ -279,7 +279,8 @@ exports.getFrontSignUp = (req, res, next) => {
   let jwtToken = req.body.accessToken
   let name = req.body.name
   let profileImage = req.body.profileImage
-  createUserDBFromToken(jwtToken, name, profileImage)
+  let email = req.body.email
+  createUserDBFromToken(jwtToken, name, profileImage, email)
     .then(user => res.json(user))
     .catch(err => {
       console.log(err)
@@ -425,11 +426,23 @@ exports.getUsersQna = (req, res, next) => {
     .catch((err) => next(err))
 }
 
+// 페북 이메일 안오는 사용자용 이메일이 있는지 없는지 체크하는 api
+exports.isThereAnyEmailAddress = (req, res, next) => {
+  fireHelper.admin.auth().verifyIdToken(req.query.token || req.params.token)
+    .then(result => {
+      if (result.email) {
+        res.json({ message: 'Exist', data: result })
+      } else {
+        res.json({ message: 'notExist', data: result })
+      }
+    })
+    .catch(error => next(error))
+}
 /**
  * 토큰을 이용하여 유저 데이터베이스를 생성한다.
  * @param {string} jwtToken
  */
-function createUserDBFromToken (jwtToken, name, profileImage) {
+function createUserDBFromToken (jwtToken, name, profileImage, email) {
   return new Promise((resolve, reject) => {
     fireHelper.admin.auth().verifyIdToken(jwtToken).then(decoded => {
       model.User.findOrCreate({
@@ -437,14 +450,15 @@ function createUserDBFromToken (jwtToken, name, profileImage) {
           email: decoded.email
         },
         defaults: {
-          email: decoded.email || 'Undefinded Email',
+          email: decoded.email || email || 'Undefinded Email',
           name: name || decoded.name,
           profile_image: profileImage || decoded.profile_image || '/static/images/default-profile.png',
           uuid: decoded.sub
         }
       }).then(user => {
         fireHelper.admin.auth().updateUser(decoded.sub, {
-          displayName: name || decoded.name
+          displayName: name || decoded.name,
+          email: user.email || email
         })
         return user
       }).then(user => {
