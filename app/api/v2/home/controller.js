@@ -233,7 +233,7 @@ exports.newestActivity = (req, res, next) => {
       { model: model.WekinNew, attributes: [], required: false, duplicating: false, where: { state: 'paid' } },
       { model: model.Host, attributes: ['host_key', 'profile_image'], required: false, duplicating: false }, { model: model.Favorite, attributes: ['fav_key'], required: false, duplicating: false }
     ],
-    limit: 7
+    limit: 18
   })
   .then(results => {
     returnMsg.success200RetObj(res, results)
