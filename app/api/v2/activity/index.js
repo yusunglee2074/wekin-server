@@ -768,7 +768,7 @@ router.get('/filter/mobile',
           }
         ],
         group: ['ActivityNew.activity_key', 'Docs.doc_key', 'Host.host_key'],
-      },
+      }
     )
       .then(activities => {
         if (query.date == '[]') {
