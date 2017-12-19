@@ -10,6 +10,13 @@ const cron = require('./app/api/v2/util/cron')
 
 cron.batch()
 
+//시각 차이 확인
+let moment = require('moment')
+
+console.log("얍얍얍")
+console.log(moment().format())
+
+
 app.set('port', port)
 
 app.listen(port, () => {

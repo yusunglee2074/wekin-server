@@ -15,7 +15,7 @@ exports.findAllActivity = (req, res, next) => {
     model.Activity.findAll({
       group: ['Activity.activity_key', 'Host.host_key', 'Favorites.fav_key', 'Wekins.wekin_key', 'Wekins->Orders.order_key'],
       order: [['Wekins', 'start_date', 'ASC']],
-      attributes: [
+      ttributes: [
         'activity_key', 'status', 'host_key', 'main_image', 'title', 'intro_summary', 'address', 'address_detail', 'price', 'category', 'created_at', 'isteamorpeople',
         [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
         [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count']
@@ -337,7 +337,7 @@ exports.createActivity = (req, res, next) => {
   for (let a = 0; a < count_days + 1; a++) {
     if (week[start_day.format('dddd').slice(0, 2)] === 1 && !close_dates.includes(Number(start_day.format('YYMMDD')))) {
       let clone_start_day = start_day.clone()
-      start_date_list.push(clone_start_day)
+      start_date_list.push(clone_start_day.add(-9, 'hour'))
       start_day = start_day.add(1, 'days')
     } else {
       start_day = start_day.add(1, 'days')
@@ -494,7 +494,7 @@ exports.updateActivity = (req, res, next) => {
   for (let a = 0; a < count_days + 1; a++) {
     if (week[start_day.format('dddd').slice(0, 2)] === 1 && !activityModelData.close_dates.includes(Number(start_day.format('YYMMDD')))) {
       let clone_start_day = start_day.clone()
-      start_date_list.push(clone_start_day)
+      start_date_list.push(clone_start_day.add(-9, 'hour'))
       start_day = start_day.add(1, 'days')
     } else {
       start_day = start_day.add(1, 'days')
