@@ -217,7 +217,6 @@ exports.postWekin = (req, res, next) => {
       .catch(error => next(error))
     // 한 사람당 한 엑티비티에 대해서 하나의 북킹 위킨만 생성가능
   } else {
-    console.log("여기들어옴")
 
     model.WekinNew.count({
       where: {
