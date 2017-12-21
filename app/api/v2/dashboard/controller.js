@@ -57,7 +57,7 @@ exports.getDashboard = (req, res, next) => {
       result.activityThatEndsSoon = activityThatEndsSoon
       return model.WekinNew.findAll({
         order: [[ 'wekin_key', 'DESC' ]],
-        limit: 10,
+        limit: 40,
         where: {
           state: {
             $in: ['paid', 'reqRef', 'cancelled']
