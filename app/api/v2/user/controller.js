@@ -456,16 +456,18 @@ function createUserDBFromToken (jwtToken, name, profileImage, email) {
           uuid: decoded.sub
         }
       }).then(user => {
-        console.log(user.email, email)
+        console.log(decoded.sub, email)
         fireHelper.admin.auth().updateUser(decoded.sub, {
           displayName: name || decoded.name,
           email: email || user.email
         })
         return user
       }).then(user => {
+        /*
         if (user[1] === true) {
           utilService.slackLog(user + '님 회원가입 완료')
         }
+        */
         resolve(user)
       }).catch(err => {
         console.log(err)
