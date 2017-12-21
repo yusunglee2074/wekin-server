@@ -168,16 +168,36 @@ exports.setOrderRefundRequest = (req, res, next) => {
     },
     returning: true
   })
-  .then(r => { 
-    model.WekinNew.update({ state: 'reqRef' }, { where: { wekin_key: r[1][0].wekin_key }, returning: true })
-    utilService.sendOrderCancellRequest(r[1][0])
-  })
-  .then(r => {
-    returnMsg.success200RetObj(res, r)
-  })
-  .catch(e => {
-    next(e)
-  })
+    .then(r => { 
+      utilService.sendOrderCancellRequest(r[1][0])
+      return model.WekinNew.update({ state: 'reqRef' }, { where: { wekin_key: r[1][0].wekin_key }, returning: true })
+    })
+    .then(wekin => {
+      let userName, start_date, ActivityName, hostTel, hostName
+      start_date = moment(wekin[1][0].start_date).add(9, 'hour').format('YYYY-MM-DD')
+      model.User.findOne({ 
+        where: {
+          user_key: wekin[1][0].user_key
+        } 
+      })
+        .then(user => {
+          userName = user.name
+          return model.ActivityNew.findOne({ where: { activity_key: wekin[1][0].activity_key }, include: [{ model: model.Host }] })
+        })
+        .then(activity => {
+          ActivityName = activity.title
+          hostTel = activity.Host.tel
+          hostName = activity.Host.name
+          return utilService.sendOrderCancellRequestToHost(userName, start_date, ActivityName, hostTel, hostName)
+        })
+        .then(result => {
+          returnMsg.success200RetObj(res, result)
+        })
+        .catch(error => next(error))
+    })
+    .catch(e => {
+      next(e)
+    })
 }
 
 let cancelVbank = (imp_uid) => {
