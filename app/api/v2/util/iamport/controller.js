@@ -17,8 +17,10 @@ exports.importHook = (req, res, next) => {
             if (r[1][0].status === 'paid') {
               model.WekinNew.update({ state: 'paid' }, { where: { wekin_key: r[1][0].wekin_key } })
                 .then(result => {
-                  utilService.sendOrderConfirmSms(r[1][0])
-                  utilService.sendOrderConfirmSmsToMaker(r[1][0])
+                  if (r[1][0].order_pay_method === 'vbank') {
+                    utilService.sendOrderConfirmSms(r[1][0])
+                    utilService.sendOrderConfirmSmsToMaker(r[1][0])
+                  }
                 })
                 .catch(error => next(error))
             } else if (r.status === 'ready') {
