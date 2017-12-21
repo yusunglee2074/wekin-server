@@ -456,9 +456,10 @@ function createUserDBFromToken (jwtToken, name, profileImage, email) {
           uuid: decoded.sub
         }
       }).then(user => {
+        console.log(user.email, email)
         fireHelper.admin.auth().updateUser(decoded.sub, {
           displayName: name || decoded.name,
-          email: user.email || email
+          email: email || user.email
         })
         return user
       }).then(user => {
