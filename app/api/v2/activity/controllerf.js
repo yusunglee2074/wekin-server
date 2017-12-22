@@ -324,7 +324,7 @@ exports.createActivity = (req, res, next) => {
   let week = {}
   let close_dates = []
   for (let i = 0; i < data.close_dates.length; i++) {
-    close_dates.push(Number(moment(data.close_dates[i]).format('YYMMDD')))
+    close_dates.push(Number(moment(data.close_dates[i]).add(9, 'hour').format('YYMMDD')))
   }
   for (i in data.base_week_option) {
     if (data.base_week_option[i].start_time.length) {
@@ -477,7 +477,7 @@ exports.updateActivity = (req, res, next) => {
   }
   for (let i = 0; i < activityModelData.close_dates.length; i++) {
     let item = activityModelData.close_dates
-    item[i] = Number(moment(item[i]).format('YYMMDD'))
+    item[i] = Number(moment(item[i]).add(9, 'hour').format('YYMMDD'))
   }
 
   let start_date_list = []
