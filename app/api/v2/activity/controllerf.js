@@ -516,7 +516,7 @@ exports.deleteActivity = (req, res, next) => {
   let queryOptions = {
     where: { activity_key: req.params.activity_key }
   }
-  model.ActivityNew.update({ status: 5 }, queryOptions)
+  model.ActivityNew.destroy(queryOptions)
     .then(result => res.json(result))
     .catch(err => next(err))
 }
