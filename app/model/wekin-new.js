@@ -13,6 +13,7 @@ module.exports = function (sequelize, DataTypes) {
     select_option: { type: DataTypes.JSON, allowNull: false },
     pay_amount: { type: DataTypes.INTEGER, allowNull: false },
     state: { type: DataTypes.STRING, allowNull: false },
+    point: { type: DataTypes.INTEGER, allowNull: true },
   }, {
     classMethods: {},
     tableName: 'wekinnew',
