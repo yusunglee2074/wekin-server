@@ -109,7 +109,7 @@ exports.postQna = (req, res, next) => {
       .then(result => {
         model.Host.findOne({ where: { host_key: doc.host_key } })
         .then(host => {
-          sms.sendSms(host.tel,'메이커님! ' + doc.activity_title + ' 위킨에 QnA가 작성되었습니다. 내용:' + String(doc.content).slice(0, 18) + '...')
+          sms.sendSms(host.tel,'메이커님! ' + doc.activity_title + ' 위킨에 QnA가 작성되었습니다. 내용:' + String(doc.content).slice(0, 18) + '...' + '<br> 답변은 위킨 홈페이지 메이커 페이지에서 후기/Q&A 메뉴에서 답변하실 수 있습니다.')
           res.status(201).json(result)
         })
       })
