@@ -134,6 +134,12 @@ exports.postWekin = (req, res, next) => {
   }
   // event Activity List
   let eventAvtivityKeyList = [471, 499, 522]
+  // FIXME: 2017년 12월 용 50% 디스카운트 임시 코드
+  let halfDiscountPromotionKeyList = []
+  if (halfDiscountPromotionKeyList.includes(data.activity_key) && moment(data.selectedDate) > moment('20180101')) {
+    res.json({ message: 'fail/Not possible to booking discount wekin when 2018', data: null })
+    throw Error
+  }
   if (eventAvtivityKeyList.includes(data.activity_key)) {
     model.WekinNew.count({
       where: {
