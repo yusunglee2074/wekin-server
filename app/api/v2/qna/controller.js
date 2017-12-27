@@ -79,6 +79,8 @@ exports.getQna = (req, res, next) => {
       })
   }
 }
+
+const sms = require('./../../../util/sms')
 exports.postQna = (req, res, next) => {
   req.checkBody('content', '내용은 필수입니다.').notEmpty()
   req.getValidationResult().then(result => {
@@ -104,7 +106,13 @@ exports.postQna = (req, res, next) => {
     }
 
     model.Doc.create(modelData)
-      .then(result => res.status(201).json(result))
+      .then(result => {
+        model.Host.findOne({ where: { host_key: doc.host_key } })
+        .then(host => {
+          sms.sendSms(host.tel,'메이커님! ' + doc.activity_title + ' 위킨에 QnA가 작성되었습니다. 내용:' + String(doc.content).slice(0, 18) + '...')
+          res.status(201).json(result)
+        })
+      })
       .catch(err => next(err))
   })
 }
