@@ -136,7 +136,7 @@ exports.confirmOrder = (req, res, next) => {
     returnMsg.success200RetObj(res, r)
   })
   .catch(val => {
-    returnMsg.error400InvalidCall(res, 'ERROR_INVALID_PARAM', val)
+    next(val)
   })
 }
 
