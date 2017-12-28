@@ -655,12 +655,12 @@ exports.postOrder = (req, res, next) => {
     let tmp = {}
 
     typeConverter(req)
-    .then(v => {
-      tmp.status = v
-      return model.User.findOne({
-        where: { user_key: body.user_key }
-      }, {transaction: t})
-    })
+      .then(v => {
+        tmp.status = v
+        return model.User.findOne({
+          where: { user_key: body.user_key }
+        }, {transaction: t})
+      })
       .then(v => {
         tmp.user = v
         return model.WekinNew.findOne(
@@ -672,29 +672,34 @@ exports.postOrder = (req, res, next) => {
             ]
           }, { transaction: t })
       })
-    .then(v => {
-      console.log(v.ActivityNew)
-      //인원 내
-      // FIXME: create까지 transaction 잡아줘야함
-      return model.Order.create({
-        user_key: body.user_key,
-        user_email: tmp.user.email,
-        user_name: tmp.user.name,
-        user_phone: tmp.user.phone,
-        wekin_key: body.wekin_key,
-        status: tmp.status,
-        amount: body.amount,
-        wekin_name: v.ActivityNew.title,
-        wekin_price: v.ActivityNew.base_price,
-        wekin_amount: body.amount,
-        order_total_price: v.final_price,
-        order_receipt_price: v.final_price,
-        order_refund_policy: v.ActivityNew.refund_policy,
-        wekin_host_name: v.ActivityNew.Host.name,
-        host_key: v.ActivityNew.Host.host_key,
-        refund_info: body.extra,
-        commission: v.ActivityNew.comision
-      })
+      .then(v => {
+        model.Order.findOne({ where: { wekin_key: v.wekin_key, status: 'order' } }) 
+          .then(order => {
+            if (order) {
+              order.destroy()
+            }
+          })
+        //인원 내
+        // FIXME: create까지 transaction 잡아줘야함
+        return model.Order.create({
+          user_key: body.user_key,
+          user_email: tmp.user.email,
+          user_name: tmp.user.name,
+          user_phone: tmp.user.phone,
+          wekin_key: body.wekin_key,
+          status: tmp.status,
+          amount: body.amount,
+          wekin_name: v.ActivityNew.title,
+          wekin_price: v.ActivityNew.base_price,
+          wekin_amount: body.amount,
+          order_total_price: v.final_price,
+          order_receipt_price: v.final_price,
+          order_refund_policy: v.ActivityNew.refund_policy,
+          wekin_host_name: v.ActivityNew.Host.name,
+          host_key: v.ActivityNew.Host.host_key,
+          refund_info: body.extra,
+          commission: v.ActivityNew.comision
+        })
     })
     .then(result => {
       returnMsg.success200RetObj(res, result)
