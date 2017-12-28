@@ -599,6 +599,54 @@ exports.putOrder = (req, res, next) => {
   .catch(val => { next(val) })
 }
 
+
+
+exports.postOrderWithPoint = (req, res, next) => {
+  let body = req.body
+  let promiseList = []
+  console.log(body.wekin_key, body.amount, '얍')
+  promiseList.push(model.WekinNew.update({ point: body.amount, state: 'paid' }, { where: { wekin_key: body.wekin_key } }))
+  model.WekinNew.findOne({
+    where: {
+      wekin_key: body.wekin_key
+    },
+    include: ['User', { model: model.ActivityNew, include: ['Host'] }]
+  })
+  .then(wekin => {
+    promiseList.push(model.Order.create({
+      order_pay_method: 'point',
+      user_key: wekin.User.user_key,
+      user_email: wekin.User.email,
+      user_name: wekin.User.name,
+      user_phone: wekin.User.phone,
+      wekin_name: wekin.ActivityNew.title,
+      wekin_price: wekin.ActivityNew.base_price,
+      wekin_amount: wekin.pay_amount,
+      order_total_price: wekin.final_price,
+      order_receipt_price: 0,
+      order_refund_price: 0,
+      order_pay_price: wekin.final_price,
+      status: 'paid',
+      order_at: new Date(),
+      order_method: 'point',
+      order_refund_policy: wekin.ActivityNew.refund_policy,
+      wekin_host_name: wekin.ActivityNew.Host.name,
+      commision: 0,
+      refund_info: {"account":null,"bank":null,"name":null},
+      host_key: wekin.ActivityNew.Host.host_key,
+      wekin_key: wekin.wekin_key
+    }))
+    return Promise.all(promiseList)
+  })
+  .then(result => {
+    returnMsg.success200RetObj(res, result[1])
+  })
+  .catch(error => next(error))
+
+}
+
+
+
 exports.postOrder = (req, res, next) => {
 
   model.sequelize.transaction(t => {
