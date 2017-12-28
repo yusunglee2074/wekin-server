@@ -258,7 +258,7 @@ router.post('/front/use',
             },
             order: [['created_at', 'ASC']]
           })
-            .then( points => {
+            .then(points => {
               let usePoint = Number(req.body.value)
               let due_date_be_written_days = 0
               return Model.sequelize.transaction( t => {
@@ -278,6 +278,8 @@ router.post('/front/use',
                         created_at: created_at,
                         wekin_key: req.body.wekin_key || null
                       }))
+                      promises.push(model.WekinNew.update({ point: -1 * req.body.value }, { where: { wekin_key: req.body.wekin_key } }))
+                      promises.push(model.Order.update({ order_method: 'point' }, { where: { wekin_key: req.body.wekin_key, status: 'paid' } }))
                       promises.push(model.Point.create({
                         user_key: user.user_key,
                         point_change: req.body.value,
