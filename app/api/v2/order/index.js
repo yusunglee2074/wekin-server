@@ -318,6 +318,31 @@ router.put('/:order_key', adminChk, controller.putOrder)
  */
 router.get('/user/:user_key', controller.getOneByUser)
 
+
+/**
+ * @api {post} /order/point 결제금액 몽땅 포인트로
+ *userKey, wekinKey, amount, extra
+ * @apiParam {Number} userKey 유저키
+ * @apiParam {Number} wekinKey 위킨키
+ * @apiParam {Number} amount 포인트 사용량
+ * @apiParam {Json} extra 추가데이터
+ * @apiName postOrderWithPoint
+ * @apiGroup order
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *
+ * @apiError Bad Request 잘못된 요청
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Bad Request
+ *     {
+ *       "errorCode": -2,
+ *       "data": "ERROR_INVALID_PARAM"
+ *     }
+ */
+router.post('/point', controller.postOrderWithPoint)
+
 /**
  * @api {post} /order/:type 주문 생성
  * @apiParam {string} type 타입[order, refund]
