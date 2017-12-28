@@ -180,7 +180,7 @@ router.post('/front/use',
   function (req, res, next) {
     // 사용할 유저의 정보를 헤더의 토큰을 통해서 가져온다.
     getUserByToken(req)
-      .then( user => {
+      .then(user => {
         if (req.body.type === '1') {
           if (user.point.point_special < -1 * req.body.value) {
             let err = "User's point_special is not enough"
@@ -197,7 +197,7 @@ router.post('/front/use',
             },
             order: [['created_at', 'ASC']]
           })
-            .then( points => {
+            .then(points => {
               let usePoint = Number(req.body.value)
               let due_date_be_written_days = 0
               return Model.sequelize.transaction( t => {
