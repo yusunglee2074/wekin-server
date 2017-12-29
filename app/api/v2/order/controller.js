@@ -240,12 +240,6 @@ exports.setOrderCancelled = (req, res, next) => {
     }
   })
   .then(r => {
-    return r
-  })
-  .then(r => {
-    // utilService.slackLog('취소상태 업데이트')
-    // utilService.slackLog(r)
-    // utilService.slackLog('취소상태 업데이트')
     return model.Order.update({
       status: 'cancelled',
       order_refund_price: req.body.order_refund_price
@@ -257,7 +251,6 @@ exports.setOrderCancelled = (req, res, next) => {
   })
   .then(r => {
     model.WekinNew.update({ state: 'cancelled' }, { where: { wekin_key: r[1][0].wekin_key } })
-    // utilService.slackLog('취소 sms 전송')
     utilService.sendOrderConcellSuccess(r[1][0])
     return r
   })
@@ -268,12 +261,9 @@ exports.setOrderCancelled = (req, res, next) => {
     //return waitingService.sendNoti(r[1][0].wekin_key)
   })
   .then(r => {
-    // utilService.slackLog('성공')
     returnMsg.success200RetObj(res, {result: 'done'})
   })
   .catch(e => {
-    // utilService.slackLog('실패')
-    // utilService.slackLog(e)
     next(e)
   })
 }
