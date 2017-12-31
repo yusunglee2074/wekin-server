@@ -112,6 +112,77 @@ router.post('/create',
       .catch(err => next(err) )
   })
 
+/** @api {get} /point/refund/:order_key 포인트 환불
+ * @apiParam {Number} order_key orderkey
+ * 
+ * @apiName refundPoint
+ * @apiGroup point
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ * {
+ *     "point": {
+ *         "point": 0,
+ *         "point_special": 0,
+ *         "percentage": 100
+ *     }
+ * }
+ */
+router.post('/refund/:order_key',
+  function (req, res, next) {
+    let refundPointAmount = req.body.refundAmount
+    let refundPointDueDate
+    model.Order.findOne({ 
+      where: { 
+        order_key: 661 
+      }, include: [{ 
+        model: model.WekinNew, 
+        include: [{
+          model: model.Point,
+          where: {
+            type: {
+              $in: [21, 11]
+            }
+          }
+        }, {
+          model: model.User
+        }] 
+      }] 
+    })
+      .then(order => {
+        // 포인트 재적립 해줘야 한다.
+        // 1. 유저 포인트 변동해주기, 2. 포인트 객체 생성하기, 포인트 로깅하기
+        let promiseList = []
+        model.User.findOne({ where: { user_key: order.WekinNew.User.user_key } })
+          .then(user => {
+            if (order.WekinNew.Point.type === 11) {
+              user.set("point.point", Number(user.point.point) + Number(refundPointAmount))
+            } else {
+              user.set("point.point_special", Number(user.point.point_special) + Number(refundPointAmount))
+            }
+            promiseList.push(model.Point.create({
+              user_key: order.WekinNew.User.user_key,
+              point_change: refundPointAmount,
+              due_date_be_written_days: order.WekinNew.Point.due_date_be_written_days,
+              type: order.WekinNew.Point.type === 11 ? 0 : 1
+            }))
+            promiseList.push(model.Point.create({
+              user_key: order.WekinNew.User.user_key,
+              point_change: refundPointAmount,
+              due_date_be_written_days: order.WekinNew.Point.due_date_be_written_days,
+              type: order.WekinNew.Point.type === 11 ? 10 : 20
+            }))
+            promiseList.push(user.save())
+            return Promise.all(promiseList)
+          })
+          .then(result => {
+            console.log('하핫#################')
+            res.json({ message: 'success', data: null })
+          })
+          .catch(error => next(error))
+      })
+  })
+
 /** @api {get} /point/create 포인트 조회
  * @apiParam {Number} user_key userkey
  * 
