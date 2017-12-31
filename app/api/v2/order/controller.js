@@ -220,6 +220,9 @@ exports.setOrderCancelled = (req, res, next) => {
   // utilService.slackLog('주문취소')
   model.Order.findById(req.params.order_key)
   .then(orderObj => {
+    if (!orderObj.order_extra) {
+      orderObj.order_extra = {} 
+    }
     if((orderObj.order_pay_price === 0) && (orderObj.order_pay_method === 'vbank')) {
       // utilService.slackLog('0원 무통장')
       return cancelVbank(orderObj.imp_uid)
@@ -228,6 +231,9 @@ exports.setOrderCancelled = (req, res, next) => {
       return {status: '무통장 취소처리'}
     } else {
       // utilService.slackLog('가격이 있거나 무통장외')
+      if (orderObj.order_pay_method === 'point') {
+        return
+      }
       return iamporter.cancel({
         imp_uid: orderObj.imp_uid,
         merchant_uid: orderObj.order_id,
