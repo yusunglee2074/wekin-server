@@ -321,7 +321,6 @@ router.get('/user/:user_key', controller.getOneByUser)
 
 /**
  * @api {post} /order/point 결제금액 몽땅 포인트로
- *userKey, wekinKey, amount, extra
  * @apiParam {Number} userKey 유저키
  * @apiParam {Number} wekinKey 위킨키
  * @apiParam {Number} amount 포인트 사용량
@@ -352,7 +351,7 @@ router.post('/point', controller.postOrderWithPoint)
  * @apiParam {Number} user_key 회원키
  * @apiParam {Number} wekin_key 위킨키
  * @apiParam {Numbern} amount 구매 갯수
- * @apiParam {Jso} extra 추가데이터
+ * @apiParam {Json} extra 추가데이터
  * 
  *
  * @apiSuccessExample Success-Response:
