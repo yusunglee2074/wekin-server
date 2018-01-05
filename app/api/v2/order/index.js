@@ -4,9 +4,10 @@ const router = express.Router()
 
 const controller = require('./controller')
 
-/** @api {get} /order/host/:host_key/:month 호스트 대시보드
+/** @api {get} /order/host/:host_key/:year/:month 호스트 대시보드
  * @apiParam {Number} host_key 호스트 key
  * @apiParam {Number} month 조회 월 key
+ * @apiParam {Number} year 조회 년도 key
  * 
  * @apiName getHostsInfo
  * @apiGroup order
@@ -40,7 +41,7 @@ const controller = require('./controller')
  *       "data": "ERROR_INVALID_PARAM"
  *     }
  */
-router.get('/host/:host_key/:month', controller.getHostsInfo)
+router.get('/host/:host_key/:year/:month', controller.getHostsInfo)
 
 /** @api {get} /order/pageing/ 주문리스트 페이징 출력
  * 
