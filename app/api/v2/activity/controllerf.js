@@ -473,7 +473,8 @@ exports.updateActivity = (req, res, next) => {
     ticket_due_date: requestData.ticket_due_date,
     ticket_max_apply: requestData.ticket_max_apply,
     comision: requestData.comision,
-    start_date_list: requestData.start_date_list
+    start_date_list: requestData.start_date_list,
+    status_wetiful: requestData.status_wetiful
   }
   for (let i = 0; i < activityModelData.close_dates.length; i++) {
     let item = activityModelData.close_dates
