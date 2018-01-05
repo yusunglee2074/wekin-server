@@ -172,7 +172,7 @@ exports.postWekin = (req, res, next) => {
         }
       })
       .then(count => {
-        if (count + amount < data.max_user) {
+        if (count + amount <= data.max_user) {
           model.WekinNew.findOne({
             where: {
               user_key: req.user.user_key,
