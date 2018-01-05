@@ -72,7 +72,7 @@ exports.slackLog = (msg) => {
  */
 exports.sendOrderReadySms = (objectData) => {
   return new Promise((resolve, reject) => {
-    let msg = `${objectData.user_name} 위키너님, [${objectData.wekin_name}] 위킨을 신청해 주셔서 정말 감사합니다. 가상계좌 유효기간은 익일 24시까지이오니 그 전에 입금을 해주셔야 하며, 익일 24시간이 지난 이후에는 자동으로 신청 취소가 되므로 이 점 유의하여 주시기 바랍니다.\n\n은행명 : ${objectData.order_extra.vbank_name}\n계좌번호 : ${objectData.order_extra.vbank_num}\n예금주 : ${objectData.order_extra.vbank_holder}\n입금 금액 : [${objectData.order_total_price}]원\n\n* 문의\n- 위키너카카오톡: @위킨\n(평일 10:00 ~ 19:00)\n(점심시간 13:00 ~ 14:00)\n\n위(We)를 보면 즐(KIN)거움이 보인다. WE:KIN`
+    let msg = `${objectData.user_name} 위키너님, [${objectData.wekin_name}] 위킨을 신청해 주셔서 정말 감사합니다. 가상계좌 유효기간은 결제시각으로부터 48시간오니 그 전에 입금을 해주셔야 하며, 이후에는 자동으로 가상계좌가 닫히게 되므로 이 점 유의하여 주시기 바랍니다.\n\n은행명 : ${objectData.order_extra.vbank_name}\n계좌번호 : ${objectData.order_extra.vbank_num}\n예금주 : ${objectData.order_extra.vbank_holder}\n입금 금액 : [${objectData.order_total_price}]원\n\n* 문의\n- 위키너카카오톡: @위킨\n(평일 10:00 ~ 19:00)\n(점심시간 13:00 ~ 14:00)\n\n위(We)를 보면 즐(KIN)거움이 보인다. WE:KIN`
     this.sendSms(objectData.user_phone, msg, `[위킨] 입금 대기 중`)
     .then(_ => resolve(objectData)).catch(reject)
   })

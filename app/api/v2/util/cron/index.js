@@ -57,7 +57,7 @@ function checkActivityDueDate() {
   model.ActivityNew.findAll({
     where: {
       end_date: {
-        $lt: moment()
+        $lt: moment().add(9, 'hour')
       },
       status: 3
     },
@@ -83,7 +83,7 @@ function checkPointDueDate () {
   let endDueDatePoint = []
   model.Point.findAll({
     where: {
-      due_date_be_written_days:  { $lt: moment() },
+      due_date_be_written_days:  { $lt: moment().add(9, 'hour') },
       type: { $in: [0, 1] }
     }
   })
@@ -116,7 +116,7 @@ function orderDelete () {
     where: {
       status: 'order',
       order_at: {
-        $lt: moment().add(-1, 'hours')
+        $lt: moment().add(8, 'hours')
       }
     }
   })
@@ -155,7 +155,7 @@ function readyDelete() {
     where: {
       status: 'ready',
       order_at: {
-        $lt: moment().add(-1, 'days')
+        $lt: moment().add(-2, 'days').add(9, 'hour')
       }
     }
   })
@@ -184,7 +184,7 @@ function bookingDelete() {
     where: {
       state: 'booking',
       updated_at: {
-        $lt: moment().add(-1, 'hours')
+        $lt: moment().add(8, 'hours')
       }
     }
   })

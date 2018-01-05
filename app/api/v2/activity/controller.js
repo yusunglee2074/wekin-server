@@ -23,7 +23,7 @@ exports.getApproveList = (req, res) => {
 exports.getApproveList = (req, res, next) => {
   model.ActivityNew.findAll({
     order: [['created_at', 'DESC']],
-    where: { status: { $in: [1, 9] } },
+    where: { status: { $in: [1, 9, 4] } },
     include: {
       model: model.Host
     }
