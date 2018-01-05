@@ -19,7 +19,10 @@ const TYPE_MAP = {
 }
 
 exports.getHostsInfo = (req, res, next) => {
-  let monthStart = moment(req.params.month, 'MM')
+  if (!req.params.year || !req.params.month) {
+    return
+  }
+  let monthStart = moment(req.params.month, 'MM').set('year', req.params.year)
   let monthEnd = monthStart.clone().endOf('month')
   model.Order.findAll({
     attributes: ['order_key', 'order_total_price', 'order_receipt_price', 'order_pay_price', 'status', 'commission', 'order_refund_price'],
