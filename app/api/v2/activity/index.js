@@ -801,4 +801,69 @@ router.get('/filter/mobile',
   }
 )
 
+/** @api {get} /activity/wetiful/:status/:size?/:page? 위티플 status 필터
+ * 
+ * @apiName WetifulStatus
+ * @apiGroup activity
+ * @apiParam {String} status 상태['both', 'wekin', 'wetiful']
+ * @apiParam {Number} size (옵션)페이지별 갯수 
+ * @apiParam {Number} page (옵션)페이지 
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *  {
+ *    message: 'success', data: [ {{ activities DATA }} ]
+ *  }
+ * }
+ */
+router.get('/wetiful/:status/:size?/:page?', 
+  (req, res, next) => {
+    let status = req.params.status
+    let size  = req.params.size 
+    let page  = req.params.page 
+    if (status === 'both') {
+      model.ActivityNew.findAll({
+        where: {
+          status_wetiful: 'both',
+          status: 3
+        },
+        order: ['confirm_date'],
+        limit: size || 1000,
+        offset: (page || 0) * (size || 10)
+      })
+        .then(activities => {
+          res.json({ message: 'success', data: activities })
+        })
+        .catch(error => next(error))
+    } else if (status === 'wekin') {
+      model.ActivityNew.findAll({
+        where: {
+          status_wetiful: 'wekin',
+          status: 3
+        },
+        order: ['confirm_date'],
+        limit: size || 1000,
+        offset: (page || 0) * (size || 10)
+      })
+        .then(activities => {
+          res.json({ message: 'success', data: activities })
+        })
+        .catch(error => next(error))
+    } else {
+      model.ActivityNew.findAll({
+        where: {
+          status_wetiful: 'wetiful',
+          status: 3
+        },
+        order: ['confirm_date'],
+        limit: size || 1000,
+        offset: (page || 0) * (size || 10)
+      })
+        .then(activities => {
+          res.json({ message: 'success', data: activities })
+        })
+        .catch(error => next(error))
+    }
+  })
+
 module.exports = router 
