@@ -667,7 +667,7 @@ router.route('/front/host/:host_key/')
 router.route('/front/host/:host_key/recently')
   .get(controllerf.findAllRecentlyActivityOfHost)
 
-/** @api {get} /activity/front/host/:host_key/recently [어드민] 승인엑티비티 조회
+/** @api {get} /activity/approve [어드민] 승인엑티비티 조회
  * 
  * @apiName getApproveList
  * @apiGroup activity
