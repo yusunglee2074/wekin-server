@@ -85,7 +85,7 @@ exports.findAllReview = (req, res, next) => {
     where: { host_key: req.params.host_key },
     attributes: ['activity_key']
   }
-  model.Activity.findAll(queryOptions)
+  model.ActivityNew.findAll(queryOptions)
     .then((results) => {
       let activityKeys = results.map(activity => {
         return activity.activity_key
