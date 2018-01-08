@@ -123,9 +123,7 @@ function orderDelete () {
   })
     .then(r => {
       let stack = []
-
       r.forEach(v => {
-        if (v
         stack.push(
           model.WekinNew.destroy({
             where: {
