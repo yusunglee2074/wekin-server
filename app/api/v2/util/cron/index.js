@@ -92,12 +92,13 @@ function checkPointDueDate () {
         model.User.findById(points[i].user_key)
           .then(user => {
             if (points[i].type === 1) {
-              user.point.point_special -= points[i].point_change
+              user.set('point.point_special', user.point.point_special - points[i].point_change)
               points[i].destroy()
             } else {
-              user.point.point -= points[i].point_change
+              user.set('point.point', user.point.point - points[i].point_change)
               points[i].destroy()
             }
+            user.save()
           })
           .catch( err => {
             console.log("에러")
