@@ -134,7 +134,7 @@ router.post('/refund/:order_key',
     let refundPointDueDate
     model.Order.findOne({ 
       where: { 
-        order_key: 661 
+        order_key: req.params.order_key
       }, include: [{ 
         model: model.WekinNew, 
         include: [{
@@ -176,7 +176,6 @@ router.post('/refund/:order_key',
             return Promise.all(promiseList)
           })
           .then(result => {
-            console.log('하핫#################')
             res.json({ message: 'success', data: null })
           })
           .catch(error => next(error))
