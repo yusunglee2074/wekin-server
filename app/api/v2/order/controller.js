@@ -638,6 +638,7 @@ exports.postOrderWithPoint = (req, res, next) => {
     return Promise.all(promiseList)
   })
   .then(result => {
+    utilService.sendOrderConfirm(result[1])
     returnMsg.success200RetObj(res, result[1])
   })
   .catch(error => next(error))
