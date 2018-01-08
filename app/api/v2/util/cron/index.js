@@ -116,7 +116,7 @@ function orderDelete () {
     where: {
       status: 'order',
       order_at: {
-        $lt: moment().add(8, 'hours')
+        $lt: moment().add(-30, 'minutes')
       }
     }
   })
@@ -124,6 +124,7 @@ function orderDelete () {
       let stack = []
 
       r.forEach(v => {
+        if (v
         stack.push(
           model.WekinNew.destroy({
             where: {
@@ -155,7 +156,7 @@ function readyDelete() {
     where: {
       status: 'ready',
       order_at: {
-        $lt: moment().add(-2, 'days').add(9, 'hour')
+        $lt: moment().add(-2, 'days')
       }
     }
   })
