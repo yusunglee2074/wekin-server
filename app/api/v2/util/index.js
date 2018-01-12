@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const model = require('./../../../model')
+const request = require('request')
 
 const controller = require('./controller')
 
@@ -65,6 +66,13 @@ router.post('/join/sms', controller.joinSms)
 router.post('/join/mail', controller.joinMail)
 
 router.post('/wekin', controller.confirmWekin)
+
+router.get('/imageApi/:searchWord', function (req, res, next) {
+  let searchWord = encodeURIComponent(req.params.searchWord)
+  request.get(`http://api.visitkorea.or.kr/openapi/service/rest/PhotoGalleryService/gallerySearchList?ServiceKey=EzvXSqsiDK8eQamNNjWsW0EJyglsIT8R9g6SZ4rYCUchpXp8Ty5TwqR6xNlilowkUBd58eEel8kLXNnGqum7ZA%3D%3D&pageNo=1&numOfRows=100&MobileOS=ETC&MobileApp=wekin&keyword=${searchWord}&_type=json`, (err, response, body) => {
+    res.json({ err: err, response: response, body: body })
+})
+})
 
 router.get('/share/doc/:doc_key', 
   function (req, res, next) {
