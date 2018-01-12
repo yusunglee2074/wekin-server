@@ -314,7 +314,8 @@ router.route('/search')
  *     9: '힐링',
  *     10: '아웃도어',
  *     11: '요가/피트니스',
- *     12: '소품제작'
+ *     12: '소품제작',
+ *     13: '한국체험'
  *   }
  * @apiParam {Number} how_many 페이지 별 갯수
  * @apiParam {Number} offset 페이지 번호
