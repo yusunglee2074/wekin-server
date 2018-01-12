@@ -121,14 +121,12 @@ exports.confirmOrder = (req, res, next) => {
       r[1][0].getWekinNew()
         .then( wekin => {
           wekin.update( { state: 'paid' })
-          utilService.sendOrderConfirm(r[1][0])
         })
         .catch(error => next(error))
     } else if (r[1][0].status === 'ready') {
       r[1][0].getWekinNew()
         .then( wekin => {
           wekin.update( { state: 'ready' })
-          utilService.sendOrderReadySms(r[1][0])
         })
         .catch(error => next(error))
     }

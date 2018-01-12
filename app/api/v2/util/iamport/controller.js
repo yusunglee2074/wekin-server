@@ -10,6 +10,7 @@ exports.importHook = (req, res, next) => {
   let body = req.body
   iamporter.findByImpUid(req.body.imp_uid)
     .then(r => {
+      console.log(r, '아임포트에서 주는것')
       let data = r
       let dataForVerify = r.data
       let orderModel = {
@@ -50,10 +51,13 @@ exports.importHook = (req, res, next) => {
                   if (r[1][0].order_pay_method === 'vbank') {
                     utilService.sendOrderConfirmSms(r[1][0])
                     utilService.sendOrderConfirmSmsToMaker(r[1][0])
+                  } else {
+                    utilService.sendOrderConfirmSms(r[1][0])
+                    utilService.sendOrderConfirmSmsToMaker(r[1][0])
                   }
                 })
                 .catch(error => next(error))
-            } else if (r.status === 'ready') {
+            } else if (r[1][0].status === 'ready') {
               utilService.sendOrderReadySms(r[1][0])
             }
             returnMsg.success200RetObj(res, {success: true})
