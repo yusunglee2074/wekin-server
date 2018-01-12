@@ -183,7 +183,7 @@ exports.getActivityWithDetailCateogry = (req, res, next) => {
     9: '힐링',
     10: '아웃도어',
     11: '요가/피트니스',
-    12: '소품제작'
+    12: '소품제작',
     13: '한국체험'
   }
   model.ActivityNew.findAll({
