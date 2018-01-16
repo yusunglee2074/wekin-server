@@ -216,6 +216,25 @@ exports.findAllReservation = (req, res, next) => {
     .catch(err => next(err))
 }
 
+exports.getHostsWithAllOrders = (req, res, next) => {
+  model.Host.findAll({
+    include: [ 
+      {
+        model: model.Order,
+        where: {
+          status: {
+            $in: ['paid', 'cancelled']
+          }
+        }
+      }
+    ]
+  })
+    .then(result => {
+      res.json({ message: 'success', data: result })
+    })
+    .catch(error => next(error))
+}
+
 /** 누적 팔로우수 기준으로 상위 20개 선정 후, 10개를 랜덤으로 표시
  * host: profile, name
  * activity: image, title

@@ -588,6 +588,8 @@ router.put('/approve/:host_key', controller.approveHost)
 
 router.delete('/delete/:host_key', controller.deleteHost)
 
+router.get('/admin/get-hosts-with-all-orders', controllerf.getHostsWithAllOrders)
+
 
 
 
