@@ -12,7 +12,7 @@ var config = {
     db.Point.belongsTo(db.WekinNew, { foreignKey: 'wekin_key' })
 
     db.Host.belongsTo(db.User, { foreignKey: 'user_key' })
-    // db.Host.hasMany(db.Activity, { foreignKey: 'host_key' })
+    db.Host.hasMany(db.Order, { foreignKey: 'host_key' })
     db.Host.hasMany(db.ActivityNew, { foreignKey: 'host_key' })
 
     // db.Activity.belongsTo(db.Host, { foreignKey: 'host_key' })
