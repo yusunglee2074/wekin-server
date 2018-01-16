@@ -476,7 +476,8 @@ exports.updateActivity = (req, res, next) => {
     comision: requestData.comision,
     start_date_list: requestData.start_date_list,
     status_wetiful: requestData.status_wetiful,
-    detail_question: requestData.detail_question
+    detail_question: requestData.detail_question,
+    confirm_date: requestData.confirm_date
   }
   for (let i = 0; i < activityModelData.close_dates.length; i++) {
     let item = activityModelData.close_dates
