@@ -42,7 +42,7 @@ exports.getHostsInfo = (req, res, next) => {
         // FIXME: 정책확인
         // NOTICE: 쿠폰등의 손해를 위킨이 감수함
         tmp.total += v.order_total_price
-        tmp.commission += v.order_total_price * v.commission
+        tmp.commission += v.order_total_price * (v.commission * 0.01)
       }
       if (v.status === 'cancelled') {
         tmp.total += (v.order_total_price - v.order_refund_price)
