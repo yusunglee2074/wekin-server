@@ -601,7 +601,6 @@ exports.putOrder = (req, res, next) => {
 exports.postOrderWithPoint = (req, res, next) => {
   let body = req.body
   let promiseList = []
-  console.log(body.wekin_key, body.amount, '얍')
   promiseList.push(model.WekinNew.update({ point: body.amount, state: 'paid' }, { where: { wekin_key: body.wekin_key } }))
   model.WekinNew.findOne({
     where: {
@@ -620,7 +619,7 @@ exports.postOrderWithPoint = (req, res, next) => {
       wekin_price: wekin.ActivityNew.base_price,
       wekin_amount: wekin.pay_amount,
       order_total_price: wekin.final_price,
-      order_receipt_price: 0,
+      order_receipt_price: wekin.final_price,
       order_refund_price: 0,
       order_pay_price: wekin.final_price,
       status: 'paid',
