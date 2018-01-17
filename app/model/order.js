@@ -68,6 +68,7 @@ module.exports = function (sequelize, DataTypes) {
     wekin_host_name: { type: DataTypes.STRING },
     refund_info: { type: DataTypes.JSON, allowNull: true },
     host_key: { type: DataTypes.INTEGER, allowNull: false, references: { model: model.Host, key: 'host_key' } },
+    is_it_paybacked: { type: DataTypes.BOOLEAN, defaultValue: false }
 
   }, {
     classMethods: {},
