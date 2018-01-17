@@ -133,7 +133,7 @@ exports.postWekin = (req, res, next) => {
     amount += data.selectedExtraOption[i]
   }
   // event Activity List
-  let eventAvtivityKeyList = [471, 499, 522]
+  let eventAvtivityKeyList = [609, 611, 551, 552]
   if (eventAvtivityKeyList.includes(data.activity_key)) {
     model.WekinNew.count({
       where: {
