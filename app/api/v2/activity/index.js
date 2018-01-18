@@ -330,7 +330,7 @@ router.route('/search')
  *  }
  * }
  */
-router.route('/front/category/detail/:key/:how_many/:offset')
+router.route('/front/category/detail/:key/:how_many?/:offset?')
     .get(controllerf.getActivityWithDetailCateogry)
 
 /** @api {get} /activity/front/category/:key/:how_many/:offset [모바일] 2차 카테고리 엑티비티 조회 
