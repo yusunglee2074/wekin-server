@@ -144,10 +144,8 @@ exports.popularMaker = (req, res, next) => {
  * comment : 댓글수
  */ 
 exports.popularFeed = (req, res, next) => {
-  let daybefore30 = moment().add({days: -30})
-  
   model.Doc.findAll({
-    // order: [[model.Sequelize.fn('COUNT', model.Sequelize.col('Likes.like_key')), 'DESC']],
+    order: [[model.Sequelize.fn('COUNT', model.Sequelize.col('Likes.like_key')), 'DESC']],
     group: ['Doc.doc_key', 'User.user_key', 'Likes.like_key'],
     attributes: ['doc_key', 'content', 'tags', 'created_at', 'image_url',
       // [model.Sequelize.fn('COUNT', model.Sequelize.col('Likes.like_key')), 'like_count'],
@@ -162,7 +160,7 @@ exports.popularFeed = (req, res, next) => {
       }, {
         model: model.Comment, attributes: []
       }],
-    where: {created_at : {$gt: daybefore30}, private_mode: false, type: 0}
+    where: {created_at : {$gt: moment().add({days: -30})}, private_mode: false, type: { $in: [0, 1] } }
   })
   .then(r => {
     r.slice(0, 10)
