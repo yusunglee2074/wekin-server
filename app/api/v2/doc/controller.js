@@ -61,12 +61,12 @@ exports.getFrontDocuments = (req, res, next) => {
       'doc_key', 'activity_key', 'activity_title', 'activity_rating',
       'images', 'image_url', 'medias', 'tags', 'content', 'user_key', 'private_mode',
       'status', 'type', 'created_at', 'share_count',
-      [model.Sequelize.fn('COUNT', model.Sequelize.col('Comments.comment_key')), 'comment_count']
+      [model.Sequelize.fn('COUNT', model.Sequelize.fn('DISTINCT', model.Sequelize.col('Comments.comment_key'))), 'comment_count']
     ],
     include: [
       {
         model: model.Comment,
-        attributes: []
+        attributes: [],
       },
       {
         model: model.User,
