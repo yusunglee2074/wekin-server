@@ -272,31 +272,6 @@ router.post('/import', controller.importHook)
  */
 router.put('/confirm/:order_key', controller.confirmOrder)
 
-/**
- * @deprecated 별도의 수정은 없도록
- * 
- * @api {put} /order/:order_key 주문 수정
- * @apiParam {Number} order_key order 키
- * @apiName putOrder
- * @apiGroup order
- *
- * @apiParam {String} status 주문상태
- * @apiParam {Json} extra json타입의 부가데이터 (optional)
- * 
- *
- * @apiSuccessExample Success-Response:
- *     HTTP/1.1 200 OK
- *
- * @apiError Bad Request 잘못된 요청
- *
- * @apiErrorExample Error-Response:
- *     HTTP/1.1 400 Bad Request
- *     {
- *       "errorCode": -2,
- *       "data": "ERROR_INVALID_PARAM"
- *     }
- */
-router.put('/:order_key', adminChk, controller.putOrder)
 
 /**
  * @api {get} /order/user/:user_key 유저의 주문 리스트
@@ -434,10 +409,51 @@ router.post('/:type', controller.postOrder)
  */
 router.get('/:type/:wekin_key', controller.getOrderByWekin)
 
+const model = require('./../../../model')
+router.put('/not-payback', function (req, res, next) {
+  let tempPromiseList = []
+  for (let i = 0, length = req.body.orderList.length; i < length; i++) {
+    tempPromiseList.push(model.Order.update({ is_it_paybacked: false }, { where: { order_key: req.body.orderList[i] } }))
+  }
+  Promise.all(tempPromiseList)
+    .then(order => res.json({ message: 'success' }))
+    .catch(error => next(error))
+})
+
+router.put('/payback', function (req, res, next) {
+  let tempPromiseList = []
+  for (let i = 0, length = req.body.orderList.length; i < length; i++) {
+    tempPromiseList.push(model.Order.update({ is_it_paybacked: true }, { where: { order_key: req.body.orderList[i] } }))
+  }
+  Promise.all(tempPromiseList)
+    .then(order => res.json({ message: 'success' }))
+    .catch(error => next(error))
+})
 
 
-
-
-
-
+/**
+ * @deprecated 별도의 수정은 없도록
+ * 
+ * @api {put} /order/:order_key 주문 수정
+ * @apiParam {Number} order_key order 키
+ * @apiName putOrder
+ * @apiGroup order
+ *
+ * @apiParam {String} status 주문상태
+ * @apiParam {Json} extra json타입의 부가데이터 (optional)
+ * 
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *
+ * @apiError Bad Request 잘못된 요청
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 400 Bad Request
+ *     {
+ *       "errorCode": -2,
+ *       "data": "ERROR_INVALID_PARAM"
+ *     }
+ */
+router.put('/:order_key', adminChk, controller.putOrder)
 module.exports = router
