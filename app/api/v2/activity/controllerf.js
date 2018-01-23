@@ -86,7 +86,7 @@ exports.findAllActivity = (req, res, next) => {
       },
       include: [
         {
-          attributes: ['host_key', 'profile_image', 'user_key'],
+          attributes: ['host_key', 'profile_image', 'user_key', 'name'],
           model: model.Host,
           include: {
             model: model.User,
