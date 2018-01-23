@@ -1,6 +1,7 @@
 const model = require('../../../model')
 const service = require('../service')
 const moment = require('moment')
+const cache = require('memory-cache')
 
 /*
 // activity 조회
@@ -75,48 +76,56 @@ exports.findAllActivity = (req, res, next) => {
 // 엑티비티 리스트
 exports.findAllActivity = (req, res, next) => {
   let keyword = req.query.keyword ? req.query.keyword : '%'
-  model.ActivityNew.findAll({
-    where: {
-      status: 3 || 5,
-      title: { $like: `%${keyword}%` }
-    },
-    include: [
-      {
-        model: model.Host,
-        include: {
-          model: model.User,
-          attributes: []
-        },
-        group: ['User.user_key']
-      }, {
-        model: model.Doc,
-        attributes: [],
-        where: { type: service.docType.review.code },
-        required: false,
-      }, {
-        model: model.WekinNew,
-        attributes: [],
-        where: { state: 'paid' },
-        required: false,
-        duplicating: false
-      }, {
-        model: model.Favorite,
-        attributes: ['fav_key'],
-        required: false,
-      }
-    ],
-    attributes: {
+  if (cache.get('allActivities')) {
+    res.json(cache.get('allActivities'))
+  } else {
+    model.ActivityNew.findAll({
+      where: {
+        status: 3 || 5,
+        title: { $like: `%${keyword}%` }
+      },
       include: [
-        [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count'],
-        [model.Sequelize.fn('sum', model.Sequelize.col('WekinNews.pay_amount')), 'wekinnew_count']
-      ]
-    },
-    group: ['ActivityNew.activity_key', model.Sequelize.col('Docs.activity_key'), 'Host.host_key', 'Favorites.fav_key'],
-  })
-    .then(activities => {
-      res.json(activities)
+        {
+          attributes: ['host_key', 'profile_image', 'user_key'],
+          model: model.Host,
+          include: {
+            model: model.User,
+            attributes: []
+          },
+          group: ['User.user_key']
+        }, {
+          model: model.Doc,
+          attributes: [],
+          where: { type: service.docType.review.code },
+          required: false,
+        }, {
+          model: model.WekinNew,
+          attributes: [],
+          where: { state: 'paid' },
+          required: false,
+          duplicating: false
+        }, {
+          model: model.Favorite,
+          attributes: ['fav_key'],
+          required: false,
+        }
+      ],
+      attributes: {
+        include: [
+          [model.Sequelize.fn('COUNT', model.Sequelize.col('Docs.doc_key')), 'review_count'],
+          [model.Sequelize.fn('sum', model.Sequelize.col('WekinNews.pay_amount')), 'wekinnew_count']
+        ],
+        exclude: ['intro_detail', 'schedule', 'inclusion', 'preparation', 'refund_policy', 'category_two', 'start_date', 'end_date', 'base_start_time', 'base_min_user', 'base_max_user', 'base_price_option', 'base_extra_price_option', 'base_week_option', 'close_dates', 'is_it_ticket', 'ticket_due_date', 'ticket_max_apply', 'comision', 'detail_question', 'deleted_at', 'intro_summary']
+      },
+      group: ['ActivityNew.activity_key', model.Sequelize.col('Docs.activity_key'), 'Host.host_key', 'Favorites.fav_key'],
     })
-    .catch( error => next(error) )
+      .then(activities => {
+        cache.put('allActivities', activities, 10000)
+        res.json(activities)
+      })
+      .catch(error => next(error))
+
+  }
 }
 
 exports.findAllActivityForAdmin = (req, res, next) => {
