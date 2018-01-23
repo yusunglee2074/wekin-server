@@ -178,7 +178,7 @@ exports.findAllActivityForAdmin = (req, res, next) => {
 //12: '소품제작'
 // }
 exports.getActivityWithDetailCateogry = (req, res, next) => {
-  categoryDetail = {
+  let categoryDetail = {
     0: '투어/여행',
     1: '익스트림',
     2: '스포츠',
