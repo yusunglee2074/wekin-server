@@ -10,6 +10,44 @@ exports.batch = _ => {
   schedule.scheduleJob('1 38 * * * *', checkPointDueDate)
   schedule.scheduleJob('1 1 19 * * *', checkActivityDueDate)
   //schedule.scheduleJob('1 1 19 * * *', sendSMSToMakerWhenStartDayOnPaidUserExist)
+  schedule.scheduleJob('1 1 5 * * *', compressActivityStartDateList)
+}
+
+
+
+function compressActivityStartDateList () {
+  console.log("start_date_list 압축시작")
+  model.ActivityNew.findAll({
+    where: {
+      status: 3
+    }
+  })
+  .then(activities => {
+    let promiseList = []
+    for (let i = 0; i < activities.length; i++) {
+      let item = activities[i]
+      let count = 0
+      for (let ii = 0; ii < item.start_date_list.length; ii++) {
+        let date = item.start_date_list[ii]
+        if (moment(date) - moment().add(-2, 'days') > 0) {
+          count = ii
+          break
+        }
+      }
+      item.start_date_list.splice(0, count)
+      item.set('start_date_list', item.start_date_list)
+      promiseList.push(item.save())
+    }
+    return Promise.all(promiseList)
+  })
+  .then(result => {
+    console.log("성공")
+  })
+  .catch(error => {
+    console.log(error)
+    console.log('에러')
+    console.log("#################################실패")
+  })
 }
 
 /*
