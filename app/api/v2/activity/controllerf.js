@@ -124,7 +124,6 @@ exports.findAllActivity = (req, res, next) => {
         res.json(activities)
       })
       .catch(error => next(error))
-
   }
 }
 
