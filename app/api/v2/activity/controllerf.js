@@ -120,7 +120,7 @@ exports.findAllActivity = (req, res, next) => {
       group: ['ActivityNew.activity_key', model.Sequelize.col('Docs.activity_key'), 'Host.host_key', 'Favorites.fav_key'],
     })
       .then(activities => {
-        cache.put('allActivities', activities, 10000)
+        cache.put('allActivities', activities, 30000)
         res.json(activities)
       })
       .catch(error => next(error))
