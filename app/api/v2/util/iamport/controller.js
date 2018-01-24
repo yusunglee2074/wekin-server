@@ -6,11 +6,20 @@ const iamporter = new Iamporter({
   apiKey: '4401466536780514',
   secret: 'PDNJ0Cws2yDvdk5AXOp0nxu5kbKh70gWE3GEFc6ILKdY4iy26Y2uwwzQHk8PkoMYrsC7FJQqt3oxmXAs'
 })
+
+
+
+exports.getResponse = (req, res, next) => {
+  iamporter.findByImpUid(req.params.imp_uid)
+    .then(r => res.json({ message:'success', data: r }))
+    .catch(e => next(e))
+}
+
+
 exports.importHook = (req, res, next) => {
   let body = req.body
   iamporter.findByImpUid(req.body.imp_uid)
     .then(r => {
-      console.log(r, '아임포트에서 주는것')
       let data = r
       let dataForVerify = r.data
       let orderModel = {
