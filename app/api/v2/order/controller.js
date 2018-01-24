@@ -119,7 +119,7 @@ exports.confirmOrder = (req, res, next) => {
     // notiService.wekinPay(r[1][0])
     if (r[1][0].status === 'paid') {
       r[1][0].getWekinNew()
-        .then( wekin => {
+        .then(wekin => {
           wekin.update( { state: 'paid' })
         })
         .catch(error => next(error))
@@ -222,16 +222,6 @@ exports.setOrderCancelled = (req, res, next) => {
     if (orderObj.order_pay_method === 'point') {
       return
     }
-    console.log({
-      imp_uid: orderObj.imp_uid,
-      merchant_uid: orderObj.order_id,
-      amount: req.body.order_refund_price,
-      checksum: req.body.order_refund_price,
-      reason: orderObj.order_extra.reason,
-      refund_holder: orderObj.refund_info.name,
-      refund_bank: orderObj.refund_info.bank,
-      refund_account: orderObj.refund_info.account
-    })
     return iamporter.cancel({
       imp_uid: orderObj.imp_uid,
       merchant_uid: orderObj.order_id,
