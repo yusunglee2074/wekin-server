@@ -201,21 +201,6 @@ exports.setOrderRefundRequest = (req, res, next) => {
     })
 }
 
-let cancelVbank = (imp_uid) => {
-  return new Promise((resolve, reject) => {
-    iamporter.getToken()
-    .then(r => r.data.access_token)
-    .then(r => {
-      request({url: `http://api.iamport.kr/vbanks/${imp_uid}`, headers: {
-        Authorization: r
-      }}, (e ,r, b) => {
-        resolve(b)
-      })
-    })
-    .catch(reject)
-  })
-  
-}
 
 exports.setOrderCancelled = (req, res, next) => {
   // utilService.slackLog('주문취소')
@@ -224,30 +209,42 @@ exports.setOrderCancelled = (req, res, next) => {
     if (!orderObj.order_extra) {
       orderObj.order_extra = {} 
     }
+    /*
     if((orderObj.order_pay_price === 0) && (orderObj.order_pay_method === 'vbank')) {
       // utilService.slackLog('0원 무통장')
       return cancelVbank(orderObj.imp_uid)
-    } else if ((orderObj.order_pay_price !== 0) && (orderObj.order_pay_method === 'vbank')) {
+     if ((orderObj.order_pay_price !== 0) && (orderObj.order_pay_method === 'vbank')) {
       // 돈이 들어온 무통장
       return {status: '무통장 취소처리'}
     } else {
+    */
       // utilService.slackLog('가격이 있거나 무통장외')
-      if (orderObj.order_pay_method === 'point') {
-        return
-      }
-      return iamporter.cancel({
-        imp_uid: orderObj.imp_uid,
-        merchant_uid: orderObj.order_id,
-        amount: req.body.order_refund_price,
-        checksum: req.body.order_refund_price,
-        reason: orderObj.order_extra.reason,
-        refund_holder: orderObj.refund_info.name,
-        refund_bank: orderObj.refund_info.bank,
-        refund_account: orderObj.refund_info.account.
-      })
+    if (orderObj.order_pay_method === 'point') {
+      return
     }
+    console.log({
+      imp_uid: orderObj.imp_uid,
+      merchant_uid: orderObj.order_id,
+      amount: req.body.order_refund_price,
+      checksum: req.body.order_refund_price,
+      reason: orderObj.order_extra.reason,
+      refund_holder: orderObj.refund_info.name,
+      refund_bank: orderObj.refund_info.bank,
+      refund_account: orderObj.refund_info.account
+    })
+    return iamporter.cancel({
+      imp_uid: orderObj.imp_uid,
+      merchant_uid: orderObj.order_id,
+      amount: req.body.order_refund_price,
+      checksum: req.body.order_refund_price,
+      reason: orderObj.order_extra.reason,
+      refund_holder: orderObj.refund_info.name || orderObj.refund_info.refund_holder,
+      refund_bank: orderObj.refund_info.bank || orderObj.refund_info.refund_bank,
+      refund_account: orderObj.refund_info.account || orderObj.refund_info.refund_account
+    })
   })
   .then(r => {
+    console.log(r)
     return model.Order.update({
       status: 'cancelled',
       order_refund_price: req.body.order_refund_price
