@@ -42,6 +42,7 @@ module.exports = function (sequelize, DataTypes) {
     detail_question: { type: DataTypes.JSON, allowNull: true },
     price_before_discount: { type: DataTypes.INTEGER, allowNull: true },
     status_wetiful: { type: DataTypes.STRING, defaultValue: 'both' },
+    is_it_end: { type: DataTypes.BOOLEAN, defaultValue: false },
   }, {
     classMethods: {},
     tableName: 'activitynew',
