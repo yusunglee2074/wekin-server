@@ -222,7 +222,7 @@ exports.newestActivity = (req, res, next) => {
       include: [
         [model.Sequelize.fn('AVG', model.Sequelize.col('Docs.activity_rating')), 'rating_avg'],
         [model.Sequelize.fn('count', model.Sequelize.fn('DISTINCT', model.Sequelize.col('Docs.doc_key'))), 'review_count'],
-        [model.Sequelize.fn('sum', model.Sequelize.fn('DISTINCT', model.Sequelize.col('WekinNews.pay_amount'))), 'wekinnew_count']
+        [model.Sequelize.fn('sum', model.Sequelize.col('WekinNews.pay_amount')), 'wekinnew_count']
       ]
     },
     where: { status: 3 },
@@ -231,7 +231,7 @@ exports.newestActivity = (req, res, next) => {
       { model: model.WekinNew, attributes: [], required: false, duplicating: false, where: { state: 'paid' } },
       { model: model.Host, attributes: ['host_key', 'profile_image'], required: false, duplicating: false }, { model: model.Favorite, attributes: ['fav_key'], required: false, duplicating: false }
     ],
-    limit: 18
+    limit: 100
   })
   .then(results => {
     returnMsg.success200RetObj(res, results)
