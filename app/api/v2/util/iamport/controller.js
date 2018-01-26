@@ -52,7 +52,7 @@ exports.importHook = (req, res, next) => {
         returning: true
       })
       if (r.status === 200) {
-        model.Order.update({ status: r.data.status, order_pay_price: r.data.status === 'paid' ? r.data.amount : 0 }, { where: { order_id: r.data.merchant_uid }, returning: true })
+        model.Order.update({ status: r.data.status, order_pay_price: r.data.status == 'paid' ? r.data.amount : 0 }, { where: { order_id: r.data.merchant_uid }, returning: true })
           .then(r => {
             if (r[1][0].status === 'paid') {
               model.WekinNew.update({ state: 'paid' }, { where: { wekin_key: r[1][0].wekin_key } })
