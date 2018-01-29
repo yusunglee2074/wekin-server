@@ -393,9 +393,12 @@ exports.putFrontUserInfo = (req, res, next) => {
       email_noti: user.email_noti,
       push_noti: user.push_noti,
       phone: user.phone,
-      phone_valid: user.phone_valid,
+      phone_valid: user.phone_valid || nulll,
       sms_noti: user.sms_noti,
+      email_valid: user.email_valid || null
     }
+    if(!user.email_valid) delete modelData.email_valid
+    if(!user.phone_valid) delete modelData.phone_valid
     if (user.profile_image) {
       modelData.profile_image = user.profile_image
     }
