@@ -86,7 +86,7 @@ exports.popularActivity = (req, res, next) => {
         [model.Sequelize.fn('sum', model.Sequelize.col('WekinNews.pay_amount')), 'wekinnew_count']
       ]
     },
-    where: { status: 3 },
+    where: { status: 3, is_it_end: false },
     include: [
       { model: model.Doc, attributes: [], where: { type: 1 }, required: false, duplicating: false },
       { model: model.WekinNew, attributes: [], required: false, duplicating: false, where: { state: 'paid' } },
