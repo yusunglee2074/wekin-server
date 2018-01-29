@@ -193,7 +193,7 @@ function readyDelete() {
     where: {
       status: 'ready',
       order_at: {
-        $lt: moment().add(-2, 'days')
+        $lt: moment().add(-3, 'days')
       }
     }
   })
