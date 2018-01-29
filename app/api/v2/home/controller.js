@@ -127,7 +127,7 @@ exports.popularMaker = (req, res, next) => {
        }
     ],
     subQuery: false,
-    limit: 15 
+    limit: 150 
   })
   .then(r => {
     r.slice(0, 10)
