@@ -361,6 +361,9 @@ router.route('/front/category/detail/:key/:how_many?/:offset?')
 router.route('/front/category/:key/:how_many/:offset')
     .get(controllerf.getActivityWithCateogry)
 
+router.route('/search-with-title')
+  .get(controllerf.searchActivityWithTitle)
+
 router.route('/front/period/:key/')
   .get(controllerf.findAllActivity)
 

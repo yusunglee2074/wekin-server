@@ -72,6 +72,23 @@ exports.findAllActivity = (req, res, next) => {
 }
 */
 
+
+// 검색 api 따로 뺌
+//
+exports.searchActivityWithTitle = (req, res, next) => {
+  model.ActivityNew.findAll({
+    where: {
+      status: 3 || 5,
+      title: { $like: `%${req.query.keyword}%` }
+    },
+    include: ['Host']
+  })
+    .then(activities => {
+      res.json(activities)
+    })
+    .catch(error => next(error))
+}
+
 // 리펙토링
 // 엑티비티 리스트
 exports.findAllActivity = (req, res, next) => {
