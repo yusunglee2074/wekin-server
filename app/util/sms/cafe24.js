@@ -3,7 +3,7 @@ const request = require('request')
 const TARGET_URL = 'https://sslsms.cafe24.com/sms_sender.php'
 const USER_ID = 'wekiner'
 const USER_KEY = '59b212ca502ffd227ab4aa62de415623'
-const BASE_NUMBER = {sphone1: '031', sphone2: '377', sphone3: '0410'};
+const BASE_NUMBER = {sphone1: '031', sphone2: '211', sphone3: '0410'};
 
 exports.cafe24Sender = (target, message, title) => {
   return new Promise((resolve, reject) => {
