@@ -5,6 +5,42 @@ const model = require('./../../../model')
 const { authChk } = require('../service')
 const moment = require('moment')
 const controller = require('./controller')
+const cache = require('memory-cache')
+
+router.get('/paid-amount', (req, res, next) => {
+  if (cache.get('paidAmount')) {
+    res.json(cache.get('paidAmount'))
+  } else {
+    let result = {}
+    let promiseList = []
+    let activityKeyList = []
+    model.ActivityNew.findAll({ where: { status: 3 }, attributes: [ 'activity_key' ] })
+      .then(r => {
+        for (let i = 0, length = r.length; i < length; i++) {
+          let item = r[i]
+          activityKeyList.push(item.activity_key)
+        }
+        return
+      })
+      .then(() => {
+        for (let i = 0, length = activityKeyList.length; i < length; i++) {
+          let item = activityKeyList[i]
+          promiseList.push(model.WekinNew.count({ where: { activity_key: item, state: 'paid' } }))
+        }
+        return Promise.all(promiseList)
+      })
+      .then(r => {
+        for (let i = 0, length = activityKeyList.length; i < length; i++) {
+          let item = activityKeyList[i]
+          if (r[i] === 0) continue
+          result[item] = r[i]
+        }
+        cache.put('paidAmount', result, 180000)
+        return res.json(result)
+      })
+      .catch(e => next(e))
+  }
+})
 
 /** @api {get} /wekin/category/:user_key 위킨뉴(결제건) 카테고리별 조회
  * 
@@ -248,7 +284,7 @@ router.get('/ranking', function (req, res, next) {
     attributes: [
     ],
   })
-    .then( result => {
+    .then(result => {
       let category = {
         1: '투어/여행', 2: '익스트림', 3: '스포츠', 4: '음악', 5: '댄스', 6: '뷰티', 
         7: '요리', 8: '아트', 9: '힐링', 10: '아웃도어', 11: '요가/피트니스', 12: '소품제작'
