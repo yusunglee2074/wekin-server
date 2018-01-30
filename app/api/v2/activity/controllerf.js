@@ -92,14 +92,12 @@ exports.searchActivityWithTitle = (req, res, next) => {
 // 리펙토링
 // 엑티비티 리스트
 exports.findAllActivity = (req, res, next) => {
-  let keyword = req.query.keyword ? req.query.keyword : '%'
   if (cache.get('allActivities')) {
     res.json(cache.get('allActivities'))
   } else {
     model.ActivityNew.findAll({
       where: {
         status: 3 || 5,
-        title: { $like: `%${keyword}%` }
       },
       include: [
         {
