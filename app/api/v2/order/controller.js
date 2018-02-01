@@ -226,7 +226,7 @@ exports.setOrderCancelled = (req, res, next) => {
       imp_uid: orderObj.imp_uid,
       merchant_uid: orderObj.order_id,
       amount: req.body.order_refund_price,
-      checksum: req.body.order_refund_price,
+      checksum: req.body.order_receipt_price,
       reason: orderObj.order_extra.reason,
       refund_holder: orderObj.refund_info.name || orderObj.refund_info.refund_holder,
       refund_bank: orderObj.refund_info.bank || orderObj.refund_info.refund_bank,
