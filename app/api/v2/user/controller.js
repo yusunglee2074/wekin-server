@@ -56,7 +56,7 @@ exports.kakaoLogin = (req, res, next) => {
             return fireHelper.admin.auth().createCustomToken(userId, {provider: 'KAKAO'});
           })
           .then(customToken => {
-            res.json({ customToken: customToken, userInfo: userInfo }) 
+            res.json({ customToken: customToken, userInfo: userInfo, userToken: userToken }) 
           })
           .catch(err => {
             if (err.errorInfo.code === "auth/email-already-exists") {
@@ -125,7 +125,7 @@ exports.kakaoLogin = (req, res, next) => {
             return fireHelper.admin.auth().createCustomToken(userId, {provider: 'KAKAO'});
           })
           .then(customToken => {
-            res.json({ customToken: customToken, userInfo: userInfo }) 
+            res.json({ customToken: customToken, userInfo: userInfo, userToken: userToken }) 
           })
           .catch(err => {
             if (err.errorInfo.code === "auth/email-already-exists") {
