@@ -60,7 +60,9 @@ exports.kakaoLogin = (req, res, next) => {
           })
           .catch(err => {
             if (err.errorInfo.code === "auth/email-already-exists") {
-              res.status(501).json({ message: 'Already signin with this email', data: userInfo.email })
+              let tmpObj = { message: 'Already signin with this email', email: userInfo.email || userInfo.kaccount_email } 
+              console.log(tmpObj)
+              res.status(501).json(tmpObj)
             } else {
               next(err)
             }
@@ -153,18 +155,22 @@ exports.dbCreateWithIdtoken = (req, res, next) => {
           uuid: decoded.sub
         }
       })
-        .then(user => {
-          let uuid = user[0].dataValues.uuid
+        .spread((user, created) => {
+          if (!created) {
+            user.dataValues.exist = true
+            return res.send(user)
+          }
+          let uuid = user.dataValues.uuid
           fireHelper.admin.auth().updateUser(decoded.sub, {
             displayName: decoded.name,
             email: decoded.email
           })
             .then(result => {
-              res.send(user[0])
+              res.send(user)
             })
             .catch( err => {
               fireHelper.admin.auth().getUser(uuid)
-                .then( user => res.send(user) )
+                .then(resultUser => res.send(resultUser) )
                 .catch( error => next(error) )
             })
         })
@@ -188,9 +194,9 @@ exports.getList = (req, res, next) => {
 exports.getOne = (req, res, next) => {
   let tmp = {}
   model.User.findById(req.params.user_key, {paranoid: false})
-  .then(u => {
-    tmp = u
-    return fireHelper.admin.auth().getUser(u.uuid)
+    .then(u => {
+      tmp = u
+      return fireHelper.admin.auth().getUser(u.uuid)
   })
   .then(r => {
     tmp.email_valid = r.emailVerified
