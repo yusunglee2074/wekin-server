@@ -8,8 +8,7 @@ const controller = require('./controller')
 
 
 router.post('/withdraw-social', (req, res, next) => {
-  // 네이버, 다음 연결끊기
-  let socialToken = req.body.socialToken
+  let socialToken = JSON.parse(req.body.socialToken) || {}
   let uuid = req.body.uuid
   let optionForKakao = {
     url: 'https://kapi.kakao.com/v1/user/unlink',
@@ -18,10 +17,10 @@ router.post('/withdraw-social', (req, res, next) => {
     }
   }
   let optionForNaver = {
-    url: 'https://nid.naver.com/oauth2.0/token' + `?grant_type=delete&client_id=rTHYGlmyZuVKSzR4_45d&client_secret=5Wo2kSoe2R&access_token=${socialToken.access_token}`
+    url: 'https://nid.naver.com/oauth2.0/token' + `?grant_type=delete&client_id=rTHYGlmyZuVKSzR4_45d&client_secret=5Wo2kSoe2R&access_token=${socialToken.access_token}&service_provider=NAVER`
   }
-  request.post(optionForKakao, { form: { target_id_type: 'user_id', target_id: userId } }, (err, response, body) => {
-    if (body.id === uuid.slice(7, 100)) {
+  request.post(optionForKakao, (err, response, body) => {
+    if (JSON.parse(body).id == uuid.slice(6, 100)) {
       fireHelper.admin.auth().deleteUser(uuid)
         .then(() => {
           return model.User.destroy({
@@ -37,31 +36,42 @@ router.post('/withdraw-social', (req, res, next) => {
         })
         .catch(e => next(e))
     } else {
-      next('실패')
+      request.post(optionForNaver, (err, response, body) => {
+        if (JSON.parse(body).result == 'success') {
+          fireHelper.admin.auth().deleteUser(uuid)
+            .then(() => {
+              return model.User.destroy({
+                where: {
+                  uuid: uuid
+                },
+                returning: true
+              })
+            })
+            .then(user => {
+              if (user) res.send('success')
+              else throw new Error()
+            })
+            .catch(e => next(e))
+        } else {
+          // 페이스북 가입자
+          fireHelper.admin.auth().deleteUser(uuid)
+            .then(() => {
+              return model.User.destroy({
+                where: {
+                  uuid: uuid
+                },
+                returning: true
+              })
+            })
+            .then(user => {
+              if (user) res.send('success')
+              else throw new Error()
+            })
+            .catch(e => next(e))
+        }
+      })
     }
   })
-  request.post(optionForNaver, (err, response, body) => {
-    if (body.result === 'success') {
-      fireHelper.admin.auth().deleteUser(uuid)
-        .then(() => {
-          return model.User.destroy({
-            where: {
-              uuid: uuid
-            },
-            returning: true
-          })
-        })
-        .then(user => {
-          if (user) res.send('success')
-          else throw new Error()
-        })
-        .catch(e => next(e))
-    } else {
-      next('실패')
-    }
-  })
-  // 네이버, 다음 연결 끊기 끝---------
-  // 파이어베이스 삭제
 })
 
 /** @api {get} /user/ 전체 유저 
