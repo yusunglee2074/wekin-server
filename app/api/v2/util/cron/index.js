@@ -5,9 +5,8 @@ const service = require('./../service.js')
 const process = require('process')
 
 exports.batch = _ => {
-  // if (isProductionEnv()) {
-  if (!isProductionEnv()) {
-    console.log("헤헤")
+  if (isProductionEnv()) {
+  // if (!isProductionEnv()) {
     schedule.scheduleJob('38 * * * *', orderDelete)
     schedule.scheduleJob('38 * * * *', readyDelete)
     schedule.scheduleJob('38 * * * *', bookingDelete)
@@ -72,7 +71,7 @@ function sendSMSToMakerWhenStartDayOnPaidUserExist () {
       state: { $in : ['paid', 'ready'] },
       start_date: {
         $and: {
-          $lte: moment().add(1, 'day').set('hour', 23).set('minute', 59).set('second', 59).add(1, 'hour'),
+          $lte: moment().add(1, 'day').set('hour', 23).set('minute', 59).set('second', 59),
           $gte: moment().add(1, 'day').set('hour', 0).set('minute', 0).set('second', 0)
         }
       }
@@ -88,7 +87,6 @@ function sendSMSToMakerWhenStartDayOnPaidUserExist () {
           ? result[item.ActivityNew.Host.tel]['paidUsers'].push([item.User.name, item.User.phone, item.state]) 
           : result[item.ActivityNew.Host.tel] = { activityTitle: item.ActivityNew.title, activityKey: item.ActivityNew.activity_key, makerName: item.ActivityNew.Host.name, makerEmail: item.ActivityNew.Host.email, hostKey: item.ActivityNew.Host.host_key, paidUsers: [[item.User.name, item.User.phone, item.state]] }
       }
-      console.log(result, '리절틍')
       for (item in result) {
         let user = ''
         for (let i = 0; i < result[item].paidUsers.length; i++) {
