@@ -198,7 +198,7 @@ exports.postWekin = (req, res, next) => {
               } else {
                 let value = {}
                 value.final_price = data.finalPrice
-                value.start_date = moment(data.selectedDate).add.(9, 'hour')format()
+                value.start_date = moment(data.selectedDate).add(9, 'hour').format()
                 value.start_time = tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 5)),
                 value.select_option = cloneData
                 value.pay_amount = amount
