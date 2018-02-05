@@ -2,18 +2,27 @@ const schedule = require('node-schedule')
 const model = require('../../../../model')
 const moment = require('moment')
 const service = require('./../service.js')
+const process = require('process')
 
 exports.batch = _ => {
-  schedule.scheduleJob('1 38 * * * *', orderDelete)
-  schedule.scheduleJob('1 38 * * * *', readyDelete)
-  schedule.scheduleJob('1 38 * * * *', bookingDelete)
-  schedule.scheduleJob('1 38 * * * *', checkPointDueDate)
-  schedule.scheduleJob('1 1 19 * * *', checkActivityDueDate)
-  //schedule.scheduleJob('1 1 19 * * *', sendSMSToMakerWhenStartDayOnPaidUserExist)
-  schedule.scheduleJob('1 1 5 * * *', compressActivityStartDateList)
+  // if (isProductionEnv()) {
+  if (!isProductionEnv()) {
+    console.log("헤헤")
+    schedule.scheduleJob('38 * * * *', orderDelete)
+    schedule.scheduleJob('38 * * * *', readyDelete)
+    schedule.scheduleJob('38 * * * *', bookingDelete)
+    schedule.scheduleJob('38 * * * *', checkPointDueDate)
+    schedule.scheduleJob('1 19 * * *', checkActivityDueDate)
+    schedule.scheduleJob('49 15 * * *', sendSMSToMakerWhenStartDayOnPaidUserExist)
+    schedule.scheduleJob('0 3 * * *', compressActivityStartDateList)
+  }
 }
 
 
+function isProductionEnv () {
+  if (process.env.USER !== 'yusunglee') return true
+  else return false
+}
 
 function compressActivityStartDateList () {
   console.log("start_date_list 압축시작")
@@ -55,36 +64,38 @@ function compressActivityStartDateList () {
  *  WekinNew를 긁어서 paid인 경우 그리고 시작일이 내일인 경우를 찾아서 메이커에게 문자를 보내준다.
  *  sample = { 'makerTelephone' { maker: 'makerPhone', PaidList: [ ..... ] }, .... }
  */
+sendSMSToMakerWhenStartDayOnPaidUserExist()
 function sendSMSToMakerWhenStartDayOnPaidUserExist () {
   console.log("참가인원 명단 문자보내기")
   model.WekinNew.findAll({
     where: {
-      state: 'paid',
+      state: { $in : ['paid', 'ready'] },
       start_date: {
         $and: {
-          $lt: moment().set('hour', 23).set('minute', 59),
-          $gt: moment().set('hour', 0).set('minute', 1)
+          $lte: moment().add(1, 'day').set('hour', 23).set('minute', 59).set('second', 59).add(1, 'hour'),
+          $gte: moment().add(1, 'day').set('hour', 0).set('minute', 0).set('second', 0)
         }
       }
     },
-    include: [{ model: model.ActivityNew, include: [{ model: model.Host, attributes: ['tel', 'name', 'email'] }] }, { model: model.User }]
+    include: [{ model: model.ActivityNew, include: [{ model: model.Host, attributes: ['host_key', 'tel', 'name', 'email'] }] }, { model: model.User }]
   })
     .then(wekins => {
+      console.log(wekins)
       let result = {}
       for (let i = 0; i < wekins.length; i++) {
         let item = wekins[i]
-        // { 메이커명 : { makerTel: 메이커 폰번, makerEmail: 메이커 메일, paidUsers: [[유저명, 유저폰번], [유저명2, 유저폰번2]....] }
         result[item.ActivityNew.Host.tel] 
-          ? result[item.ActivityNew.Host.tel]['paidUsers'].push([item.User.name, item.User.phone]) 
-          : result[item.ActivityNew.Host.tel] = { activityTitle: item.ActivityNew.title, makerName: item.ActivityNew.Host.name, makerEmail: item.ActivityNew.Host.email, paidUsers: [[item.User.name, item.User.phone]] }
+          ? result[item.ActivityNew.Host.tel]['paidUsers'].push([item.User.name, item.User.phone, item.state]) 
+          : result[item.ActivityNew.Host.tel] = { activityTitle: item.ActivityNew.title, activityKey: item.ActivityNew.activity_key, makerName: item.ActivityNew.Host.name, makerEmail: item.ActivityNew.Host.email, hostKey: item.ActivityNew.Host.host_key, paidUsers: [[item.User.name, item.User.phone, item.state]] }
       }
+      console.log(result, '리절틍')
       for (item in result) {
         let user = ''
         for (let i = 0; i < result[item].paidUsers.length; i++) {
           let wekiner = result[item].paidUsers[i]
-          user = user + wekiner[0] + ' 님' + wekiner[1] + '\n'
+          user = user + wekiner[0] + ' 님' + (wekiner[2] === 'ready' ? '(무통장결제대기)' : '(결제완료)') + '\n' + wekiner[1] + '\n'
         }
-        let msg = `안녕하세요. ${ result[item].makerName }님 위킨입니다.\n [${ result[item].activityTitle }] 활동 내일 참여 위키너 명단입니다.\n특이사항 있으시면 유선전화나 카카오톡 @위킨으로 연락바랍니다.\n\n참여 위키너 목록\n${ user }\n감사합니다.`
+        let msg = `안녕하세요. ${ result[item].makerName }님 위킨입니다.\n [${ result[item].activityTitle }] 활동 내일 참여 위키너 명단입니다.\n참여 위키너 목록\n${ user }\n해당 위킨이 취소될 예정이라면 아래 주소로 접속해서 꼭 고객분들께 문자가 갈 수 있도록 부탁드립니다.! \n http://we-kin.com/ask-the-maker-to-process-or-not?host_key=${result[item].hostKey}&activityKey=${result[item].activityKey}&paidCount=${result[item].paidUsers.length}\n그 외 특이사항은 유선전화, 카카오톡 @위킨으로 연락바랍니다.\n감사합니다.`
         service.sendSms(item, msg, "[위킨] 참여자명단")
       }
     })
@@ -155,7 +166,7 @@ function orderDelete () {
     where: {
       status: 'order',
       order_at: {
-        $lt: moment().add(-30, 'minutes')
+        $lt: moment().add(-60, 'minutes')
       }
     }
   })
@@ -222,7 +233,7 @@ function bookingDelete() {
     where: {
       state: 'booking',
       updated_at: {
-        $lt: moment().add(8, 'hours')
+        $lt: moment().add(-1, 'hours')
       }
     }
   })
