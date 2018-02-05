@@ -63,7 +63,6 @@ function compressActivityStartDateList () {
  *  WekinNew를 긁어서 paid인 경우 그리고 시작일이 내일인 경우를 찾아서 메이커에게 문자를 보내준다.
  *  sample = { 'makerTelephone' { maker: 'makerPhone', PaidList: [ ..... ] }, .... }
  */
-sendSMSToMakerWhenStartDayOnPaidUserExist()
 function sendSMSToMakerWhenStartDayOnPaidUserExist () {
   console.log("참가인원 명단 문자보내기")
   model.WekinNew.findAll({
