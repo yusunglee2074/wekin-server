@@ -187,7 +187,7 @@ exports.postWekin = (req, res, next) => {
                   activity_key: data.activity_key,
                   user_key: req.user.user_key,
                   final_price: data.finalPrice,
-                  start_date: moment(data.selectedDate).format(),
+                  start_date: moment(data.selectedDate).add(9, 'hour').format(),
                   start_time: tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 5)),
                   select_option: cloneData,
                   pay_amount: amount,
@@ -198,7 +198,7 @@ exports.postWekin = (req, res, next) => {
               } else {
                 let value = {}
                 value.final_price = data.finalPrice
-                value.start_date = moment(data.selectedDate).format()
+                value.start_date = moment(data.selectedDate).add.(9, 'hour')format()
                 value.start_time = tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 5)),
                 value.select_option = cloneData
                 value.pay_amount = amount
@@ -253,7 +253,7 @@ exports.postWekin = (req, res, next) => {
                   activity_key: data.activity_key,
                   user_key: req.user.user_key,
                   final_price: data.finalPrice,
-                  start_date: moment(data.selectedDate),
+                  start_date: moment(data.selectedDate).add(9, 'hour').format(),
                   start_time: tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 5)),
                   select_option: cloneData,
                   pay_amount: amount,
@@ -264,7 +264,7 @@ exports.postWekin = (req, res, next) => {
               } else {
                 let value = {}
                 value.final_price = data.finalPrice
-                value.start_date = moment(data.selectedDate).format()
+                value.start_date = moment(data.selectedDate).add(9, 'hour').format()
                 value.start_time = tmpTime.set('hour', data.startTime[0].slice(0, 2)).set('minute', data.startTime[0].slice(3, 5)),
                 value.select_option = cloneData
                 value.pay_amount = amount
