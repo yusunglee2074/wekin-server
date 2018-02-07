@@ -5,7 +5,29 @@ const model = require('../../../model')
 
 const controller = require('./controller')
 const controllerf = require('./controllerf')
+const moment = require('moment')
 
+router.get('/get-paid-wekins/:activityKey', (req, res, next) => {
+  // hostKey, activityKey
+  model.WekinNew.findAll({ 
+    where: {
+      state: { $in : ['paid', 'ready'] },
+      start_date: {
+        $and: {
+          $lte: moment('2018-02-08').add(9, 'hour').add(1, 'day').set('hour', 23).set('minute', 59).set('second', 59),
+          $gte: moment('2018-02-08').add(9, 'hour').add(1, 'day').set('hour', 0).set('minute', 0).set('second', 0)
+        }
+      },
+      activity_key: req.params.activityKey
+    },
+    include: ['User']
+  })
+    .then(results => {
+      res.send(results)
+    })
+    .catch(err => next(err))
+
+})
 /** @api {get} /host/front 모든 호스트 조회
  * 
  * @apiName findAllHost 
@@ -589,7 +611,6 @@ router.put('/approve/:host_key', controller.approveHost)
 router.delete('/delete/:host_key', controller.deleteHost)
 
 router.get('/admin/get-hosts-with-all-orders', controllerf.getHostsWithAllOrders)
-
 
 
 
