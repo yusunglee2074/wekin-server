@@ -42,11 +42,9 @@ exports.importHook = (req, res, next) => {
           user_agent: dataForVerify.user_agent
         }
       }
-      if (dataForVerify.pay_method !== 'vbank') {
+      if (dataForVerify.status == 'paid') {
         orderModel.order_pay_price = dataForVerify.amount
-      } else {
-        orderModel.order_pay_price = 0
-      }
+      } 
       model.Order.update(orderModel, {
         where: { order_id: dataForVerify.merchant_uid },
         returning: true
