@@ -70,8 +70,8 @@ function sendSMSToMakerWhenStartDayOnPaidUserExist () {
       state: { $in : ['paid', 'ready'] },
       start_date: {
         $and: {
-          $lte: moment().add(9, 'hour').add(1, 'day').set('hour', 23).set('minute', 59).set('second', 59),
-          $gte: moment().add(9, 'hour').add(1, 'day').set('hour', 0).set('minute', 0).set('second', 0)
+          $lte: moment().add(1, 'day').set('hour', 23).set('minute', 59).set('second', 59),
+          $gte: moment().add(1, 'day').set('hour', 0).set('minute', 0).set('second', 0)
         }
       }
     },
