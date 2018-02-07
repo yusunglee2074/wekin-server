@@ -4,6 +4,7 @@ const returnMsg = require('../../../return.msg')
 const { Iamporter, IamporterError } = require('iamporter')
 const { utilService, userService, waitingService, notiService } = require('../service')
 const moment = require('moment')
+const service = require('./../util/service.js')
 const iamporter = new Iamporter({
   apiKey: '4401466536780514',
   secret: 'PDNJ0Cws2yDvdk5AXOp0nxu5kbKh70gWE3GEFc6ILKdY4iy26Y2uwwzQHk8PkoMYrsC7FJQqt3oxmXAs'
@@ -16,6 +17,29 @@ const { pageable } = require('../util/page')
 const TYPE_MAP = {
   refund: 0,
   order: 'order'
+}
+
+
+exports.cancelOrderAndRefundWithSms = (req, res, next) => {
+  let list = req.body.wekinKeysList
+  // 여기서 해야할 것, 오더 환불 요청 처리, 취소됬다는 sms 보내기
+  for (let i = 0; i < list.length; i++) {
+    model.WekinNew.update({ state: 'reqRef' }, { where: { wekin_key: list[i] }, returning: true })
+    .then(wekin => {
+      return wekin[1][0].getOrder()
+    })
+    .then(order => {
+      return order.update({ status: 'reqRef', order_ip: "makerCancel" }, { returning: true } )
+    })
+    .then(order => {
+      // 취소 문자 보내기
+      return service.sendSms(order.user_phone, `안녕하세요. 고객님! \n주식회사 위키너입니다. \n정말 죄송하지만 신청해주신 위킨${order.wekin_name}이 최소인원 미달로 인해 취소처리 되었습니다.ㅠ_ㅠ\n해당 결제금액 전액 영업일 기준 2~3일 내로 취소 처리 될 예정입니다.\n다시한번 죄송하다는 말씀과 함께 다른 문의사항 있으시면\n언제든지 카카오톡 @위킨 혹은 유선전화 031-211-0410으로 연락주시길 바랍니다. 감사합니다.`, '[위킨]메이커 취소처리')
+    })
+    .then(result => {
+      res.send('success')
+    })
+    .catch(error => next(error))
+  }
 }
 
 exports.getHostsInfo = (req, res, next) => {
