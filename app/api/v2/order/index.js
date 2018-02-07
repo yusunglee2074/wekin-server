@@ -4,6 +4,8 @@ const router = express.Router()
 
 const controller = require('./controller')
 
+
+router.put('/cancel-order-and-refund-with-sms', controller.cancelOrderAndRefundWithSms)
 /** @api {get} /order/host/:host_key/:year/:month 호스트 대시보드
  * @apiParam {Number} host_key 호스트 key
  * @apiParam {Number} month 조회 월 key
