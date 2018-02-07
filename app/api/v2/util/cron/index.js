@@ -70,8 +70,8 @@ function sendSMSToMakerWhenStartDayOnPaidUserExist () {
       state: { $in : ['paid', 'ready'] },
       start_date: {
         $and: {
-          $lte: moment().add(1, 'day').set('hour', 23).set('minute', 59).set('second', 59),
-          $gte: moment().add(1, 'day').set('hour', 0).set('minute', 0).set('second', 0)
+          $lte: moment().add(9, 'hour').add(1, 'day').set('hour', 23).set('minute', 59).set('second', 59),
+          $gte: moment().add(9, 'hour').add(1, 'day').set('hour', 0).set('minute', 0).set('second', 0)
         }
       }
     },
@@ -80,20 +80,21 @@ function sendSMSToMakerWhenStartDayOnPaidUserExist () {
     .then(wekins => {
       console.log(wekins)
       let result = {}
+      // 위킨들을 돌면서 엑티비티 별로 묶은 다음 해당 명단을 보낸다.
       for (let i = 0; i < wekins.length; i++) {
         let item = wekins[i]
-        result[item.ActivityNew.Host.tel] 
-          ? result[item.ActivityNew.Host.tel]['paidUsers'].push([item.User.name, item.User.phone, item.state]) 
-          : result[item.ActivityNew.Host.tel] = { activityTitle: item.ActivityNew.title, activityKey: item.ActivityNew.activity_key, makerName: item.ActivityNew.Host.name, makerEmail: item.ActivityNew.Host.email, hostKey: item.ActivityNew.Host.host_key, paidUsers: [[item.User.name, item.User.phone, item.state]] }
+        result[item.ActivityNew.activity_key] 
+          ? result[item.ActivityNew.activity_key]['paidUsers'].push([item.User.name, item.User.phone, item.state, moment(item.start_time).format('HH:mm')]) 
+          : result[item.ActivityNew.activity_key] = { activityTitle: item.ActivityNew.title, makerTel: item.ActivityNew.Host.tel, makerName: item.ActivityNew.Host.name, makerEmail: item.ActivityNew.Host.email, hostKey: item.ActivityNew.Host.host_key, paidUsers: [[item.User.name, item.User.phone, item.state, moment(item.start_time).format('HH:mm')]] }
       }
       for (item in result) {
         let user = ''
         for (let i = 0; i < result[item].paidUsers.length; i++) {
           let wekiner = result[item].paidUsers[i]
-          user = user + wekiner[0] + ' 님' + (wekiner[2] === 'ready' ? '(무통장결제대기)' : '(결제완료)') + '\n' + wekiner[1] + '\n'
+          user = user + wekiner[0] + ' 님' + (wekiner[2] === 'ready' ? '(무통장결제대기)' : '(결제완료)') + '\n' + wekiner[1] + ' ' + wekiner[3] + '\n'
         }
-        let msg = `안녕하세요. ${ result[item].makerName }님 위킨입니다.\n [${ result[item].activityTitle }] 활동 내일 참여 위키너 명단입니다.\n참여 위키너 목록\n${ user }\n해당 위킨이 취소될 예정이라면 아래 주소로 접속해서 꼭 고객분들께 문자가 갈 수 있도록 부탁드립니다.! \n http://we-kin.com/ask-the-maker-to-process-or-not?host_key=${result[item].hostKey}&activityKey=${result[item].activityKey}&paidCount=${result[item].paidUsers.length}\n그 외 특이사항은 유선전화, 카카오톡 @위킨으로 연락바랍니다.\n감사합니다.`
-        service.sendSms(item, msg, "[위킨] 참여자명단")
+        let msg = `안녕하세요. ${ result[item].makerName }님 주식회사 위킨입니다.\n [${ result[item].activityTitle }] 활동 내일 참여 위키너 명단입니다.\n참여 위키너 목록\n${ user }\n해당 위킨이 취소될 예정이라면 아래 주소로 접속해서 꼭 고객분들께 문자가 갈 수 있도록 부탁드립니다.! \n http://we-kin.com/ask-the-maker-to-process-or-not?host_key=${result[item].hostKey}&activityKey=${item}&paidCount=${result[item].paidUsers.length}\n그 외 특이사항은 유선전화, 카카오톡 @위킨으로 연락바랍니다.\n감사합니다.`
+        service.sendSms(result[item].makerTel, msg, "[위킨] 참여자명단")
       }
     })
 }
