@@ -12,7 +12,7 @@ exports.batch = _ => {
     schedule.scheduleJob('38 * * * *', bookingDelete)
     schedule.scheduleJob('38 * * * *', checkPointDueDate)
     schedule.scheduleJob('1 19 * * *', checkActivityDueDate)
-    schedule.scheduleJob('49 15 * * *', sendSMSToMakerWhenStartDayOnPaidUserExist)
+    schedule.scheduleJob('*/10 * * * *', sendSMSToMakerWhenStartDayOnPaidUserExist)
     schedule.scheduleJob('0 3 * * *', compressActivityStartDateList)
   }
 }
@@ -94,7 +94,9 @@ function sendSMSToMakerWhenStartDayOnPaidUserExist () {
           user = user + wekiner[0] + ' 님' + (wekiner[2] === 'ready' ? '(무통장결제대기)' : '(결제완료)') + '\n' + wekiner[1] + ' ' + wekiner[3] + '\n'
         }
         let msg = `안녕하세요. ${ result[item].makerName }님 주식회사 위킨입니다.\n [${ result[item].activityTitle }] 활동 내일 참여 위키너 명단입니다.\n참여 위키너 목록\n${ user }\n해당 위킨이 취소될 예정이라면 아래 주소로 접속해서 꼭 고객분들께 문자가 갈 수 있도록 부탁드립니다.! \n http://we-kin.com/ask-the-maker-to-process-or-not?host_key=${result[item].hostKey}&activityKey=${item}&paidCount=${result[item].paidUsers.length}\n그 외 특이사항은 유선전화, 카카오톡 @위킨으로 연락바랍니다.\n감사합니다.`
-        service.sendSms(result[item].makerTel, msg, "[위킨] 참여자명단")
+        if (result[item].makerTel == '01093666639') {
+          service.sendSms(result[item].makerTel, msg, "[위킨] 참여자명단")
+        }
       }
     })
 }
