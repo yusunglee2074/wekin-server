@@ -43,7 +43,7 @@ module.exports = function (sequelize, DataTypes) {
     price_before_discount: { type: DataTypes.INTEGER, allowNull: true },
     status_wetiful: { type: DataTypes.STRING, defaultValue: 'both' },
     is_it_end: { type: DataTypes.BOOLEAN, defaultValue: false },
-    point_rate: { type: DataTypes.JSONB, allowNull: true, defaultValue: { rate: 0, amount: 0 } },
+    point_rate: { type: DataTypes.JSONB, allowNull: true, defaultValue: { rate: 0, amount: 0, due_days: 30 } },
   }, {
     classMethods: {},
     tableName: 'activitynew',
