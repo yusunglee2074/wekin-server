@@ -54,7 +54,7 @@ router.get('/:type/:name', controller.getData)
 router.post('/:type/:name', controller.postData)
 
 
-router.get('/test', (res, req, next) => {
+router.get('/test', (req, res, next) => {
   var ip = req.connection.remoteAddress;
   let second = req.headers
   console.log('#########', req.ip, req.ips)
