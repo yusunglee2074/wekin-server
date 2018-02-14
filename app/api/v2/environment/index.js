@@ -53,7 +53,14 @@ router.get('/:type/:name', controller.getData)
  */
 router.post('/:type/:name', controller.postData)
 
+
+router.get('/test', (res, req, next) => {
+  var ip = req.connection.remoteAddress;
+  console.log("아이피############################", ip)
+})
+
 router.put('/:type/:name', controller.putData)
+
 
 /** @api {delete} /env/:type/:name/:key [어드민] enviroment 삭제
  * 
