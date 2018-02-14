@@ -230,6 +230,66 @@ router.get('/front/:user_key',
       })
   })
 
+router.tempCreatePoint = (req) => {
+  // 헤더에 있는 토큰으로 어드민 유저인지 판단 후 
+  model.User.findOne({ where: { user_key: req.body.user_key } })
+    .then(user => {
+      // 어드민 유저라면 날라오는 유저키를 이용해서 포인트 적립
+      // TODO: admin 유저인가? 판단해야함
+      return Model.sequelize.transaction( t => {
+        return model.Point.create({
+          user_key: req.body.user_key,
+          point_change: req.body.value,
+          due_date_be_written_days: moment(req.body.due_date),
+          type: req.body.type
+        }, { transaction: t })
+          .then(point => {
+            return Promise.all([point, model.User.findOne({
+              where: {
+                user_key: req.body.user_key,
+              },
+              transaction: t
+            })
+            ])
+          })
+          .then(result => {
+            if (req.body.type == 1) {
+              return result[1].updateAttributes({ "point.point_special": result[1].point.point_special + result[0].point_change }, { transaction: t } )
+            } else if (req.body.type == 0) {
+              return result[1].updateAttributes({ "point.point": result[1].point.point + result[0].point_change }, { transaction: t } )
+            } else {
+              throw new Error()
+            }
+          })
+          .then(result => {
+            if (req.body.type == 1) {
+              return model.Point.create({
+                user_key: req.body.user_key,
+                point_change: req.body.value,
+                due_date_be_written_days: moment(req.body.due_date),
+                type: 20
+              },
+                { transaction: t }
+              )
+            } else if (req.body.type == 0) {
+              return model.Point.create({
+                user_key: req.body.user_key,
+                point_change: req.body.value,
+                due_date_be_written_days: moment(req.body.due_date),
+                type: 10
+              },
+                { transaction: t }
+              )
+            } else {
+              throw new Error()
+            }
+          })
+      })
+    })
+    .then(result => { return 'success' })
+    .catch(err => console.log(err) )
+}
+
 /** @api {post} /point/front/use 포인트 사용
  * @apiParam {Number} value 포인트 변화량 양수음수
  * @apiParam {Number} type 타입(기업포인트, 일반포인트)
