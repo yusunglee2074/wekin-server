@@ -17,6 +17,7 @@ console.log(moment().format())
 
 
 app.set('port', port)
+app.set('trust_proxy', 1)
 
 app.listen(port, () => {
     console.log(`server start => port : ${port}`)

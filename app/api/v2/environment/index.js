@@ -56,7 +56,10 @@ router.post('/:type/:name', controller.postData)
 
 router.get('/test', (res, req, next) => {
   var ip = req.connection.remoteAddress;
-  console.log("아이피############################", ip)
+  let second = req.headers['x-appengine-user-ip']
+  console.log("############################", ip)
+  console.log("############################", second)
+
 })
 
 router.put('/:type/:name', controller.putData)
