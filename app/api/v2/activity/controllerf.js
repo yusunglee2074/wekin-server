@@ -500,8 +500,9 @@ exports.updateActivity = (req, res, next) => {
     start_date_list: requestData.start_date_list,
     status_wetiful: requestData.status_wetiful,
     detail_question: requestData.detail_question,
-    confirm_date: requestData.confirm_date
+    confirm_date: requestData.confirm_date,
   }
+  if (requestData.point_rate) activityModelData.point_rate = requestData.point_rate
   for (let i = 0; i < activityModelData.close_dates.length; i++) {
     let item = activityModelData.close_dates
     item[i] = Number(moment(item[i]).add(9, 'hour').format('YYMMDD'))
