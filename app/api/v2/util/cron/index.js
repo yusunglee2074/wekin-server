@@ -3,6 +3,7 @@ const model = require('../../../../model')
 const moment = require('moment')
 const service = require('./../service.js')
 const process = require('process')
+const point = require('./../../point')
 
 exports.batch = _ => {
   if (isProductionEnv()) {
@@ -14,6 +15,7 @@ exports.batch = _ => {
     schedule.scheduleJob('1 19 * * *', checkActivityDueDate)
     schedule.scheduleJob('1 10 * * *', sendSMSToMakerWhenStartDayOnPaidUserExist)
     schedule.scheduleJob('0 3 * * *', compressActivityStartDateList)
+    // schedule.scheduleJob('0 15 * * *', savePoint)
   }
 }
 
@@ -21,6 +23,38 @@ exports.batch = _ => {
 function isProductionEnv () {
   if (process.env.USER !== 'yusunglee') return true
   else return false
+}
+
+function savePoint () {
+  console.log("포인트 적립 시작")
+  model.Order.findAll({
+    where: {
+      status: 'paid',
+    },
+    include: [{ 
+      model: model.WekinNew,
+      include: ['ActivityNew', 'User'],
+      require: true,
+      where: { 
+        start_date: { 
+          $and: {
+            $lte: moment().add(-1, 'day').set('hour', 23).set('minute', 59).set('second', 59),
+            $gte: moment().add(-1, 'day').set('hour', 0).set('minute', 0).set('second', 0)
+          }
+        }
+      }
+    }]
+  })
+  .then(orders => {
+    for (let i = 0; i < orders.length; i++) {
+      // 포인트 적립해주면 된다.
+    }
+  })
+  .catch(error => {
+    console.log(error)
+    console.log('에러')
+    console.log("#################################실패")
+  })
 }
 
 function compressActivityStartDateList () {
