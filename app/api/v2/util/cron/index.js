@@ -38,8 +38,8 @@ function savePoint () {
       where: { 
         start_date: { 
           $and: {
-            $lte: moment().add(-1, 'day').set('hour', 23).set('minute', 59).set('second', 59),
-            $gte: moment().add(-1, 'day').set('hour', 0).set('minute', 0).set('second', 0)
+            $lte: moment().set('hour', 23).set('minute', 59).set('second', 59),
+            $gte: moment().set('hour', 0).set('minute', 0).set('second', 0)
           }
         }
       }
@@ -48,6 +48,24 @@ function savePoint () {
   .then(orders => {
     for (let i = 0; i < orders.length; i++) {
       // 포인트 적립해주면 된다.
+      let value
+      let pointRate = orders[i].WekinNew.ActivityNew.point_rate
+      if (pointRate.rate === 0 && pointRate.amount === 0) {
+        continue
+      }
+      if (orders[i].WekinNew.ActivityNew.point_rate === 0) {
+        value = pointRate.amount
+      } else {
+        value = 0.01 * pointRate.rate * orders[i].order_receip_price
+      }
+      point.tempCreatePoint({
+        body: { 
+          user_key: orders[i].WekinNew.User.user_key,
+          type: '0', 
+          value: value, 
+          due_date: moment().add(orders[i].WekinNew.ActivityNew.point_rate.due_days, 'day').format() 
+        }
+      })
     }
   })
   .catch(error => {
@@ -56,6 +74,7 @@ function savePoint () {
     console.log("#################################실패")
   })
 }
+
 
 function compressActivityStartDateList () {
   console.log("start_date_list 압축시작")
