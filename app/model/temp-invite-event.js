@@ -8,7 +8,7 @@ module.exports = function (sequelize, DataTypes) {
     type: { type: DataTypes.TEXT, allowNull: false },
     ip: { type: DataTypes.TEXT, allowNull: true },
     status: { type: DataTypes.TEXT, allowNull: true },
-    be_invited_user_key: { type: DataTypes.INTEGER, allowNull: true },
+    be_invited_user_key: { type: DataTypes.INTEGER, allowNull: true, unique: true },
     value: { type: DataTypes.TEXT, allowNull: true },
   }, {
     tableName: 'event',

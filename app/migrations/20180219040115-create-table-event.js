@@ -11,7 +11,7 @@ module.exports = {
         type: { type: Sequelize.TEXT, allowNull: false },
         ip: { type: Sequelize.TEXT, allowNull: true },
         status: { type: Sequelize.TEXT, allowNull: true },
-        be_invited_user_key: { type: Sequelize.INTEGER, allowNull: true },
+        be_invited_user_key: { type: Sequelize.INTEGER, allowNull: true, unique: true },
         value: { type: Sequelize.TEXT, allowNull: true },
         created_at: { type: Sequelize.DATE },
         updated_at: { type: Sequelize.DATE },
