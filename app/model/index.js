@@ -53,6 +53,7 @@ var db = {
   ActivityNew: sequelize.import(path.join(__dirname, 'activity-new.js')),
   WekinNew: sequelize.import(path.join(__dirname, 'wekin-new.js')),
   News: sequelize.import(path.join(__dirname, 'news.js')),
+  News: sequelize.import(path.join(__dirname, 'temp-invite-event.js')),
 }
 
 fs.readdirSync(__dirname)
