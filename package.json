@@ -19,6 +19,7 @@
     "express-validator": "^3.2.0",
     "firebase": "^4.7.0",
     "firebase-admin": "^5.5.1",
+    "goo.gl": "^0.1.4",
     "googleapis": "^20.2.0",
     "iamporter": "^1.4.2",
     "json2xls": "^0.1.2",
