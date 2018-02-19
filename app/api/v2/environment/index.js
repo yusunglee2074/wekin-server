@@ -54,13 +54,14 @@ router.get('/:type/:name', controller.getData)
 router.post('/:type/:name', controller.postData)
 
 
-router.get('/test', (req, res, next) => {
-  var ip = req.connection.remoteAddress;
-  let second = req.headers
-  console.log('#########', req.ip, req.ips)
-  console.log("############################", ip)
-  console.log("############################", second)
-
+router.get('/client-ip', (req, res, next) => {
+  if (process.env.USER !== 'yusunglee') {
+    let ip = req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'][0] : '아이피 확인불가'
+    res.send(ip)
+  } else {
+    var ip = req.connection.remoteAddress;
+    res.send(ip.slice(7, 90))
+  }
 })
 
 router.put('/:type/:name', controller.putData)
