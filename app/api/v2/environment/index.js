@@ -55,11 +55,12 @@ router.post('/:type/:name', controller.postData)
 
 
 router.get('/client-ip', (req, res, next) => {
-  if (process.env.USER !== 'yusunglee') {
-    let ip = req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'][0] : '아이피 확인불가'
+  console.log(req.headers, req.connection.remoteAddress, '###')
+  let ip = req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'][0] : '아이피 확인불가'
+  if (ip.length > 10) {
     res.send(ip)
   } else {
-    var ip = req.connection.remoteAddress;
+    ip = req.connection.remoteAddress;
     res.send(ip.slice(7, 90))
   }
 })
