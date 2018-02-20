@@ -54,10 +54,10 @@ function currentItem() {
       giftCard: 10,
       americano: 201
     }
-    model.Event.count({ where: { value: americano } })
+    model.Event.count({ where: { value: 'americano' } })
       .then(ame => {
         item.americano -= ame
-        return model.Event.count({ where: { value: giftCard } })
+        return model.Event.count({ where: { value: 'giftCard' } })
       })
       .then(giftCard => {
         item.giftCard -= giftCard
@@ -147,6 +147,7 @@ router.put('/set-item', function (req, res, next) {
   let userData
   getUser(req.body.user_key)
   .then(user => {
+    if (moment(user.created_at) < moment().add(-7, 'days')) throw Error(JSON.stringify({ msg: 'This user is not Fresh user', data: '' }))
     userData = user
     return currentItem()
   })
@@ -155,19 +156,26 @@ router.put('/set-item', function (req, res, next) {
     if (Math.floor((Math.random() * 1000) + 1) === 1) item.giftCard !== 0 ? value = 'giftCard' : value = 'nope'
     else if (Math.floor((Math.random() * 1000) + 1) < 22) item.americano !== 0 ? value = 'americano' : value = 'nope'
     else value = 'nope'
-    return model.Event.update({
-      value: value
-    }, {
-      where: {
-        be_invited_user_key: user_key
-      },
-      returning: true
-    })
+    return model.Event.findOne({ where: { be_invited_user_key: req.body.user_key } })
   })
   .then(result => {
-    res.json(result[0].dataValues)
+    if (result) {
+      throw Error(JSON.stringify({ msg: 'Already receive this item.', data: result.value }))
+    } else {
+      return model.Event.update({
+        value: value
+      }, {
+        where: {
+          be_invited_user_key: req.body.user_key
+        },
+        returning: true
+      })
+    }
   })
-  .catch(e => next(e))
+    .then(result => {
+      res.json(result[0].dataValues.value)
+    })
+    .catch(e => next(e))
 })
 
 router.get('/ranking', function (req, res, next) {
