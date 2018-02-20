@@ -159,7 +159,7 @@ router.put('/set-item', function (req, res, next) {
       throw Error(JSON.stringify({ msg: 'Already receive this item.', data: result.value }))
     } else {
       return model.Event.update({
-        value: value
+        value: result.value
       }, {
         where: {
           be_invited_user_key: req.body.user_key
