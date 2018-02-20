@@ -39,13 +39,9 @@ function getUser(key) {
 }
 
 function getIp(req) {
-  if (process.env.USER !== 'yusunglee') {
-    let ip = req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'][0] : '아이피 확인불가'
-    return ip
-  } else {
-    var ip = req.connection.remoteAddress;
-    return ip.slice(7, 90)
-  }
+  let ip = req.headers['x-forwarded-for']
+  ip = ip.slice(0, ip.indexOf(','))
+  return ip
 }
 
 function currentItem() {
