@@ -71,12 +71,11 @@ router.post('/url',
   function (req, res, next) {
     let body = req.body
     let userData
-    console.log(body)
     getUser(body.user_key)
     .then(user => {
       if (user === null) throw Error('user doesn\'t exist')
       userData = user
-      return googl.shorten('http://we-kin.com/event/landing/' + user.user_key)
+      return googl.shorten('http://we-kin.com/event/share/invite-friend/' + user.user_key)
     })
     .then(shortUrl => {
       return model.Event.findOrCreate({ 
@@ -172,15 +171,29 @@ router.put('/set-item', function (req, res, next) {
 })
 
 router.get('/ranking', function (req, res, next) {
+  let ranking 
   model.Event.findAll({
     where: {
       type: 'log'
     },
     attributes: [[sequelize.fn('count', sequelize.col('event_key')), 'count'], 'url_user_key'],
-    group: ["url_user_key", "event_key"]
+    group: ["url_user_key"],
+    order: ['count']
   })
   .then(result => {
-    res.json(result)
+    ranking = result
+    let tempList = []
+    for (let i = 0; i < result.length; i++) {
+      let item = result[i]
+      tempList.push(model.User.findOne({ where: { user_key: item.url_user_key }, attributes: ['email'] }))
+    }
+    return Promise.all(tempList)
+  })
+  .then(results => {
+    for (let i = 0; i < results.length; i++) {
+      ranking[i].dataValues['email'] = results[i].email
+    }
+    res.json(ranking)
   })
   .catch(e => next(e))
 })
