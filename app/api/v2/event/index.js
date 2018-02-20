@@ -39,9 +39,13 @@ function getUser(key) {
 }
 
 function getIp(req) {
-  let ip = req.headers['x-forwarded-for']
-  ip = ip.slice(0, ip.indexOf(','))
-  return ip
+  if (process.env.USER !== 'yusunglee') {
+    let ip = req.headers['x-forwarded-for']
+    ip = ip.slice(0, ip.indexOf(','))
+    return ip
+  } else {
+    return '192.168.0.0'
+  }
 }
 
 function currentItem() {
@@ -134,7 +138,11 @@ router.put('/join', function (req, res, next) {
         })
     })
     .then(result => {
-      res.json(result[0].dataValues)
+      if (result) {
+        res.json(result[1][0].dataValues)
+      } else {
+        res.send('not be invited user')
+      }
     })
     .catch(e => next(e))
 })
@@ -179,7 +187,11 @@ router.put('/set-item', function (req, res, next) {
     }
   })
     .then(result => {
-      res.json(result.value)
+      if (result[1]) {
+        res.json(result[1][0])
+      } else {
+        res.json(result)
+      }
     })
     .catch(e => next(e))
 })
@@ -188,7 +200,8 @@ router.get('/ranking', function (req, res, next) {
   let ranking 
   model.Event.findAll({
     where: {
-      type: 'log'
+      type: 'log',
+      status: 'joined'
     },
     attributes: [[sequelize.fn('count', sequelize.col('event_key')), 'count'], 'url_user_key'],
     group: ["url_user_key"],
