@@ -141,6 +141,8 @@ router.put('/join', function (req, res, next) {
 
 router.put('/set-item', function (req, res, next) {
   let userData
+  let value
+  let ip = getIp(req)
   getUser(req.body.user_key)
   .then(user => {
     if (moment(user.created_at) < moment().add(-7, 'days')) throw Error(JSON.stringify({ msg: 'This user is not Fresh user', data: '' }))
@@ -148,28 +150,36 @@ router.put('/set-item', function (req, res, next) {
     return currentItem()
   })
   .then(item => {
-    let value
     if (Math.floor((Math.random() * 1000) + 1) === 1) item.giftCard !== 0 ? value = 'giftCard' : value = 'nope'
     else if (Math.floor((Math.random() * 1000) + 1) < 22) item.americano !== 0 ? value = 'americano' : value = 'nope'
     else value = 'nope'
-    return model.Event.findOne({ where: { be_invited_user_key: req.body.user_key } })
+    return model.Event.findOne({ where: { ip: ip } })
   })
   .then(result => {
     if (result) {
-      throw Error(JSON.stringify({ msg: 'Already receive this item.', data: result.value }))
+      if (result.value !== null) {
+        throw Error(JSON.stringify({ msg: 'Already receive this item.', data: result.value }))
+      } else {
+        return model.Event.update({
+          value: value
+        }, {
+          where: {
+            be_invited_user_key: req.body.user_key
+          },
+          returning: true
+        })
+      }
     } else {
-      return model.Event.update({
-        value: result.value
-      }, {
-        where: {
-          be_invited_user_key: req.body.user_key
-        },
-        returning: true
+      return model.Event.create({
+        value: value,
+        type: 'newUser',
+        ip: ip,
+        status: 'joined'
       })
     }
   })
     .then(result => {
-      res.json(result[0].dataValues.value)
+      res.json(result.value)
     })
     .catch(e => next(e))
 })
