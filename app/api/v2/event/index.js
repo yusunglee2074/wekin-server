@@ -7,6 +7,7 @@ const moment = require('moment')
 const Model = require('./../../../model')
 const googl = require('goo.gl')
 googl.setKey('AIzaSyDhLTs-_169xWGtXO4gIheQf_Jdqejco_c')
+const point = require('./../point')
 
 const router = express.Router()
 
@@ -149,48 +150,69 @@ router.put('/join', function (req, res, next) {
 
 router.put('/set-item', function (req, res, next) {
   let userData
+  let url_user_key
   let value
   let ip = getIp(req)
   getUser(req.body.user_key)
-  .then(user => {
-    if (moment(user.created_at) < moment().add(-7, 'days')) throw Error(JSON.stringify({ msg: 'This user is not Fresh user', data: '' }))
-    userData = user
-    return currentItem()
-  })
-  .then(item => {
-    if (Math.floor((Math.random() * 1000) + 1) === 1) item.giftCard !== 0 ? value = 'giftCard' : value = 'nope'
-    else if (Math.floor((Math.random() * 1000) + 1) < 22) item.americano !== 0 ? value = 'americano' : value = 'nope'
-    else value = 'nope'
-    return model.Event.findOne({ where: { ip: ip } })
-  })
-  .then(result => {
-    if (result) {
-      if (result.value !== null) {
-        throw Error(JSON.stringify({ msg: 'Already receive this item.', data: result.value }))
+    .then(user => {
+      if (moment(user.created_at) < moment().add(-7, 'days')) throw Error(JSON.stringify({ msg: 'This user is not Fresh user', data: '' }))
+      userData = user
+      return currentItem()
+    })
+    .then(item => {
+      if (Math.floor((Math.random() * 1000) + 1) === 1) item.giftCard !== 0 ? value = 'giftCard' : value = 'nope'
+      else if (Math.floor((Math.random() * 1000) + 1) < 22) item.americano !== 0 ? value = 'americano' : value = 'nope'
+      else value = 'nope'
+      return model.Event.findOne({ where: { ip: ip } })
+    })
+    .then(result => {
+      if (result) {
+        url_user_key = result.url_user_key
+        if (result.value !== null) {
+          throw Error(JSON.stringify({ msg: 'Already receive this item.', data: result.value }))
+        } else {
+          return model.Event.update({
+            value: value
+          }, {
+            where: {
+              be_invited_user_key: req.body.user_key
+            },
+            returning: true
+          })
+        }
       } else {
-        return model.Event.update({
-          value: value
-        }, {
-          where: {
-            be_invited_user_key: req.body.user_key
-          },
-          returning: true
+        return model.Event.create({
+          value: value,
+          type: 'newUser',
+          ip: ip,
+          status: 'joined'
         })
       }
-    } else {
-      return model.Event.create({
-        value: value,
-        type: 'newUser',
-        ip: ip,
-        status: 'joined'
-      })
-    }
-  })
+    })
     .then(result => {
       if (result[1]) {
         res.json(result[1][0])
       } else {
         res.json(result)
+      }
+      // 가입한 사용자에게 모두 1만 포인트 지급, 추천해준 친구에게는 2000포인트 지급
+      point.tempCreatePoint({
+        body: {
+          user_key: req.body.user_key,
+          type: '0',
+          value: 10000,
+          due_date: moment('2018-03-31').format()
+        }
+      })
+      if (url_user_key) {
+        point.tempCreatePoint({
+          body: {
+            user_key: url_user_key,
+            type: '0',
+            value: 2000,
+            due_date: moment('2018-03-31').format()
+          }
+        })
       }
     })
     .catch(e => next(e))
