@@ -248,9 +248,14 @@ router.get('/ranking', function (req, res, next) {
 })
 
 router.get('/count-user', function (req, res, next) {
-  model.Event.count({ where: { type: 'log', status: 'joined' } })
+  let temp = 0
+  model.Env.findOne({ where: { env_key: 1 } })
     .then(result => {
-      res.send(String(result))
+      temp += JSON.parse(result.description).eventSum
+      return model.Event.count({ where: { type: 'log', status: 'joined' } })
+    })
+    .then(result => {
+      res.send(String(result + temp))
     })
     .catch(e => next(e))
 })
