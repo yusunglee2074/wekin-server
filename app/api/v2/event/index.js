@@ -227,7 +227,7 @@ router.get('/ranking', function (req, res, next) {
     },
     attributes: [[sequelize.fn('count', sequelize.col('event_key')), 'count'], 'url_user_key'],
     group: ["url_user_key"],
-    order: ['count']
+    order: [['count', 'desc']]
   })
   .then(result => {
     ranking = result
