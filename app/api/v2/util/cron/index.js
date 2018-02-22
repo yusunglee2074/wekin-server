@@ -15,7 +15,7 @@ exports.batch = _ => {
     schedule.scheduleJob('1 19 * * *', checkActivityDueDate)
     schedule.scheduleJob('1 10 * * *', sendSMSToMakerWhenStartDayOnPaidUserExist)
     schedule.scheduleJob('0 3 * * *', compressActivityStartDateList)
-    kchedule.scheduleJob('0 15 * * *', savePoint)
+    schedule.scheduleJob('0 15 * * *', savePoint)
   }
 }
 
