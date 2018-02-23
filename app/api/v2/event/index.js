@@ -255,7 +255,7 @@ router.get('/count-user', function (req, res, next) {
   model.Env.findOne({ where: { env_key: 1 } })
     .then(result => {
       temp += JSON.parse(result.description).eventSum
-      return model.Event.count({ where: { type: 'log', status: 'joined' } })
+      return model.User.count({ where: { created_at: { $gt: moment('2018-02-21').format() } } })
     })
     .then(result => {
       res.send(String(result + temp))
