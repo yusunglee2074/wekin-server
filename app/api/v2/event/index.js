@@ -185,7 +185,8 @@ router.put('/set-item', function (req, res, next) {
           value: value,
           type: 'newUser',
           ip: ip,
-          status: 'joined'
+          status: 'joined',
+          be_invited_user_key: req.body.user_key
         })
       }
     })
@@ -196,23 +197,25 @@ router.put('/set-item', function (req, res, next) {
         res.json(result)
       }
       // 가입한 사용자에게 모두 1만 포인트 지급, 추천해준 친구에게는 2000포인트 지급
-      point.tempCreatePoint({
-        body: {
-          user_key: req.body.user_key,
-          type: '0',
-          value: 10000,
-          due_date: moment('2018-03-31').format()
-        }
-      })
-      if (url_user_key) {
+      if (userData.point.point !== 0) {
         point.tempCreatePoint({
           body: {
-            user_key: url_user_key,
+            user_key: req.body.user_key,
             type: '0',
-            value: 2000,
+            value: 10000,
             due_date: moment('2018-03-31').format()
           }
         })
+        if (url_user_key) {
+          point.tempCreatePoint({
+            body: {
+              user_key: url_user_key,
+              type: '0',
+              value: 2000,
+              due_date: moment('2018-03-31').format()
+            }
+          })
+        }
       }
     })
     .catch(e => next(e))
