@@ -197,7 +197,7 @@ router.put('/set-item', function (req, res, next) {
         res.json(result)
       }
       // 가입한 사용자에게 모두 1만 포인트 지급, 추천해준 친구에게는 2000포인트 지급
-      if (userData.point.point !== 0) {
+      if (userData.point.point === 0) {
         point.tempCreatePoint({
           body: {
             user_key: req.body.user_key,
