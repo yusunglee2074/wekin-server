@@ -221,6 +221,29 @@ router.put('/set-item', function (req, res, next) {
     .catch(e => next(e))
 })
 
+router.get('/admin', function (req, res, next) {
+  let eventList = []
+  model.Event.findAll({
+    where: {
+      value: {
+        $in: ['americano', 'giftCard']
+      }
+    },
+  })
+    .then(result => {
+      eventList = result
+      let promiseList = []
+      for (let i = 0; i < result.length; i++) {
+        promiseList.push(model.User.findOne({ where: { user_key: result[i].be_invited_user_key } }))
+      }
+      return Promise.all(promiseList)
+    })
+    .then(result => {
+      res.json({ event: eventList, user: result })
+    })
+    .catch(e => next(e))
+})
+
 router.get('/ranking', function (req, res, next) {
   let ranking 
   model.Event.findAll({
