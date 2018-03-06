@@ -255,7 +255,7 @@ exports.createUser = (req, res, next) => {
           phone: user.phoneNumber,
           phone_valid: true,
           name: r.displayName,
-          profile_image: r.photoURL || user.photo || '/static/images/default-profile.png',
+          profile_image: r.photoURL || user.photo || (user.gender === 0 ? '/static/images/default-profile.png' : '/static/images/default-profile2.png'),
           uuid: r.uid,
           country: user.country || 'Korea'
         }
