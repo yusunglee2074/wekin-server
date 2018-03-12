@@ -399,7 +399,7 @@ exports.putFrontUserInfo = (req, res, next) => {
       email_noti: user.email_noti,
       push_noti: user.push_noti,
       phone: user.phone,
-      phone_valid: user.phone_valid || nulll,
+      phone_valid: user.phone_valid || null,
       sms_noti: user.sms_noti,
       email_valid: user.email_valid || null
     }
