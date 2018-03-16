@@ -185,44 +185,49 @@ exports.putOrder = (req, res, next) => {
  * 예약취소 요청
  */
 exports.setOrderRefundRequest = (req, res, next) => {
-  model.Order.update({
-    status: 'reqRef'
-  }, {
-    where: {
-      order_key: req.params.order_key
-    },
-    returning: true
-  })
-    .then(r => { 
-      utilService.sendOrderCancellRequest(r[1][0])
-      return model.WekinNew.update({ state: 'reqRef' }, { where: { wekin_key: r[1][0].wekin_key }, returning: true })
+  model.Order.findOne({ where: req.paramsorder_key })
+  .then(tempOrder => {
+    if (tempOrder.host_key == 16) throw Error("Not allow to refund with this maker")
+    model.Order.update({
+      status: 'reqRef'
+    }, {
+      where: {
+        order_key: req.params.order_key
+      },
+      returning: true
     })
-    .then(wekin => {
-      let userName, start_date, ActivityName, hostTel, hostName
-      start_date = moment(wekin[1][0].start_date).add(9, 'hour').format('YYYY-MM-DD')
-      model.User.findOne({ 
-        where: {
-          user_key: wekin[1][0].user_key
-        } 
+      .then(r => { 
+        utilService.sendOrderCancellRequest(r[1][0])
+        return model.WekinNew.update({ state: 'reqRef' }, { where: { wekin_key: r[1][0].wekin_key }, returning: true })
       })
-        .then(user => {
-          userName = user.name
-          return model.ActivityNew.findOne({ where: { activity_key: wekin[1][0].activity_key }, include: [{ model: model.Host }] })
+      .then(wekin => {
+        let userName, start_date, ActivityName, hostTel, hostName
+        start_date = moment(wekin[1][0].start_date).add(9, 'hour').format('YYYY-MM-DD')
+        model.User.findOne({ 
+          where: {
+            user_key: wekin[1][0].user_key
+          } 
         })
-        .then(activity => {
-          ActivityName = activity.title
-          hostTel = activity.Host.tel
-          hostName = activity.Host.name
-          return utilService.sendOrderCancellRequestToHost(userName, start_date, ActivityName, hostTel, hostName)
-        })
-        .then(result => {
-          returnMsg.success200RetObj(res, result)
-        })
-        .catch(error => next(error))
-    })
-    .catch(e => {
-      next(e)
-    })
+          .then(user => {
+            userName = user.name
+            return model.ActivityNew.findOne({ where: { activity_key: wekin[1][0].activity_key }, include: [{ model: model.Host }] })
+          })
+          .then(activity => {
+            ActivityName = activity.title
+            hostTel = activity.Host.tel
+            hostName = activity.Host.name
+            return utilService.sendOrderCancellRequestToHost(userName, start_date, ActivityName, hostTel, hostName)
+          })
+          .then(result => {
+            returnMsg.success200RetObj(res, result)
+          })
+          .catch(error => next(error))
+      })
+      .catch(e => {
+        next(e)
+      })
+  })
+  .catch(next)
 }
 
 
